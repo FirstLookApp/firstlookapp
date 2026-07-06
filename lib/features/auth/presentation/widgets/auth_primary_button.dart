@@ -19,16 +19,41 @@ class AuthPrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final ButtonStyle style = ButtonStyle(
       minimumSize: const WidgetStatePropertyAll<Size>(Size.fromHeight(56)),
-      elevation: WidgetStatePropertyAll<double>(outlined ? 0 : 8),
+      elevation: WidgetStateProperty.resolveWith<double>(
+        (Set<WidgetState> states) =>
+            states.contains(WidgetState.disabled) || outlined ? 0 : 8,
+      ),
       shadowColor: const WidgetStatePropertyAll<Color>(Color(0x33FF315F)),
-      backgroundColor: WidgetStatePropertyAll<Color>(
-        outlined ? Colors.white : AppColors.primary,
+      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
+            return outlined ? Colors.white : const Color(0xFFE9E9EE);
+          }
+
+          return outlined ? Colors.white : AppColors.primary;
+        },
       ),
-      foregroundColor: WidgetStatePropertyAll<Color>(
-        outlined ? AppColors.primary : Colors.white,
+      foregroundColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.disabled)) {
+            return AppColors.textMuted;
+          }
+
+          return outlined ? AppColors.primary : Colors.white;
+        },
       ),
-      side: WidgetStatePropertyAll<BorderSide>(
-        outlined ? const BorderSide(color: AppColors.primary) : BorderSide.none,
+      side: WidgetStateProperty.resolveWith<BorderSide>(
+        (Set<WidgetState> states) {
+          if (!outlined) {
+            return BorderSide.none;
+          }
+
+          return BorderSide(
+            color: states.contains(WidgetState.disabled)
+                ? AppColors.border
+                : AppColors.primary,
+          );
+        },
       ),
       shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

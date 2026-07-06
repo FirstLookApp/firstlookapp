@@ -78,10 +78,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authPasswordLabel => 'ŞİFRE';
 
   @override
+  String get authNewPasswordLabel => 'YENİ ŞİFRE';
+
+  @override
   String get authPasswordConfirmationLabel => 'ŞİFRENİZİ ONAYLAYIN';
 
   @override
   String get authFullNameLabel => 'ADINIZ SOYADINIZ';
+
+  @override
+  String get authOtpLabel => 'DOĞRULAMA KODU';
+
+  @override
+  String get authOtpHint => '6 haneli kod';
 
   @override
   String get authRegisterCta => 'KAYIT OL';
@@ -121,6 +130,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get favoritesTitle => 'Begeniler';
+
+  @override
+  String get favoritesEmptyMessage => 'Henüz hiçbir uygulamayı beğenmediniz.';
 
   @override
   String get profileTitle => 'Profil';
@@ -192,7 +204,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get discoverTitle => 'Bu Hafta: Mobil Oyunlar';
 
   @override
+  String get testDiscoverTitle => 'Test Ürünlerini Keşfet';
+
+  @override
   String get discoverSubtitle => 'Kesfet';
+
+  @override
+  String get discoverBannerTimer => 'Bitişe 3 gün';
+
+  @override
+  String get discoverWeekBadge => '23. HAFTA';
+
+  @override
+  String get discoverReviewButton => 'İncele';
 
   @override
   String get dropTab => 'Drop';
@@ -222,39 +246,60 @@ class AppLocalizationsTr extends AppLocalizations {
   String get detailJoinBeta => 'Betaya katil';
 
   @override
+  String get betaAccessRequestButton => 'Erişim İste';
+
+  @override
   String get commentHint => 'Yorum yaz';
 
   @override
   String get commentSend => 'Gonder';
 
   @override
-  String get favoritesMissingEndpointTitle => 'Begendiklerim';
-
-  @override
-  String get favoritesMissingEndpointBody =>
-      'TODO: API henuz begenilen uygulamalar endpoint\'i sunmuyor.';
-
-  @override
   String get notificationsTitle => 'Bildirimler';
 
   @override
-  String get notificationsMissingEndpointBody =>
-      'TODO: API henuz mobil bildirim endpoint\'i sunmuyor.';
+  String get notificationsEmptyMessage => 'Henüz bildiriminiz yok.';
 
   @override
   String get notificationUnread => 'Yeni';
 
   @override
+  String get submitSubtitle =>
+      'Dünyaya yeni bir dijital deneyim sunmaya hazır mısın? Detayları doldur ve keşfedilmeye başla.';
+
+  @override
   String get submitName => 'Uygulama adi';
+
+  @override
+  String get submitNameLabel => 'UYGULAMA ADI';
+
+  @override
+  String get submitNameHint => 'Örn: SuperApp';
 
   @override
   String get submitCategory => 'Kategori';
 
   @override
+  String get submitCategoryGame => 'Oyun';
+
+  @override
+  String get submitCategoryFinance => 'Finans';
+
+  @override
+  String get submitCategoryEducation => 'Eğitim';
+
+  @override
   String get submitDescription => 'Aciklama';
 
   @override
+  String get submitDescriptionHint =>
+      'Uygulamanın sunduğu temel değerler nelerdir?';
+
+  @override
   String get submitVideoUrl => 'Video URL';
+
+  @override
+  String get submitVideoUrlHint => 'https://youtube.com/...';
 
   @override
   String get submitAppStoreUrl => 'App Store URL';
@@ -266,8 +311,32 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitDestination => 'Hedef';
 
   @override
-  String get submitScreenshotsTodo =>
-      'TODO: ekran goruntusu secimi ve multipart upload API sekline baglanacak.';
+  String get submitScreenshotsLabel => 'EKRAN GÖRÜNTÜLERİ (MAKS. 5)';
+
+  @override
+  String get submitPickScreenshots => 'Görsel seç';
+
+  @override
+  String get submitPlatform => 'PLATFORM';
+
+  @override
+  String get submitStoreLinks => 'MAĞAZA LİNKLERİ';
+
+  @override
+  String get submitBothPlatforms => 'İkisi';
+
+  @override
+  String get submitApplyDrop => 'Drop\'a Başvur';
+
+  @override
+  String get submitAddTest => 'Test\'e Ekle';
+
+  @override
+  String get submitRequiredFields =>
+      'Uygulama adı ve açıklama alanlarını doldurun.';
+
+  @override
+  String get submitSuccess => 'Uygulama incelemeye gönderildi.';
 
   @override
   String get submitButton => 'Incelemeye gonder';
@@ -277,6 +346,13 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileMyComments => 'Yorumlarim';
+
+  @override
+  String get profilePromoteApp => 'Uygulamanı Öne Çıkar';
+
+  @override
+  String get profileCommentsTodo =>
+      'Yorumlarım için mobil profil endpoint\'i bekleniyor.';
 
   @override
   String get profileStatsApps => 'Uygulama';

@@ -53,3 +53,35 @@ final notificationsProvider =
     FutureProvider<PagedResult<NotificationItem>>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).notifications();
 });
+
+final myApplicationsProvider =
+    FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).myApplications();
+});
+
+final submitApplicationControllerProvider = StateNotifierProvider.autoDispose<
+    SubmitApplicationController, AsyncValue<String?>>((Ref ref) {
+  return SubmitApplicationController(ref);
+});
+
+class SubmitApplicationController extends StateNotifier<AsyncValue<String?>> {
+  SubmitApplicationController(this._ref)
+      : super(const AsyncData<String?>(null));
+
+  final Ref _ref;
+
+  Future<void> submit(SubmitApplicationPayload payload) async {
+    state = const AsyncLoading<String?>();
+
+    state = await AsyncValue.guard<String?>(() async {
+      final String applicationId = await _ref
+          .read(firstLookRepositoryProvider)
+          .submitApplication(payload);
+      _ref
+        ..invalidate(myApplicationsProvider)
+        ..invalidate(profileProvider);
+
+      return applicationId;
+    });
+  }
+}

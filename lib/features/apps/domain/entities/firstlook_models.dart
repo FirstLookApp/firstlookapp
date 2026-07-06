@@ -81,6 +81,30 @@ class ApplicationListItem {
   final double score;
 }
 
+class SubmitApplicationPayload {
+  const SubmitApplicationPayload({
+    required this.name,
+    required this.category,
+    required this.description,
+    required this.videoUrl,
+    required this.platform,
+    required this.appStoreUrl,
+    required this.googlePlayUrl,
+    required this.destination,
+    required this.screenshotPaths,
+  });
+
+  final String name;
+  final String category;
+  final String description;
+  final String videoUrl;
+  final PlatformType platform;
+  final String appStoreUrl;
+  final String googlePlayUrl;
+  final SubmitDestination destination;
+  final List<String> screenshotPaths;
+}
+
 class ApplicationDetail {
   const ApplicationDetail({
     required this.id,

@@ -35,6 +35,10 @@ class FirstLookRepository {
     );
   }
 
+  Future<String> submitApplication(SubmitApplicationPayload payload) {
+    return _remoteDataSource.submitApplication(payload);
+  }
+
   Future<ApplicationDetail> detail({
     required String id,
     required PlatformType platform,
@@ -92,6 +96,16 @@ class FirstLookRepository {
     int pageSize = 20,
   }) {
     return _remoteDataSource.notifications(
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+    );
+  }
+
+  Future<PagedResult<ApplicationListItem>> myApplications({
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) {
+    return _remoteDataSource.myApplications(
       pageNumber: pageNumber,
       pageSize: pageSize,
     );

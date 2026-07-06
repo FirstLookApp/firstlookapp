@@ -5,10 +5,9 @@ import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
-import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
-import 'package:firstlook/widgets/firstlook_logo.dart';
+import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +24,6 @@ class DiscoverPage extends ConsumerWidget {
         ref.watch(applicationListProvider);
     final SubmitDestination destination =
         ref.watch(selectedDestinationProvider);
-    final PlatformType platform = ref.watch(selectedPlatformProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -36,56 +34,50 @@ class DiscoverPage extends ConsumerWidget {
             ref.invalidate(applicationListProvider);
           },
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 10, 18, 96),
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
             children: <Widget>[
-              const FirstLookLogo(size: 16),
-              const SizedBox(height: 18),
-              _SegmentedPills<SubmitDestination>(
-                values: SubmitDestination.values,
+              const FirstLookAppHeader(),
+              const SizedBox(height: 24),
+              _DestinationSwitch(
                 selected: destination,
-                label: (SubmitDestination value) =>
-                    value == SubmitDestination.drop
-                        ? l10n.dropTab
-                        : l10n.testTab,
                 onChanged: (SubmitDestination value) => ref
                     .read(selectedDestinationProvider.notifier)
                     .state = value,
               ),
+              const SizedBox(height: 24),
+              _WeeklyBanner(
+                title: destination == SubmitDestination.drop
+                    ? l10n.discoverTitle
+                    : l10n.testDiscoverTitle,
+                timer: l10n.discoverBannerTimer,
+                badge: l10n.discoverWeekBadge,
+              ),
+              const SizedBox(height: 22),
+              _SectionTitle(title: l10n.discoverSubtitle),
               const SizedBox(height: 12),
-              _SegmentedPills<PlatformType>(
-                values: PlatformType.values,
-                selected: platform,
-                label: (PlatformType value) => switch (value) {
-                  PlatformType.ios => l10n.iosTab,
-                  PlatformType.android => l10n.androidTab,
-                  PlatformType.both => l10n.allPlatformsTab,
-                },
-                onChanged: (PlatformType value) =>
-                    ref.read(selectedPlatformProvider.notifier).state = value,
-              ),
-              const SizedBox(height: 18),
-              Text(
-                l10n.discoverTitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 14),
               discovery.when(
-                data: (List<DiscoveryItem> items) => Column(
-                  children: items
-                      .map(
-                        (DiscoveryItem item) => _ApplicationCard(
-                          title: item.name,
-                          subtitle: item.shortDescription,
-                          imagePath: item.mainScreenshot,
-                          onTap: () => context.push(
-                            RouteNames.detailPath.replaceFirst(':id', item.id),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
+                data: (List<DiscoveryItem> items) => items.isEmpty
+                    ? const SizedBox.shrink()
+                    : Column(
+                        children: items.take(3).map(
+                          (DiscoveryItem item) {
+                            return _ApplicationRow(
+                              title: item.name,
+                              subtitle: item.shortDescription,
+                              imagePath: item.mainScreenshot,
+                              buttonLabel: destination == SubmitDestination.drop
+                                  ? l10n.discoverReviewButton
+                                  : l10n.detailJoinBeta,
+                              onTap: () => context.push(
+                                RouteNames.detailPath.replaceFirst(
+                                  ':id',
+                                  item.id,
+                                ),
+                              ),
+                            );
+                          },
+                        ).toList(),
+                      ),
                 error: (Object error, StackTrace stackTrace) => AppErrorState(
                   message: error.toString(),
                   onRetry: () => ref.invalidate(discoveryProvider),
@@ -95,20 +87,15 @@ class DiscoverPage extends ConsumerWidget {
                   child: AppLoadingIndicator(),
                 ),
               ),
-              const SizedBox(height: 18),
-              Text(
-                l10n.discoverSubtitle,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 10),
               list.when(
                 data: (PagedResult<ApplicationListItem> result) => Column(
                   children: result.items
                       .map<Widget>(
                         (ApplicationListItem item) => _CompactAppRow(
                           item: item,
+                          buttonLabel: destination == SubmitDestination.drop
+                              ? l10n.discoverReviewButton
+                              : l10n.detailJoinBeta,
                           onTap: () => context.push(
                             RouteNames.detailPath.replaceFirst(':id', item.id),
                           ),
@@ -128,88 +115,242 @@ class DiscoverPage extends ConsumerWidget {
   }
 }
 
-class _SegmentedPills<T> extends StatelessWidget {
-  const _SegmentedPills({
-    required this.values,
+class _DestinationSwitch extends StatelessWidget {
+  const _DestinationSwitch({
     required this.selected,
-    required this.label,
     required this.onChanged,
   });
 
-  final List<T> values;
-  final T selected;
-  final String Function(T value) label;
-  final ValueChanged<T> onChanged;
+  final SubmitDestination selected;
+  final ValueChanged<SubmitDestination> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: values
-          .map(
-            (T value) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  selected: value == selected,
-                  label: Center(child: Text(label(value))),
-                  selectedColor: AppColors.primary,
-                  labelStyle: TextStyle(
-                    color: value == selected ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.w700,
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      height: 38,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F1F4),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Row(
+        children: SubmitDestination.values.map((SubmitDestination value) {
+          final bool isSelected = value == selected;
+          final String label =
+              value == SubmitDestination.drop ? l10n.dropTab : l10n.testTab;
+
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onChanged(value),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0,
                   ),
-                  onSelected: (_) => onChanged(value),
                 ),
               ),
             ),
-          )
-          .toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }
 
-class _ApplicationCard extends StatelessWidget {
-  const _ApplicationCard({
+class _WeeklyBanner extends StatelessWidget {
+  const _WeeklyBanner({
+    required this.title,
+    required this.timer,
+    required this.badge,
+  });
+
+  final String title;
+  final String timer;
+  final String badge;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        height: 132,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[Color(0xFFFFF3F5), Color(0xFFFFD8E0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Stack(
+          children: <Widget>[
+            const Positioned(
+              left: -16,
+              top: -18,
+              child: _BannerOrb(size: 66, opacity: 0.38),
+            ),
+            const Positioned(
+              right: -18,
+              bottom: -22,
+              child: _BannerOrb(size: 96, opacity: 0.28),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 25,
+                      height: 1.05,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Icon(
+                        Icons.schedule_rounded,
+                        color: AppColors.primary,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        timer,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 7),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      badge,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BannerOrb extends StatelessWidget {
+  const _BannerOrb({
+    required this.size,
+    required this.opacity,
+  });
+
+  final double size;
+  final double opacity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: opacity),
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.title,
+  });
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 20,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+class _ApplicationRow extends StatelessWidget {
+  const _ApplicationRow({
     required this.title,
     required this.subtitle,
     required this.imagePath,
+    required this.buttonLabel,
     required this.onTap,
   });
 
   final String title;
   final String subtitle;
   final String imagePath;
+  final String buttonLabel;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          boxShadow: const <BoxShadow>[
-            BoxShadow(
-              color: Color(0x12000000),
-              blurRadius: 18,
-              offset: Offset(0, 8),
-            ),
-          ],
-        ),
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           children: <Widget>[
             ClipRRect(
               borderRadius: BorderRadius.circular(14),
               child: SizedBox(
-                width: 58,
-                height: 58,
+                width: 48,
+                height: 48,
                 child: imagePath.isEmpty
-                    ? const ColoredBox(color: AppColors.primarySoft)
-                    : Image.network(UrlResolver.media(imagePath),
-                        fit: BoxFit.cover),
+                    ? const ColoredBox(
+                        color: AppColors.primarySoft,
+                        child: Icon(
+                          Icons.apps_rounded,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : Image.network(
+                        UrlResolver.media(imagePath),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(width: 12),
@@ -217,20 +358,55 @@ class _ApplicationCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                        color: AppColors.textMuted, fontSize: 12),
+                      color: AppColors.textMuted,
+                      fontSize: 11,
+                      height: 1.25,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.favorite_border, color: AppColors.primary),
+            const SizedBox(width: 8),
+            FilledButton(
+              onPressed: onTap,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(60, 34),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                backgroundColor: const Color(0xFFF4F4F6),
+                foregroundColor: Colors.black,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              child: Text(buttonLabel),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.star_rounded,
+              color: AppColors.primary,
+              size: 22,
+            ),
           ],
         ),
       ),
@@ -241,18 +417,21 @@ class _ApplicationCard extends StatelessWidget {
 class _CompactAppRow extends StatelessWidget {
   const _CompactAppRow({
     required this.item,
+    required this.buttonLabel,
     required this.onTap,
   });
 
   final ApplicationListItem item;
+  final String buttonLabel;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return _ApplicationCard(
+    return _ApplicationRow(
       title: item.name,
       subtitle: item.shortDescription,
       imagePath: item.mainScreenshot,
+      buttonLabel: buttonLabel,
       onTap: onTap,
     );
   }

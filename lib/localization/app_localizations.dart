@@ -230,6 +230,12 @@ abstract class AppLocalizations {
   /// **'PASSWORD'**
   String get authPasswordLabel;
 
+  /// No description provided for @authNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW PASSWORD'**
+  String get authNewPasswordLabel;
+
   /// No description provided for @authPasswordConfirmationLabel.
   ///
   /// In en, this message translates to:
@@ -241,6 +247,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'FULL NAME'**
   String get authFullNameLabel;
+
+  /// No description provided for @authOtpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'VERIFICATION CODE'**
+  String get authOtpLabel;
+
+  /// No description provided for @authOtpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'6-digit code'**
+  String get authOtpHint;
 
   /// No description provided for @authRegisterCta.
   ///
@@ -319,6 +337,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Favorites'**
   String get favoritesTitle;
+
+  /// No description provided for @favoritesEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have not liked any apps yet.'**
+  String get favoritesEmptyMessage;
 
   /// No description provided for @profileTitle.
   ///
@@ -458,11 +482,35 @@ abstract class AppLocalizations {
   /// **'This Week: Mobile Apps'**
   String get discoverTitle;
 
+  /// No description provided for @testDiscoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Test Products'**
+  String get testDiscoverTitle;
+
   /// No description provided for @discoverSubtitle.
   ///
   /// In en, this message translates to:
   /// **'Discover'**
   String get discoverSubtitle;
+
+  /// No description provided for @discoverBannerTimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends in 3 days'**
+  String get discoverBannerTimer;
+
+  /// No description provided for @discoverWeekBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'WEEK 23'**
+  String get discoverWeekBadge;
+
+  /// No description provided for @discoverReviewButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get discoverReviewButton;
 
   /// No description provided for @dropTab.
   ///
@@ -518,6 +566,12 @@ abstract class AppLocalizations {
   /// **'Join beta'**
   String get detailJoinBeta;
 
+  /// No description provided for @betaAccessRequestButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Access'**
+  String get betaAccessRequestButton;
+
   /// No description provided for @commentHint.
   ///
   /// In en, this message translates to:
@@ -530,29 +584,17 @@ abstract class AppLocalizations {
   /// **'Send'**
   String get commentSend;
 
-  /// No description provided for @favoritesMissingEndpointTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Liked apps'**
-  String get favoritesMissingEndpointTitle;
-
-  /// No description provided for @favoritesMissingEndpointBody.
-  ///
-  /// In en, this message translates to:
-  /// **'TODO: API does not expose a liked-apps endpoint yet.'**
-  String get favoritesMissingEndpointBody;
-
   /// No description provided for @notificationsTitle.
   ///
   /// In en, this message translates to:
   /// **'Notifications'**
   String get notificationsTitle;
 
-  /// No description provided for @notificationsMissingEndpointBody.
+  /// No description provided for @notificationsEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'TODO: API does not expose a mobile notifications endpoint yet.'**
-  String get notificationsMissingEndpointBody;
+  /// **'You do not have any notifications yet.'**
+  String get notificationsEmptyMessage;
 
   /// No description provided for @notificationUnread.
   ///
@@ -560,11 +602,29 @@ abstract class AppLocalizations {
   /// **'New'**
   String get notificationUnread;
 
+  /// No description provided for @submitSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to introduce a new digital experience? Fill in the details and start getting discovered.'**
+  String get submitSubtitle;
+
   /// No description provided for @submitName.
   ///
   /// In en, this message translates to:
   /// **'Application name'**
   String get submitName;
+
+  /// No description provided for @submitNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'APPLICATION NAME'**
+  String get submitNameLabel;
+
+  /// No description provided for @submitNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ex: SuperApp'**
+  String get submitNameHint;
 
   /// No description provided for @submitCategory.
   ///
@@ -572,17 +632,47 @@ abstract class AppLocalizations {
   /// **'Category'**
   String get submitCategory;
 
+  /// No description provided for @submitCategoryGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Game'**
+  String get submitCategoryGame;
+
+  /// No description provided for @submitCategoryFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get submitCategoryFinance;
+
+  /// No description provided for @submitCategoryEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get submitCategoryEducation;
+
   /// No description provided for @submitDescription.
   ///
   /// In en, this message translates to:
   /// **'Description'**
   String get submitDescription;
 
+  /// No description provided for @submitDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What core value does your app provide?'**
+  String get submitDescriptionHint;
+
   /// No description provided for @submitVideoUrl.
   ///
   /// In en, this message translates to:
   /// **'Video URL'**
   String get submitVideoUrl;
+
+  /// No description provided for @submitVideoUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://youtube.com/...'**
+  String get submitVideoUrlHint;
 
   /// No description provided for @submitAppStoreUrl.
   ///
@@ -602,11 +692,59 @@ abstract class AppLocalizations {
   /// **'Destination'**
   String get submitDestination;
 
-  /// No description provided for @submitScreenshotsTodo.
+  /// No description provided for @submitScreenshotsLabel.
   ///
   /// In en, this message translates to:
-  /// **'TODO: screenshot picker and multipart upload are wired to API shape next.'**
-  String get submitScreenshotsTodo;
+  /// **'SCREENSHOTS (MAX. 5)'**
+  String get submitScreenshotsLabel;
+
+  /// No description provided for @submitPickScreenshots.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick image'**
+  String get submitPickScreenshots;
+
+  /// No description provided for @submitPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'PLATFORM'**
+  String get submitPlatform;
+
+  /// No description provided for @submitStoreLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'STORE LINKS'**
+  String get submitStoreLinks;
+
+  /// No description provided for @submitBothPlatforms.
+  ///
+  /// In en, this message translates to:
+  /// **'Both'**
+  String get submitBothPlatforms;
+
+  /// No description provided for @submitApplyDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to Drop'**
+  String get submitApplyDrop;
+
+  /// No description provided for @submitAddTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Test'**
+  String get submitAddTest;
+
+  /// No description provided for @submitRequiredFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in the application name and description.'**
+  String get submitRequiredFields;
+
+  /// No description provided for @submitSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Application sent for review.'**
+  String get submitSuccess;
 
   /// No description provided for @submitButton.
   ///
@@ -625,6 +763,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My comments'**
   String get profileMyComments;
+
+  /// No description provided for @profilePromoteApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Promote My App'**
+  String get profilePromoteApp;
+
+  /// No description provided for @profileCommentsTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the mobile profile comments endpoint.'**
+  String get profileCommentsTodo;
 
   /// No description provided for @profileStatsApps.
   ///

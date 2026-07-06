@@ -77,10 +77,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordLabel => 'PASSWORD';
 
   @override
+  String get authNewPasswordLabel => 'NEW PASSWORD';
+
+  @override
   String get authPasswordConfirmationLabel => 'CONFIRM PASSWORD';
 
   @override
   String get authFullNameLabel => 'FULL NAME';
+
+  @override
+  String get authOtpLabel => 'VERIFICATION CODE';
+
+  @override
+  String get authOtpHint => '6-digit code';
 
   @override
   String get authRegisterCta => 'REGISTER';
@@ -121,6 +130,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoritesTitle => 'Favorites';
+
+  @override
+  String get favoritesEmptyMessage => 'You have not liked any apps yet.';
 
   @override
   String get profileTitle => 'Profile';
@@ -193,7 +205,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverTitle => 'This Week: Mobile Apps';
 
   @override
+  String get testDiscoverTitle => 'Discover Test Products';
+
+  @override
   String get discoverSubtitle => 'Discover';
+
+  @override
+  String get discoverBannerTimer => 'Ends in 3 days';
+
+  @override
+  String get discoverWeekBadge => 'WEEK 23';
+
+  @override
+  String get discoverReviewButton => 'Review';
 
   @override
   String get dropTab => 'Drop';
@@ -223,39 +247,60 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailJoinBeta => 'Join beta';
 
   @override
+  String get betaAccessRequestButton => 'Request Access';
+
+  @override
   String get commentHint => 'Write a comment';
 
   @override
   String get commentSend => 'Send';
 
   @override
-  String get favoritesMissingEndpointTitle => 'Liked apps';
-
-  @override
-  String get favoritesMissingEndpointBody =>
-      'TODO: API does not expose a liked-apps endpoint yet.';
-
-  @override
   String get notificationsTitle => 'Notifications';
 
   @override
-  String get notificationsMissingEndpointBody =>
-      'TODO: API does not expose a mobile notifications endpoint yet.';
+  String get notificationsEmptyMessage =>
+      'You do not have any notifications yet.';
 
   @override
   String get notificationUnread => 'New';
 
   @override
+  String get submitSubtitle =>
+      'Ready to introduce a new digital experience? Fill in the details and start getting discovered.';
+
+  @override
   String get submitName => 'Application name';
+
+  @override
+  String get submitNameLabel => 'APPLICATION NAME';
+
+  @override
+  String get submitNameHint => 'Ex: SuperApp';
 
   @override
   String get submitCategory => 'Category';
 
   @override
+  String get submitCategoryGame => 'Game';
+
+  @override
+  String get submitCategoryFinance => 'Finance';
+
+  @override
+  String get submitCategoryEducation => 'Education';
+
+  @override
   String get submitDescription => 'Description';
 
   @override
+  String get submitDescriptionHint => 'What core value does your app provide?';
+
+  @override
   String get submitVideoUrl => 'Video URL';
+
+  @override
+  String get submitVideoUrlHint => 'https://youtube.com/...';
 
   @override
   String get submitAppStoreUrl => 'App Store URL';
@@ -267,8 +312,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitDestination => 'Destination';
 
   @override
-  String get submitScreenshotsTodo =>
-      'TODO: screenshot picker and multipart upload are wired to API shape next.';
+  String get submitScreenshotsLabel => 'SCREENSHOTS (MAX. 5)';
+
+  @override
+  String get submitPickScreenshots => 'Pick image';
+
+  @override
+  String get submitPlatform => 'PLATFORM';
+
+  @override
+  String get submitStoreLinks => 'STORE LINKS';
+
+  @override
+  String get submitBothPlatforms => 'Both';
+
+  @override
+  String get submitApplyDrop => 'Apply to Drop';
+
+  @override
+  String get submitAddTest => 'Add to Test';
+
+  @override
+  String get submitRequiredFields =>
+      'Fill in the application name and description.';
+
+  @override
+  String get submitSuccess => 'Application sent for review.';
 
   @override
   String get submitButton => 'Submit for review';
@@ -278,6 +347,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileMyComments => 'My comments';
+
+  @override
+  String get profilePromoteApp => 'Promote My App';
+
+  @override
+  String get profileCommentsTodo =>
+      'Waiting for the mobile profile comments endpoint.';
 
   @override
   String get profileStatsApps => 'Applications';

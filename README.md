@@ -112,19 +112,21 @@ Connected endpoints:
 - `POST /api/interactions/{applicationId}/beta-request`
 - `GET /api/profile/favorites`
 - `GET /api/profile/notifications`
+- `POST /api/applications`
 - `GET /api/applications/mine`
-- `GET /api/applications/my-beta-requests`
 
 Available but not fully wired yet:
 
-- `POST /api/applications`
 - `PUT /api/applications/{applicationId}`
+- `GET /api/applications/my-beta-requests`
 
 ## Missing API / TODO
 
 These are intentionally left as clean TODOs because the matching endpoint or final wiring is not available yet.
 
-- Submit application: multipart endpoint exists, but screenshot/file upload UI wiring still needs completion.
+- Profile comments: the mobile UI has a clean placeholder because Swagger does not expose a dedicated "my comments" endpoint for the current user.
+- Edit submitted application: `PUT /api/applications/{applicationId}` exists, but the edit flow is not part of the current Figma pass yet.
+- My beta requests: `GET /api/applications/my-beta-requests` exists, but no matching Figma screen has been implemented yet.
 
 When new API endpoints arrive, update this section first and then wire the related feature.
 

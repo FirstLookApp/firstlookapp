@@ -67,6 +67,36 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<String> submitApplication(SubmitApplicationPayload payload) async {
+    final FormData formData = FormData.fromMap(<String, dynamic>{
+      'Name': payload.name,
+      'Category': payload.category,
+      'Description': payload.description,
+      'VideoUrl': payload.videoUrl,
+      'Platform': payload.platform.apiValue,
+      'AppStoreUrl': payload.appStoreUrl,
+      'GooglePlayUrl': payload.googlePlayUrl,
+      'SubmitDestination': payload.destination.apiValue,
+      if (payload.screenshotPaths.isNotEmpty)
+        'Screenshots': await Future.wait<MultipartFile>(
+          payload.screenshotPaths.map(MultipartFile.fromFile),
+        ),
+    });
+
+    final Response<Map<String, dynamic>> response =
+        await _dio.post<Map<String, dynamic>>(
+      ApiPaths.applications,
+      data: formData,
+    );
+
+    final ApiEnvelope<String> envelope = ApiEnvelope<String>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => json as String? ?? '',
+    );
+
+    return envelope.data;
+  }
+
   Future<ApplicationDetail> detail({
     required String id,
     required PlatformType platform,
@@ -228,6 +258,31 @@ class FirstLookRemoteDataSource {
       (Object? json) => PagedResult<NotificationItem>.fromJson(
         json,
         NotificationItem.fromJson,
+      ),
+    );
+
+    return envelope.data;
+  }
+
+  Future<PagedResult<ApplicationListItem>> myApplications({
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.myApplications,
+      queryParameters: <String, dynamic>{
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
+      },
+    );
+
+    final ApiEnvelope<PagedResult<ApplicationListItem>> envelope =
+        ApiEnvelope<PagedResult<ApplicationListItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<ApplicationListItem>.fromJson(
+        json,
+        ApplicationListItem.fromJson,
       ),
     );
 
