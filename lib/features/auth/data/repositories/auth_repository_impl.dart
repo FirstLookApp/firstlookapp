@@ -93,11 +93,13 @@ class AuthRepositoryImpl implements AuthRepository {
     final UserSession? currentSession = await _localDataSource.restoreSession();
     final String refreshToken = currentSession?.tokens.refreshToken ?? '';
 
-    if (refreshToken.isNotEmpty) {
-      await _remoteDataSource.logout(refreshToken);
+    try {
+      if (refreshToken.isNotEmpty) {
+        await _remoteDataSource.logout(refreshToken);
+      }
+    } finally {
+      await _localDataSource.clear();
     }
-
-    await _localDataSource.clear();
   }
 
   @override

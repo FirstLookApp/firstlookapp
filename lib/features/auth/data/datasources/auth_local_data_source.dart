@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firstlook/core/storage/hive_service.dart';
 import 'package:firstlook/core/storage/local_storage_keys.dart';
 import 'package:firstlook/core/storage/secure_token_storage.dart';
@@ -48,8 +50,24 @@ class AuthLocalDataSource {
 
   Future<void> clear() async {
     await _tokenStorage.clear();
-    await HiveService.authBox.delete(LocalStorageKeys.authRememberMe);
-    await HiveService.authBox.delete(LocalStorageKeys.authEmail);
-    await HiveService.authBox.delete(LocalStorageKeys.authUsername);
+    await HiveService.authBox.clear();
+    await HiveService.authBox.flush();
+    await _clearTemporaryCache();
+  }
+
+  Future<void> _clearTemporaryCache() async {
+    final Directory tempDirectory = Directory.systemTemp;
+
+    if (!tempDirectory.existsSync()) {
+      return;
+    }
+
+    await for (final FileSystemEntity entity in tempDirectory.list()) {
+      try {
+        await entity.delete(recursive: true);
+      } on FileSystemException {
+        // Cache files can be recreated or locked by the platform.
+      }
+    }
   }
 }
