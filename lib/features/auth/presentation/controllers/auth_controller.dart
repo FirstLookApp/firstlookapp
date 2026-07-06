@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 enum AuthStatus {
   authenticated,
   unauthenticated,
+  otpRequired,
+  passwordResetOtpSent,
 }
 
 class AuthState {
@@ -47,7 +49,7 @@ class AuthController extends AsyncNotifier<AuthState> {
   }
 
   Future<void> login({
-    required String email,
+    required String login,
     required String password,
     required bool rememberMe,
   }) async {
@@ -55,7 +57,7 @@ class AuthController extends AsyncNotifier<AuthState> {
     state = await _guardAuthState(() async {
       final repository = ref.read(authRepositoryProvider);
       final UserSession session = await repository.login(
-        email: email,
+        login: login,
         password: password,
         rememberMe: rememberMe,
       );
@@ -72,6 +74,73 @@ class AuthController extends AsyncNotifier<AuthState> {
     state = await _guardAuthState(() async {
       final repository = ref.read(authRepositoryProvider);
       await repository.logout();
+      return const AuthState(status: AuthStatus.unauthenticated);
+    });
+  }
+
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String username,
+    required String biography,
+    required String email,
+    required String password,
+  }) async {
+    state = const AsyncLoading<AuthState>();
+    state = await _guardAuthState(() async {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.register(
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        biography: biography,
+        email: email,
+        password: password,
+      );
+      return const AuthState(status: AuthStatus.otpRequired);
+    });
+  }
+
+  Future<void> verifyEmail({
+    required String email,
+    required String otp,
+  }) async {
+    state = const AsyncLoading<AuthState>();
+    state = await _guardAuthState(() async {
+      final repository = ref.read(authRepositoryProvider);
+      final UserSession session = await repository.verifyEmail(
+        email: email,
+        otp: otp,
+      );
+      return AuthState(
+        status: AuthStatus.authenticated,
+        session: session,
+      );
+    });
+  }
+
+  Future<void> forgotPassword(String email) async {
+    state = const AsyncLoading<AuthState>();
+    state = await _guardAuthState(() async {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.forgotPassword(email);
+      return const AuthState(status: AuthStatus.passwordResetOtpSent);
+    });
+  }
+
+  Future<void> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    state = const AsyncLoading<AuthState>();
+    state = await _guardAuthState(() async {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.resetPassword(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      );
       return const AuthState(status: AuthStatus.unauthenticated);
     });
   }

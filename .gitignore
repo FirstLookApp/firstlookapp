@@ -13,6 +13,7 @@ lib/generated/
 # IDE
 .idea/
 .vscode/
+*.iml
 
 # Native
 android/.gradle/

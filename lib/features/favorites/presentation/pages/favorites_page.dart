@@ -10,8 +10,8 @@ class FavoritesPage extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return FeaturePlaceholderView(
-      title: l10n.favoritesTitle,
-      message: l10n.screenArchitectureReady,
+      title: l10n.favoritesMissingEndpointTitle,
+      message: l10n.favoritesMissingEndpointBody,
     );
   }
 }

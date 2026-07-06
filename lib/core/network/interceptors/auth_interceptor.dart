@@ -19,8 +19,7 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final bool requiresAuth =
-        options.extra['requiresAuth'] as bool? ?? true;
+    final bool requiresAuth = options.extra['requiresAuth'] as bool? ?? true;
 
     if (!requiresAuth) {
       handler.next(options);

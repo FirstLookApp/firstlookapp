@@ -40,8 +40,10 @@ class DioClient {
   void _configure() {
     _instance.options = BaseOptions(
       baseUrl: _environmentService.baseUrl,
-      connectTimeout: Duration(milliseconds: _environmentService.connectTimeoutMs),
-      receiveTimeout: Duration(milliseconds: _environmentService.receiveTimeoutMs),
+      connectTimeout:
+          Duration(milliseconds: _environmentService.connectTimeoutMs),
+      receiveTimeout:
+          Duration(milliseconds: _environmentService.receiveTimeoutMs),
       sendTimeout: Duration(milliseconds: _environmentService.sendTimeoutMs),
       headers: <String, dynamic>{
         HttpHeaders.acceptHeader: 'application/json',

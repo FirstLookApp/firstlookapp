@@ -1,6 +1,7 @@
 import 'package:firstlook/core/network/services/dio_client.dart';
-import 'package:firstlook/core/routing/app_router.dart';
 import 'package:firstlook/core/storage/secure_token_storage.dart';
+import 'package:firstlook/features/apps/data/firstlook_remote_data_source.dart';
+import 'package:firstlook/features/apps/data/firstlook_repository.dart';
 import 'package:firstlook/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:firstlook/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:firstlook/features/auth/data/repositories/auth_repository_impl.dart';
@@ -51,8 +52,19 @@ final authRepositoryProvider = Provider<AuthRepository>(
   ),
 );
 
-final authControllerProvider =
-    AsyncNotifierProvider<AuthController, AuthState>(
+final firstLookRemoteDataSourceProvider = Provider<FirstLookRemoteDataSource>(
+  (Ref ref) => FirstLookRemoteDataSource(
+    dio: ref.watch(dioClientProvider).instance,
+  ),
+);
+
+final firstLookRepositoryProvider = Provider<FirstLookRepository>(
+  (Ref ref) => FirstLookRepository(
+    remoteDataSource: ref.watch(firstLookRemoteDataSourceProvider),
+  ),
+);
+
+final authControllerProvider = AsyncNotifierProvider<AuthController, AuthState>(
   AuthController.new,
 );
 

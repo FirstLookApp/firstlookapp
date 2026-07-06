@@ -16,6 +16,11 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: isLoading ? null : onPressed,
+      style: FilledButton.styleFrom(
+        textStyle: const TextStyle(
+          fontWeight: FontWeight.w700,
+        ),
+      ),
       child: isLoading
           ? const SizedBox(
               width: 20,

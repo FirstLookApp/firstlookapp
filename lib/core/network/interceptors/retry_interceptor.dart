@@ -12,10 +12,9 @@ class RetryInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    final bool shouldRetry =
-        err.type == DioExceptionType.connectionError ||
-            err.type == DioExceptionType.connectionTimeout ||
-            err.type == DioExceptionType.receiveTimeout;
+    final bool shouldRetry = err.type == DioExceptionType.connectionError ||
+        err.type == DioExceptionType.connectionTimeout ||
+        err.type == DioExceptionType.receiveTimeout;
 
     if (!shouldRetry) {
       handler.next(err);

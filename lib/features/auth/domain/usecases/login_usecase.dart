@@ -7,12 +7,12 @@ class LoginUseCase {
   final AuthRepository _repository;
 
   Future<UserSession> call({
-    required String email,
+    required String login,
     required String password,
     required bool rememberMe,
   }) {
     return _repository.login(
-      email: email,
+      login: login,
       password: password,
       rememberMe: rememberMe,
     );

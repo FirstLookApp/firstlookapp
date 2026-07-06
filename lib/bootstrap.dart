@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:firstlook/app.dart';
 import 'package:firstlook/core/errors/global_error_handler.dart';

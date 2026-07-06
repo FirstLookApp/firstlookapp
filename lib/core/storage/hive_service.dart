@@ -7,5 +7,6 @@ abstract final class HiveService {
     await Hive.openBox<dynamic>(LocalStorageKeys.authBox);
   }
 
-  static Box<dynamic> get authBox => Hive.box<dynamic>(LocalStorageKeys.authBox);
+  static Box<dynamic> get authBox =>
+      Hive.box<dynamic>(LocalStorageKeys.authBox);
 }

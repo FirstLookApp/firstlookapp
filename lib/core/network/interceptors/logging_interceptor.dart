@@ -19,7 +19,8 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
     if (EnvironmentService.instance.isDebugLoggingEnabled) {
       _logger.debug(
         'Response ${response.statusCode} ${response.requestOptions.uri}',

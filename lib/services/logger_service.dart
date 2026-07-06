@@ -21,7 +21,8 @@ class LoggerService {
   void error(String message, {StackTrace? stackTrace}) {
     debugPrint('[ERROR] $message');
 
-    if (stackTrace != null && EnvironmentService.instance.isDebugLoggingEnabled) {
+    if (stackTrace != null &&
+        EnvironmentService.instance.isDebugLoggingEnabled) {
       debugPrint(stackTrace.toString());
     }
   }
