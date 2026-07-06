@@ -21,11 +21,11 @@ Implemented app areas:
 - Like / unlike
 - Store click tracking
 - Comments
-- Liked items placeholder
+- Liked items
 - Profile
 - Submit application placeholder
 - Beta access request
-- Notifications placeholder
+- Notifications
 
 ## Tech Stack
 
@@ -96,6 +96,7 @@ Connected endpoints:
 - `POST /api/auth/resend-otp`
 - `GET /api/auth/username-availability`
 - `POST /api/auth/login`
+- `POST /api/auth/logout`
 - `POST /api/auth/refresh-token`
 - `POST /api/auth/forgot-password`
 - `POST /api/auth/reset-password`
@@ -109,6 +110,8 @@ Connected endpoints:
 - `POST /api/interactions/{applicationId}/comments`
 - `POST /api/interactions/{applicationId}/store-click`
 - `POST /api/interactions/{applicationId}/beta-request`
+- `GET /api/profile/favorites`
+- `GET /api/profile/notifications`
 - `GET /api/applications/mine`
 - `GET /api/applications/my-beta-requests`
 
@@ -121,9 +124,6 @@ Available but not fully wired yet:
 
 These are intentionally left as clean TODOs because the matching endpoint or final wiring is not available yet.
 
-- Notifications: no mobile notifications endpoint was found in Swagger.
-- Liked items: no liked/favorites list endpoint was found in Swagger.
-- Logout: no logout/revoke endpoint was found in Swagger.
 - Submit application: multipart endpoint exists, but screenshot/file upload UI wiring still needs completion.
 
 When new API endpoints arrive, update this section first and then wire the related feature.

@@ -181,4 +181,56 @@ class FirstLookRemoteDataSource {
 
     return envelope.data;
   }
+
+  Future<PagedResult<ApplicationListItem>> favorites({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.profileFavorites,
+      queryParameters: <String, dynamic>{
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
+        if (search != null && search.isNotEmpty) 'Search': search,
+      },
+    );
+
+    final ApiEnvelope<PagedResult<ApplicationListItem>> envelope =
+        ApiEnvelope<PagedResult<ApplicationListItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<ApplicationListItem>.fromJson(
+        json,
+        ApplicationListItem.fromJson,
+      ),
+    );
+
+    return envelope.data;
+  }
+
+  Future<PagedResult<NotificationItem>> notifications({
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.profileNotifications,
+      queryParameters: <String, dynamic>{
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
+      },
+    );
+
+    final ApiEnvelope<PagedResult<NotificationItem>> envelope =
+        ApiEnvelope<PagedResult<NotificationItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<NotificationItem>.fromJson(
+        json,
+        NotificationItem.fromJson,
+      ),
+    );
+
+    return envelope.data;
+  }
 }

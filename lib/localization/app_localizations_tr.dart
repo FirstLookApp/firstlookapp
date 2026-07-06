@@ -199,6 +199,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'TODO: API henuz mobil bildirim endpoint\'i sunmuyor.';
 
   @override
+  String get notificationUnread => 'Yeni';
+
+  @override
   String get submitName => 'Uygulama adi';
 
   @override

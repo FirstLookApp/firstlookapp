@@ -157,7 +157,9 @@ class AuthRemoteDataSource {
   }
 
   Future<void> logout(String refreshToken) async {
-    refreshToken;
-    // TODO(firstlook-api): Swagger does not expose a logout/revoke endpoint yet.
+    await _dio.post<Map<String, dynamic>>(
+      ApiPaths.logout,
+      data: <String, dynamic>{'refreshToken': refreshToken},
+    );
   }
 }

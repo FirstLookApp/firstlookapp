@@ -74,4 +74,26 @@ class FirstLookRepository {
   Future<UserProfile> profile() {
     return _remoteDataSource.profile();
   }
+
+  Future<PagedResult<ApplicationListItem>> favorites({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  }) {
+    return _remoteDataSource.favorites(
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      search: search,
+    );
+  }
+
+  Future<PagedResult<NotificationItem>> notifications({
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) {
+    return _remoteDataSource.notifications(
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+    );
+  }
 }

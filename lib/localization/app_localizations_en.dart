@@ -200,6 +200,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'TODO: API does not expose a mobile notifications endpoint yet.';
 
   @override
+  String get notificationUnread => 'New';
+
+  @override
   String get submitName => 'Application name';
 
   @override

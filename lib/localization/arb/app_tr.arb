@@ -63,6 +63,7 @@
   "favoritesMissingEndpointBody": "TODO: API henuz begenilen uygulamalar endpoint'i sunmuyor.",
   "notificationsTitle": "Bildirimler",
   "notificationsMissingEndpointBody": "TODO: API henuz mobil bildirim endpoint'i sunmuyor.",
+  "notificationUnread": "Yeni",
   "submitName": "Uygulama adi",
   "submitCategory": "Kategori",
   "submitDescription": "Aciklama",

@@ -470,6 +470,12 @@ abstract class AppLocalizations {
   /// **'TODO: API does not expose a mobile notifications endpoint yet.'**
   String get notificationsMissingEndpointBody;
 
+  /// No description provided for @notificationUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get notificationUnread;
+
   /// No description provided for @submitName.
   ///
   /// In en, this message translates to:

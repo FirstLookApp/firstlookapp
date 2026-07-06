@@ -6,8 +6,11 @@ abstract final class ApiPaths {
   static const String refreshToken = '/api/auth/refresh-token';
   static const String forgotPassword = '/api/auth/forgot-password';
   static const String resetPassword = '/api/auth/reset-password';
+  static const String logout = '/api/auth/logout';
   static const String usernameAvailability = '/api/auth/username-availability';
   static const String profileMe = '/api/profile/me';
+  static const String profileFavorites = '/api/profile/favorites';
+  static const String profileNotifications = '/api/profile/notifications';
   static const String applications = '/api/applications';
   static const String myApplications = '/api/applications/mine';
   static const String myBetaRequests = '/api/applications/my-beta-requests';

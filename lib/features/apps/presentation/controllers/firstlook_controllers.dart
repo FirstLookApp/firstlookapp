@@ -43,3 +43,13 @@ final commentsProvider =
 final profileProvider = FutureProvider<UserProfile>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).profile();
 });
+
+final favoritesProvider =
+    FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).favorites();
+});
+
+final notificationsProvider =
+    FutureProvider<PagedResult<NotificationItem>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).notifications();
+});

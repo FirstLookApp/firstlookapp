@@ -63,6 +63,7 @@
   "favoritesMissingEndpointBody": "TODO: API does not expose a liked-apps endpoint yet.",
   "notificationsTitle": "Notifications",
   "notificationsMissingEndpointBody": "TODO: API does not expose a mobile notifications endpoint yet.",
+  "notificationUnread": "New",
   "submitName": "Application name",
   "submitCategory": "Category",
   "submitDescription": "Description",
