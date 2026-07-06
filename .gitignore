@@ -1,0 +1,25 @@
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub/
+.pub-cache/
+build/
+
+# Generated
+lib/generated/
+
+# IDE
+.idea/
+.vscode/
+
+# Native
+android/.gradle/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/.last_build_id
+ios/Flutter/ephemeral/
+
+# Env
+.env
