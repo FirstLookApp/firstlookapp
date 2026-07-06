@@ -65,6 +65,49 @@ class AppLocalizationsTr extends AppLocalizations {
   String get loginButton => 'Giris Yap';
 
   @override
+  String get authDiscoverTitle => 'Uygulamalarını Keşfet';
+
+  @override
+  String get authDiscoverSubtitle =>
+      'Yeni oyunları ve uygulamaları erken keşfet, ilk sen dene ve yorumla.';
+
+  @override
+  String get authEmailAddressLabel => 'E-POSTA ADRESİ';
+
+  @override
+  String get authPasswordLabel => 'ŞİFRE';
+
+  @override
+  String get authPasswordConfirmationLabel => 'ŞİFRENİZİ ONAYLAYIN';
+
+  @override
+  String get authFullNameLabel => 'ADINIZ SOYADINIZ';
+
+  @override
+  String get authRegisterCta => 'KAYIT OL';
+
+  @override
+  String get authLoginCta => 'GİRİŞ YAP';
+
+  @override
+  String get loginEmailHint => 'johndoe@mail.com';
+
+  @override
+  String get loginPasswordHint => 'Şifreniz';
+
+  @override
+  String get registerNameHint => 'John Doe';
+
+  @override
+  String get registerConfirmPasswordHint => 'Şifrenizi Onaylayın';
+
+  @override
+  String get authFullNameRequired => 'Adınız ve soyadınızı girin.';
+
+  @override
+  String get authPasswordMismatch => 'Şifreler eşleşmiyor.';
+
+  @override
   String get homeTitle => 'Ana Sayfa';
 
   @override

@@ -206,6 +206,90 @@ abstract class AppLocalizations {
   /// **'Sign in'**
   String get loginButton;
 
+  /// No description provided for @authDiscoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Apps'**
+  String get authDiscoverTitle;
+
+  /// No description provided for @authDiscoverSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover new games and apps early, try them first and leave a comment.'**
+  String get authDiscoverSubtitle;
+
+  /// No description provided for @authEmailAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EMAIL ADDRESS'**
+  String get authEmailAddressLabel;
+
+  /// No description provided for @authPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PASSWORD'**
+  String get authPasswordLabel;
+
+  /// No description provided for @authPasswordConfirmationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRM PASSWORD'**
+  String get authPasswordConfirmationLabel;
+
+  /// No description provided for @authFullNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'FULL NAME'**
+  String get authFullNameLabel;
+
+  /// No description provided for @authRegisterCta.
+  ///
+  /// In en, this message translates to:
+  /// **'REGISTER'**
+  String get authRegisterCta;
+
+  /// No description provided for @authLoginCta.
+  ///
+  /// In en, this message translates to:
+  /// **'SIGN IN'**
+  String get authLoginCta;
+
+  /// No description provided for @loginEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'johndoe@mail.com'**
+  String get loginEmailHint;
+
+  /// No description provided for @loginPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password'**
+  String get loginPasswordHint;
+
+  /// No description provided for @registerNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'John Doe'**
+  String get registerNameHint;
+
+  /// No description provided for @registerConfirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your password'**
+  String get registerConfirmPasswordHint;
+
+  /// No description provided for @authFullNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name.'**
+  String get authFullNameRequired;
+
+  /// No description provided for @authPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authPasswordMismatch;
+
   /// No description provided for @homeTitle.
   ///
   /// In en, this message translates to:

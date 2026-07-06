@@ -64,6 +64,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginButton => 'Sign in';
 
   @override
+  String get authDiscoverTitle => 'Discover Apps';
+
+  @override
+  String get authDiscoverSubtitle =>
+      'Discover new games and apps early, try them first and leave a comment.';
+
+  @override
+  String get authEmailAddressLabel => 'EMAIL ADDRESS';
+
+  @override
+  String get authPasswordLabel => 'PASSWORD';
+
+  @override
+  String get authPasswordConfirmationLabel => 'CONFIRM PASSWORD';
+
+  @override
+  String get authFullNameLabel => 'FULL NAME';
+
+  @override
+  String get authRegisterCta => 'REGISTER';
+
+  @override
+  String get authLoginCta => 'SIGN IN';
+
+  @override
+  String get loginEmailHint => 'johndoe@mail.com';
+
+  @override
+  String get loginPasswordHint => 'Your password';
+
+  @override
+  String get registerNameHint => 'John Doe';
+
+  @override
+  String get registerConfirmPasswordHint => 'Confirm your password';
+
+  @override
+  String get authFullNameRequired => 'Enter your full name.';
+
+  @override
+  String get authPasswordMismatch => 'Passwords do not match.';
+
+  @override
   String get homeTitle => 'Home';
 
   @override

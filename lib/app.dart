@@ -22,6 +22,7 @@ class FirstLookApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      locale: const Locale('tr'),
       routerConfig: router,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
