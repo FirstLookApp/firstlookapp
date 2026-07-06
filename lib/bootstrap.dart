@@ -10,35 +10,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 Future<void> bootstrap() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  ProviderContainer? container;
 
-  await EnvironmentService.initialize();
-  await HiveService.initialize();
+  return runZonedGuarded<Future<void>>(
+    () async {
+      WidgetsFlutterBinding.ensureInitialized();
 
-  final ProviderContainer container = ProviderContainer(
-    observers: <ProviderObserver>[
-      AppProviderObserver(),
-    ],
-  );
+      await EnvironmentService.initialize();
+      await HiveService.initialize();
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    GlobalErrorHandler.handleFlutterError(details, container);
-  };
+      container = ProviderContainer(
+        observers: <ProviderObserver>[
+          AppProviderObserver(),
+        ],
+      );
 
-  PlatformDispatcher.instance.onError = (Object error, StackTrace stackTrace) {
-    GlobalErrorHandler.handlePlatformError(error, stackTrace, container);
-    return true;
-  };
+      FlutterError.onError = (FlutterErrorDetails details) {
+        GlobalErrorHandler.handleFlutterError(details, container!);
+      };
 
-  runZonedGuarded(
-    () => runApp(
-      UncontrolledProviderScope(
-        container: container,
-        child: const FirstLookApp(),
-      ),
-    ),
-    (Object error, StackTrace stackTrace) {
-      GlobalErrorHandler.handleZoneError(error, stackTrace, container);
+      PlatformDispatcher.instance.onError =
+          (Object error, StackTrace stackTrace) {
+        GlobalErrorHandler.handlePlatformError(error, stackTrace, container!);
+        return true;
+      };
+
+      runApp(
+        UncontrolledProviderScope(
+          container: container!,
+          child: const FirstLookApp(),
+        ),
+      );
     },
-  );
+    (Object error, StackTrace stackTrace) {
+      final ProviderContainer? activeContainer = container;
+      if (activeContainer == null) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+          ),
+        );
+        return;
+      }
+      GlobalErrorHandler.handleZoneError(error, stackTrace, activeContainer);
+    },
+  )!;
 }
