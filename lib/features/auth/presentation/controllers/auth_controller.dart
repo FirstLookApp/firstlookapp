@@ -14,18 +14,22 @@ class AuthState {
   const AuthState({
     required this.status,
     this.session,
+    this.pendingEmail,
   });
 
   final AuthStatus status;
   final UserSession? session;
+  final String? pendingEmail;
 
   AuthState copyWith({
     AuthStatus? status,
     UserSession? session,
+    String? pendingEmail,
   }) {
     return AuthState(
       status: status ?? this.status,
       session: session ?? this.session,
+      pendingEmail: pendingEmail ?? this.pendingEmail,
     );
   }
 }
@@ -97,7 +101,10 @@ class AuthController extends AsyncNotifier<AuthState> {
         email: email,
         password: password,
       );
-      return const AuthState(status: AuthStatus.otpRequired);
+      return AuthState(
+        status: AuthStatus.otpRequired,
+        pendingEmail: email,
+      );
     });
   }
 

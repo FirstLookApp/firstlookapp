@@ -36,14 +36,21 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         return null;
       }
 
-      final bool isAuthenticated =
-          authState.valueOrNull?.status == AuthStatus.authenticated;
+      final AuthState? currentAuthState = authState.valueOrNull;
+      final AuthStatus? status = currentAuthState?.status;
+      final bool isAuthenticated = status == AuthStatus.authenticated;
       final bool isAuthRoute = <String>{
         RouteNames.loginPath,
         RouteNames.registerPath,
         RouteNames.otpPath,
         RouteNames.forgotPasswordPath,
       }.contains(state.matchedLocation);
+
+      if (status == AuthStatus.otpRequired &&
+          state.matchedLocation != RouteNames.otpPath) {
+        final String email = currentAuthState?.pendingEmail ?? '';
+        return '${RouteNames.otpPath}?email=${Uri.encodeComponent(email)}';
+      }
 
       if (!isAuthenticated && !isAuthRoute) {
         return RouteNames.loginPath;

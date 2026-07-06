@@ -83,15 +83,23 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             AppButton(
               label: l10n.registerButton,
               isLoading: authState.isLoading,
-              onPressed: () {
-                ref.read(authControllerProvider.notifier).register(
+              onPressed: () async {
+                final String email = _email.text.trim();
+                await ref.read(authControllerProvider.notifier).register(
                       firstName: _firstName.text.trim(),
                       lastName: _lastName.text.trim(),
                       username: _username.text.trim(),
                       biography: _biography.text.trim(),
-                      email: _email.text.trim(),
+                      email: email,
                       password: _password.text,
                     );
+                final AuthStatus? status =
+                    ref.read(authControllerProvider).valueOrNull?.status;
+                if (context.mounted && status == AuthStatus.otpRequired) {
+                  context.go(
+                    '${RouteNames.otpPath}?email=${Uri.encodeComponent(email)}',
+                  );
+                }
               },
             ),
             TextButton(
