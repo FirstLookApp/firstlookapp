@@ -32,27 +32,25 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
     debugLogDiagnostics: false,
     refreshListenable: refreshNotifier,
     redirect: (BuildContext context, GoRouterState state) {
+      if (authState.isLoading) {
+        return null;
+      }
+
       final bool isAuthenticated =
           authState.valueOrNull?.status == AuthStatus.authenticated;
-      final bool isGuestRoute = <String>{
-        RouteNames.splashPath,
+      final bool isAuthRoute = <String>{
         RouteNames.loginPath,
         RouteNames.registerPath,
         RouteNames.otpPath,
         RouteNames.forgotPasswordPath,
       }.contains(state.matchedLocation);
-      final bool requiresAuth = <String>{
-        RouteNames.submitPath,
-        RouteNames.favoritesPath,
-        RouteNames.profilePath,
-        RouteNames.notificationsPath,
-      }.contains(state.matchedLocation);
 
-      if (!isAuthenticated && requiresAuth) {
+      if (!isAuthenticated && !isAuthRoute) {
         return RouteNames.loginPath;
       }
 
-      if (isAuthenticated && isGuestRoute) {
+      if (isAuthenticated &&
+          (state.matchedLocation == RouteNames.splashPath || isAuthRoute)) {
         return RouteNames.discoverPath;
       }
 
