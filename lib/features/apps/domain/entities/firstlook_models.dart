@@ -7,6 +7,13 @@ enum PlatformType {
 
   final int apiValue;
   final String label;
+
+  static PlatformType fromApiValue(int value) {
+    return PlatformType.values.firstWhere(
+      (PlatformType platform) => platform.apiValue == value,
+      orElse: () => PlatformType.both,
+    );
+  }
 }
 
 enum SubmitDestination {
@@ -103,6 +110,30 @@ class SubmitApplicationPayload {
   final String googlePlayUrl;
   final SubmitDestination destination;
   final List<String> screenshotPaths;
+}
+
+class ApplicationDetailRequest {
+  const ApplicationDetailRequest({
+    required this.id,
+    required this.platform,
+  });
+
+  final String id;
+  final PlatformType platform;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other is ApplicationDetailRequest &&
+        other.id == id &&
+        other.platform == platform;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, platform);
 }
 
 class ApplicationDetail {

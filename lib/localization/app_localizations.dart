@@ -704,6 +704,18 @@ abstract class AppLocalizations {
   /// **'Pick image'**
   String get submitPickScreenshots;
 
+  /// No description provided for @submitScreenshotSizeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Each screenshot must be at most 2 MB.'**
+  String get submitScreenshotSizeError;
+
+  /// No description provided for @submitScreenshotLimitPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum screenshot count:'**
+  String get submitScreenshotLimitPrefix;
+
   /// No description provided for @submitPlatform.
   ///
   /// In en, this message translates to:
@@ -739,6 +751,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Fill in the application name and description.'**
   String get submitRequiredFields;
+
+  /// No description provided for @submitFieldIsRequiredSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'is required.'**
+  String get submitFieldIsRequiredSuffix;
+
+  /// No description provided for @submitInvalidUrlSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'must be a valid URL.'**
+  String get submitInvalidUrlSuffix;
 
   /// No description provided for @submitSuccess.
   ///

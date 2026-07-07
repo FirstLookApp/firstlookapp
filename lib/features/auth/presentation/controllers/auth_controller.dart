@@ -82,6 +82,20 @@ class AuthController extends AsyncNotifier<AuthState> {
     });
   }
 
+  Future<void> handleUnauthorized() async {
+    final repository = ref.read(authRepositoryProvider);
+
+    try {
+      await repository.clearSession();
+    } catch (_) {
+      // Best effort: local session cleanup is handled by the repository.
+    }
+
+    state = const AsyncData<AuthState>(
+      AuthState(status: AuthStatus.unauthenticated),
+    );
+  }
+
   Future<void> register({
     required String firstName,
     required String lastName,

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
@@ -20,6 +21,9 @@ class SubmitPage extends ConsumerStatefulWidget {
 }
 
 class _SubmitPageState extends ConsumerState<SubmitPage> {
+  static const int _maxScreenshotCount = 5;
+  static const int _maxScreenshotSizeBytes = 2 * 1024 * 1024;
+
   final TextEditingController _name = TextEditingController();
   final TextEditingController _description = TextEditingController();
   final TextEditingController _videoUrl = TextEditingController();
@@ -30,6 +34,16 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   PlatformType _selectedPlatform = PlatformType.android;
   SubmitDestination _selectedDestination = SubmitDestination.drop;
   List<PlatformFile> _screenshots = <PlatformFile>[];
+
+  bool get _showsAndroidField {
+    return _selectedPlatform == PlatformType.android ||
+        _selectedPlatform == PlatformType.both;
+  }
+
+  bool get _showsIosField {
+    return _selectedPlatform == PlatformType.ios ||
+        _selectedPlatform == PlatformType.both;
+  }
 
   @override
   void dispose() {
@@ -65,7 +79,12 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
             AppSnackbar.show(context, message: l10n.submitSuccess);
           },
           error: (Object error, StackTrace stackTrace) {
-            AppSnackbar.show(context, message: error.toString());
+            AppSnackbar.show(
+              context,
+              message: error is AppException
+                  ? error.message
+                  : l10n.commonUnexpectedError,
+            );
           },
         );
       },
@@ -124,6 +143,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                   files: _screenshots,
                   pickLabel: l10n.submitPickScreenshots,
                   onPick: _pickScreenshots,
+                  onRemove: _removeScreenshot,
                 ),
                 const SizedBox(height: 16),
                 AuthTextField(
@@ -159,19 +179,24 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 16),
                 _Label(text: l10n.submitStoreLinks),
                 const SizedBox(height: 8),
-                AuthTextField(
-                  controller: _googlePlayUrl,
-                  label: l10n.submitGooglePlayUrl,
-                  hint: l10n.submitGooglePlayUrl,
-                  keyboardType: TextInputType.url,
-                ),
-                const SizedBox(height: 12),
-                AuthTextField(
-                  controller: _appStoreUrl,
-                  label: l10n.submitAppStoreUrl,
-                  hint: l10n.submitAppStoreUrl,
-                  keyboardType: TextInputType.url,
-                ),
+                if (_showsAndroidField) ...<Widget>[
+                  AuthTextField(
+                    controller: _googlePlayUrl,
+                    label: l10n.submitGooglePlayUrl,
+                    hint: l10n.submitGooglePlayUrl,
+                    keyboardType: TextInputType.url,
+                  ),
+                ],
+                if (_showsAndroidField && _showsIosField)
+                  const SizedBox(height: 12),
+                if (_showsIosField) ...<Widget>[
+                  AuthTextField(
+                    controller: _appStoreUrl,
+                    label: l10n.submitAppStoreUrl,
+                    hint: l10n.submitAppStoreUrl,
+                    keyboardType: TextInputType.url,
+                  ),
+                ],
                 const SizedBox(height: 16),
                 _SegmentedControl<SubmitDestination>(
                   values: const <SubmitDestination>[
@@ -202,6 +227,17 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   }
 
   Future<void> _pickScreenshots() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
+    if (_screenshots.length >= _maxScreenshotCount) {
+      AppSnackbar.show(
+        context,
+        message:
+            '${l10n.submitScreenshotLimitPrefix} $_maxScreenshotCount',
+      );
+      return;
+    }
+
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.image,
@@ -211,10 +247,48 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       return;
     }
 
+    final List<PlatformFile> pickedFiles = result.files
+        .where((PlatformFile file) => file.path != null)
+        .toList(growable: false);
+
+    final List<PlatformFile> acceptedFiles = pickedFiles
+        .where((PlatformFile file) => file.size <= _maxScreenshotSizeBytes)
+        .toList(growable: false);
+
+    if (!mounted) {
+      return;
+    }
+
+    if (acceptedFiles.length != pickedFiles.length) {
+      AppSnackbar.show(context, message: l10n.submitScreenshotSizeError);
+    }
+
+    if (acceptedFiles.isEmpty) {
+      return;
+    }
+
     setState(() {
-      _screenshots = result.files
-          .where((PlatformFile file) => file.path != null)
-          .take(5)
+      final Map<String, PlatformFile> mergedFiles = <String, PlatformFile>{
+        for (final PlatformFile file in _screenshots)
+          if (file.path != null) file.path!: file,
+      };
+
+      for (final PlatformFile file in acceptedFiles) {
+        if (file.path != null) {
+          mergedFiles[file.path!] = file;
+        }
+      }
+
+      _screenshots = mergedFiles.values
+          .take(_maxScreenshotCount)
+          .toList(growable: false);
+    });
+  }
+
+  void _removeScreenshot(PlatformFile file) {
+    setState(() {
+      _screenshots = _screenshots
+          .where((PlatformFile current) => current.path != file.path)
           .toList(growable: false);
     });
   }
@@ -222,9 +296,43 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   void _submit(AppLocalizations l10n, List<String> categories) {
     final String name = _name.text.trim();
     final String description = _description.text.trim();
+    final String googlePlayUrl = _googlePlayUrl.text.trim();
+    final String appStoreUrl = _appStoreUrl.text.trim();
 
     if (name.isEmpty || description.isEmpty) {
       AppSnackbar.show(context, message: l10n.submitRequiredFields);
+      return;
+    }
+
+    if (_showsAndroidField && googlePlayUrl.isEmpty) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitGooglePlayUrl} ${l10n.submitFieldIsRequiredSuffix}',
+      );
+      return;
+    }
+
+    if (_showsIosField && appStoreUrl.isEmpty) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitAppStoreUrl} ${l10n.submitFieldIsRequiredSuffix}',
+      );
+      return;
+    }
+
+    if (_showsAndroidField && !_isValidStoreUrl(googlePlayUrl)) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitGooglePlayUrl} ${l10n.submitInvalidUrlSuffix}',
+      );
+      return;
+    }
+
+    if (_showsIosField && !_isValidStoreUrl(appStoreUrl)) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitAppStoreUrl} ${l10n.submitInvalidUrlSuffix}',
+      );
       return;
     }
 
@@ -235,8 +343,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
             description: description,
             videoUrl: _videoUrl.text.trim(),
             platform: _selectedPlatform,
-            appStoreUrl: _appStoreUrl.text.trim(),
-            googlePlayUrl: _googlePlayUrl.text.trim(),
+            appStoreUrl: _showsIosField ? appStoreUrl : '',
+            googlePlayUrl: _showsAndroidField ? googlePlayUrl : '',
             destination: _selectedDestination,
             screenshotPaths: _screenshots
                 .map((PlatformFile file) => file.path)
@@ -244,6 +352,13 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 .toList(growable: false),
           ),
         );
+  }
+
+  bool _isValidStoreUrl(String value) {
+    final Uri? uri = Uri.tryParse(value);
+    return uri != null &&
+        (uri.scheme == 'http' || uri.scheme == 'https') &&
+        (uri.host.isNotEmpty);
   }
 
   void _clearForm() {
@@ -382,34 +497,81 @@ class _ScreenshotPickerPreview extends StatelessWidget {
     required this.files,
     required this.pickLabel,
     required this.onPick,
+    required this.onRemove,
   });
 
   final List<PlatformFile> files;
   final String pickLabel;
   final VoidCallback onPick;
+  final ValueChanged<PlatformFile> onRemove;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 118,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: _ScreenshotSlot(
-              file: files.isEmpty ? null : files.first,
-              onPick: onPick,
-              pickLabel: pickLabel,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _ScreenshotSlot(
-              file: files.length < 2 ? null : files[1],
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: files.length < 5 ? files.length + 1 : files.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (BuildContext context, int index) {
+          if (index >= files.length) {
+            return _AddScreenshotSlot(
               onPick: onPick,
               pickLabel: files.isEmpty ? pickLabel : '${files.length}/5',
+            );
+          }
+
+          return _ScreenshotSlot(
+            file: files[index],
+            onRemove: () => onRemove(files[index]),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _AddScreenshotSlot extends StatelessWidget {
+  const _AddScreenshotSlot({
+    required this.onPick,
+    required this.pickLabel,
+  });
+
+  final VoidCallback onPick;
+  final String pickLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPick,
+      child: Container(
+        width: 132,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8F8FA),
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Icon(
+              Icons.add_rounded,
+              color: AppColors.primary,
+              size: 30,
             ),
-          ),
-        ],
+            const SizedBox(height: 6),
+            Text(
+              pickLabel,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -418,55 +580,56 @@ class _ScreenshotPickerPreview extends StatelessWidget {
 class _ScreenshotSlot extends StatelessWidget {
   const _ScreenshotSlot({
     required this.file,
-    required this.onPick,
-    required this.pickLabel,
+    required this.onRemove,
   });
 
-  final PlatformFile? file;
-  final VoidCallback onPick;
-  final String pickLabel;
+  final PlatformFile file;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
-    final String? path = file?.path;
+    final String? path = file.path;
 
-    return GestureDetector(
-      onTap: onPick,
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8F8FA),
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(16),
+    return Stack(
+      children: <Widget>[
+        Container(
+          width: 132,
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8F8FA),
+            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: path == null
+              ? const SizedBox.shrink()
+              : Image.file(
+                  File(path),
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                ),
         ),
-        child: path == null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Icon(
-                    Icons.add_rounded,
-                    color: AppColors.primary,
-                    size: 30,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    pickLabel,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              )
-            : Image.file(
-                File(path),
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: double.infinity,
+        Positioned(
+          top: 8,
+          left: 8,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                shape: BoxShape.circle,
               ),
-      ),
+              child: const Icon(
+                Icons.close_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

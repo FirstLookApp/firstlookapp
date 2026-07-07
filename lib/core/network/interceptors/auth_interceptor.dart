@@ -7,11 +7,19 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor({
     required SecureTokenStorage tokenStorage,
     required Future<String?> Function() refreshAccessToken,
+    required Future<Response<dynamic>> Function(RequestOptions requestOptions)
+        retryRequest,
+    required Future<void> Function() onUnauthorized,
   })  : _tokenStorage = tokenStorage,
-        _refreshAccessToken = refreshAccessToken;
+        _refreshAccessToken = refreshAccessToken,
+        _retryRequest = retryRequest,
+        _onUnauthorized = onUnauthorized;
 
   final SecureTokenStorage _tokenStorage;
   final Future<String?> Function() _refreshAccessToken;
+  final Future<Response<dynamic>> Function(RequestOptions requestOptions)
+      _retryRequest;
+  final Future<void> Function() _onUnauthorized;
   Completer<String?>? _refreshCompleter;
 
   @override
@@ -62,6 +70,7 @@ class AuthInterceptor extends Interceptor {
       _refreshCompleter = null;
 
       if (token == null || token.isEmpty) {
+        await _onUnauthorized();
         handler.next(err);
         return;
       }
@@ -70,11 +79,11 @@ class AuthInterceptor extends Interceptor {
       requestOptions.headers['Authorization'] = 'Bearer $token';
       requestOptions.extra['hasRetried'] = true;
 
-      final Response<dynamic> response =
-          await Dio().fetch<dynamic>(requestOptions);
+      final Response<dynamic> response = await _retryRequest(requestOptions);
       handler.resolve(response);
     } catch (_) {
       _refreshCompleter = null;
+      await _onUnauthorized();
       handler.next(err);
     }
   }

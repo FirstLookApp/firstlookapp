@@ -1,6 +1,6 @@
+import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/network/url_resolver.dart';
-import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
@@ -67,7 +67,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                       (ApplicationListItem item) => _FavoriteAppCard(
                         item: item,
                         onTap: () => context.push(
-                          RouteNames.detailPath.replaceFirst(':id', item.id),
+                          'applications/${item.id}?platform=${item.platform}',
                         ),
                       ),
                     ),
@@ -75,7 +75,9 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
               );
             },
             error: (Object error, StackTrace stackTrace) => AppErrorState(
-              message: error.toString(),
+              message: error is AppException
+                  ? error.message
+                  : l10n.commonUnexpectedError,
               onRetry: () => ref.invalidate(favoritesProvider),
             ),
             loading: () => const AppLoadingIndicator(),

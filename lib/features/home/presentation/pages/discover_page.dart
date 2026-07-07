@@ -1,6 +1,5 @@
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
-import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
@@ -69,10 +68,7 @@ class DiscoverPage extends ConsumerWidget {
                                   ? l10n.discoverReviewButton
                                   : l10n.detailJoinBeta,
                               onTap: () => context.push(
-                                RouteNames.detailPath.replaceFirst(
-                                  ':id',
-                                  item.id,
-                                ),
+                                'applications/${item.id}?platform=${PlatformType.both.apiValue}',
                               ),
                             );
                           },
@@ -97,7 +93,7 @@ class DiscoverPage extends ConsumerWidget {
                               ? l10n.discoverReviewButton
                               : l10n.detailJoinBeta,
                           onTap: () => context.push(
-                            RouteNames.detailPath.replaceFirst(':id', item.id),
+                            'applications/${item.id}?platform=${item.platform}',
                           ),
                         ),
                       )

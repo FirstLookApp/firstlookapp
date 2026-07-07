@@ -1,6 +1,7 @@
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
+import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
@@ -16,10 +17,12 @@ import 'package:url_launcher/url_launcher.dart';
 class ApplicationDetailPage extends ConsumerStatefulWidget {
   const ApplicationDetailPage({
     required this.applicationId,
+    required this.initialPlatform,
     super.key,
   });
 
   final String applicationId;
+  final PlatformType initialPlatform;
 
   @override
   ConsumerState<ApplicationDetailPage> createState() =>
@@ -40,11 +43,29 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final ApplicationDetailRequest request = ApplicationDetailRequest(
+      id: widget.applicationId,
+      platform: widget.initialPlatform,
+    );
     final AsyncValue<ApplicationDetail> detail =
-        ref.watch(applicationDetailProvider(widget.applicationId));
+        ref.watch(applicationDetailProvider(request));
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.of(context).maybePop(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: detail.when(
         data: (ApplicationDetail app) => SafeArea(
           child: ListView(
@@ -52,12 +73,11 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
             children: <Widget>[
               _DetailHeader(
                 app: app,
-                onBack: () => Navigator.of(context).maybePop(),
                 onLike: () async {
                   await ref
                       .read(firstLookRepositoryProvider)
                       .toggleLike(app.id);
-                  ref.invalidate(applicationDetailProvider(app.id));
+                  ref.invalidate(applicationDetailProvider(request));
                 },
               ),
               const SizedBox(height: 18),
@@ -150,7 +170,7 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                         .read(firstLookRepositoryProvider)
                         .trackStoreClick(
                           id: app.id,
-                          platform: ref.read(selectedPlatformProvider),
+                          platform: widget.initialPlatform,
                         );
                     if (url.isNotEmpty) {
                       await launchUrl(
@@ -165,9 +185,10 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
           ),
         ),
         error: (Object error, StackTrace stackTrace) => AppErrorState(
-          message: error.toString(),
-          onRetry: () =>
-              ref.invalidate(applicationDetailProvider(widget.applicationId)),
+          message: error is AppException
+              ? error.message
+              : l10n.commonUnexpectedError,
+          onRetry: () => ref.invalidate(applicationDetailProvider(request)),
         ),
         loading: () => const AppLoadingIndicator(),
       ),
@@ -178,12 +199,10 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
 class _DetailHeader extends StatelessWidget {
   const _DetailHeader({
     required this.app,
-    required this.onBack,
     required this.onLike,
   });
 
   final ApplicationDetail app;
-  final VoidCallback onBack;
   final VoidCallback onLike;
 
   @override
@@ -195,14 +214,10 @@ class _DetailHeader extends StatelessWidget {
       children: <Widget>[
         Row(
           children: <Widget>[
-            IconButton(
-              onPressed: onBack,
-              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-            ),
             Expanded(
               child: Text(
                 app.name,
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.left,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

@@ -103,6 +103,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> clearSession() {
+    return _localDataSource.clear();
+  }
+
+  @override
   Future<AuthTokens> refreshToken() async {
     final UserSession? currentSession = await _localDataSource.restoreSession();
     final String refreshToken = currentSession?.tokens.refreshToken ?? '';

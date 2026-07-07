@@ -1,5 +1,6 @@
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
+import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/pages/application_detail_page.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/features/auth/presentation/pages/forgot_password_page.dart';
@@ -92,13 +93,6 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         builder: (_, __) => const ForgotPasswordPage(),
       ),
       GoRoute(
-        path: RouteNames.detailPath,
-        name: RouteNames.detail,
-        builder: (_, GoRouterState state) => ApplicationDetailPage(
-          applicationId: state.pathParameters['id'] ?? '',
-        ),
-      ),
-      GoRoute(
         path: RouteNames.notificationsPath,
         name: RouteNames.notifications,
         builder: (_, __) => const NotificationsPage(),
@@ -118,6 +112,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.discoverPath,
                 name: RouteNames.discover,
                 builder: (_, __) => const DiscoverPage(),
+                routes: <RouteBase>[_detailRoute()],
               ),
             ],
           ),
@@ -127,6 +122,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.submitPath,
                 name: RouteNames.submit,
                 builder: (_, __) => const SubmitPage(),
+                routes: <RouteBase>[_detailRoute()],
               ),
             ],
           ),
@@ -136,6 +132,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.favoritesPath,
                 name: RouteNames.favorites,
                 builder: (_, __) => const FavoritesPage(),
+                routes: <RouteBase>[_detailRoute()],
               ),
             ],
           ),
@@ -145,6 +142,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.profilePath,
                 name: RouteNames.profile,
                 builder: (_, __) => const ProfilePage(),
+                routes: <RouteBase>[_detailRoute()],
               ),
             ],
           ),
@@ -153,6 +151,19 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
     ],
   );
 });
+
+GoRoute _detailRoute() {
+  return GoRoute(
+    path: 'applications/:id',
+    builder: (_, GoRouterState state) => ApplicationDetailPage(
+      applicationId: state.pathParameters['id'] ?? '',
+      initialPlatform: PlatformType.fromApiValue(
+        int.tryParse(state.uri.queryParameters['platform'] ?? '') ??
+            PlatformType.both.apiValue,
+      ),
+    ),
+  );
+}
 
 class RouterRefreshNotifier extends ChangeNotifier {
   void notify() {

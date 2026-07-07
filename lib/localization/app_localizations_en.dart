@@ -318,6 +318,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitPickScreenshots => 'Pick image';
 
   @override
+  String get submitScreenshotSizeError =>
+      'Each screenshot must be at most 2 MB.';
+
+  @override
+  String get submitScreenshotLimitPrefix => 'Maximum screenshot count:';
+
+  @override
   String get submitPlatform => 'PLATFORM';
 
   @override
@@ -335,6 +342,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get submitRequiredFields =>
       'Fill in the application name and description.';
+
+  @override
+  String get submitFieldIsRequiredSuffix => 'is required.';
+
+  @override
+  String get submitInvalidUrlSuffix => 'must be a valid URL.';
 
   @override
   String get submitSuccess => 'Application sent for review.';

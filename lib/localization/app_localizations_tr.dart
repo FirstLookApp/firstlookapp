@@ -317,6 +317,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitPickScreenshots => 'Görsel seç';
 
   @override
+  String get submitScreenshotSizeError =>
+      'Her ekran görüntüsü en fazla 2 MB olabilir.';
+
+  @override
+  String get submitScreenshotLimitPrefix => 'En fazla ekran görüntüsü sayısı:';
+
+  @override
   String get submitPlatform => 'PLATFORM';
 
   @override
@@ -334,6 +341,12 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get submitRequiredFields =>
       'Uygulama adı ve açıklama alanlarını doldurun.';
+
+  @override
+  String get submitFieldIsRequiredSuffix => 'alanı zorunludur.';
+
+  @override
+  String get submitInvalidUrlSuffix => 'geçerli bir bağlantı olmalıdır.';
 
   @override
   String get submitSuccess => 'Uygulama incelemeye gönderildi.';

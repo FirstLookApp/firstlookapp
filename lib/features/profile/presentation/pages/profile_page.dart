@@ -1,3 +1,4 @@
+import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
@@ -11,6 +12,7 @@ import 'package:firstlook/widgets/app_loading_indicator.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -71,7 +73,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
           ),
           error: (Object error, StackTrace stackTrace) => AppErrorState(
-            message: error.toString(),
+            message: error is AppException
+                ? error.message
+                : l10n.commonUnexpectedError,
             onRetry: () => ref.invalidate(profileProvider),
           ),
           loading: () => const AppLoadingIndicator(),
@@ -295,12 +299,24 @@ class _MyApplicationsList extends ConsumerWidget {
 
         return Column(
           children: result.items
-              .map<Widget>((ApplicationListItem item) =>
-                  _ProfileApplicationCard(item: item))
+              .map<Widget>(
+                (ApplicationListItem item) => _ProfileApplicationCard(
+                  item: item,
+                  onTap: () => context.push(
+                    'applications/${item.id}?platform=${item.platform}',
+                  ),
+                ),
+              )
               .toList(),
         );
       },
-      error: (Object error, StackTrace stackTrace) => Text(error.toString()),
+      error: (Object error, StackTrace stackTrace) => AppErrorState(
+        message: error is AppException
+            ? error.message
+            : AppLocalizations.of(context)?.commonUnexpectedError ??
+                'Something went wrong. Please try again.',
+        onRetry: () => ref.invalidate(myApplicationsProvider),
+      ),
       loading: () => const AppLoadingIndicator(),
     );
   }
@@ -309,68 +325,74 @@ class _MyApplicationsList extends ConsumerWidget {
 class _ProfileApplicationCard extends StatelessWidget {
   const _ProfileApplicationCard({
     required this.item,
+    required this.onTap,
   });
 
   final ApplicationListItem item;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-              width: 48,
-              height: 48,
-              child: item.mainScreenshot.isEmpty
-                  ? const ColoredBox(
-                      color: AppColors.primarySoft,
-                      child: Icon(Icons.apps_rounded, color: AppColors.primary),
-                    )
-                  : Image.network(
-                      UrlResolver.media(item.mainScreenshot),
-                      fit: BoxFit.cover,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: item.mainScreenshot.isEmpty
+                    ? const ColoredBox(
+                        color: AppColors.primarySoft,
+                        child:
+                            Icon(Icons.apps_rounded, color: AppColors.primary),
+                      )
+                    : Image.network(
+                        UrlResolver.media(item.mainScreenshot),
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
                     ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  item.shortDescription,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 12,
+                  const SizedBox(height: 4),
+                  Text(
+                    item.shortDescription,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
-        ],
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+          ],
+        ),
       ),
     );
   }

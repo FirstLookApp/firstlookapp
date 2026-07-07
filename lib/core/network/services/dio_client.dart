@@ -65,6 +65,8 @@ class DioClient {
         AuthInterceptor(
           tokenStorage: _tokenStorage,
           refreshAccessToken: _refreshAccessToken,
+          retryRequest: _retryRequest,
+          onUnauthorized: _handleUnauthorized,
         ),
         RetryInterceptor(_instance),
         LoggingInterceptor(_loggerService),
@@ -82,5 +84,13 @@ class DioClient {
 
     final tokens = await repository.refreshToken();
     return tokens.accessToken;
+  }
+
+  Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) {
+    return _instance.fetch<dynamic>(requestOptions);
+  }
+
+  Future<void> _handleUnauthorized() async {
+    await _ref.read(authControllerProvider.notifier).handleUnauthorized();
   }
 }

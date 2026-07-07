@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:firstlook/core/errors/app_exception.dart';
 
@@ -51,6 +53,15 @@ abstract final class ErrorMapper {
       return const AppException(
         message: 'No internet connection was detected.',
         identifier: 'connection_error',
+      );
+    }
+
+    if (error.error is SocketException ||
+        (error.message?.contains('SocketException') ?? false) ||
+        (error.message?.contains('Connection reset by peer') ?? false)) {
+      return const AppException(
+        message: 'The service is temporarily unavailable. Please try again.',
+        identifier: 'socket_error',
       );
     }
 
