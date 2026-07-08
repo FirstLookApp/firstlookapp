@@ -27,6 +27,12 @@ final applicationListProvider =
       );
 });
 
+final activeDropProvider = FutureProvider<ActiveDropBatch?>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).activeDrop(
+        platform: ref.watch(selectedPlatformProvider),
+      );
+});
+
 final applicationDetailProvider =
     FutureProvider.family<ApplicationDetail, ApplicationDetailRequest>(
   (Ref ref, ApplicationDetailRequest request) {

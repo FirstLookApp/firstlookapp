@@ -28,11 +28,32 @@ abstract final class RouteNames {
   static String applicationDetailLocation({
     required String id,
     required int platform,
+    String? currentPath,
   }) {
-    return '/applications/$id?platform=$platform';
+    return '${_shellRootFor(currentPath)}/applications/$id?platform=$platform';
   }
 
-  static String userProfileLocation(String id) {
-    return '/users/$id';
+  static String userProfileLocation(String id, {String? currentPath}) {
+    return '${_shellRootFor(currentPath)}/users/$id';
+  }
+
+  static String _shellRootFor(String? path) {
+    if (path == null || path.isEmpty) {
+      return discoverPath;
+    }
+
+    if (path.startsWith(submitPath)) {
+      return submitPath;
+    }
+
+    if (path.startsWith(favoritesPath)) {
+      return favoritesPath;
+    }
+
+    if (path.startsWith(profilePath)) {
+      return profilePath;
+    }
+
+    return discoverPath;
   }
 }

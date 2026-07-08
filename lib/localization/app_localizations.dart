@@ -806,6 +806,18 @@ abstract class AppLocalizations {
   /// **'Promote My App'**
   String get profilePromoteApp;
 
+  /// No description provided for @profilePromoteSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get profilePromoteSoonTitle;
+
+  /// No description provided for @profilePromoteSoonMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Very soon, we will open new promotion options that help your applications reach more people. Once everything is ready, you will be able to start directly from your profile.'**
+  String get profilePromoteSoonMessage;
+
   /// No description provided for @profileCommentsTodo.
   ///
   /// In en, this message translates to:

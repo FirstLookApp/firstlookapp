@@ -19,6 +19,7 @@ abstract final class ApiPaths {
   static const String myBetaRequests = '/api/applications/my-beta-requests';
   static const String userSearch = '/api/users/search';
   static const String discovery = '/api/discovery';
+  static const String activeDrop = '/api/discovery/drop/active';
   static const String interactions = '/api/interactions';
 
   static String userProfile(String userId) => '/api/users/$userId/profile';

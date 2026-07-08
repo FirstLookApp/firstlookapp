@@ -67,6 +67,52 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<ActiveDropBatch?> activeDrop({
+    required PlatformType platform,
+  }) async {
+    try {
+      final Response<Map<String, dynamic>> response =
+          await _dio.get<Map<String, dynamic>>(
+        ApiPaths.activeDrop,
+        queryParameters: <String, dynamic>{'platform': platform.label},
+        options: Options(extra: <String, dynamic>{'requiresAuth': false}),
+      );
+
+      final ApiEnvelope<ActiveDropBatch> envelope =
+          ApiEnvelope<ActiveDropBatch>.fromJson(
+        response.data ?? <String, dynamic>{},
+        (Object? json) => ActiveDropBatch.fromJson(
+          json is Map<String, dynamic> ? json : <String, dynamic>{},
+        ),
+      );
+
+      return envelope.data;
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        final PagedResult<ApplicationListItem> fallback =
+            await listApplications(
+          destination: SubmitDestination.drop,
+          platform: platform,
+        );
+
+        if (fallback.items.isEmpty) {
+          return null;
+        }
+
+        return ActiveDropBatch(
+          id: '',
+          name: '',
+          platform: platform.apiValue,
+          plannedStartAt: null,
+          publishedAt: null,
+          items: fallback.items,
+        );
+      }
+
+      rethrow;
+    }
+  }
+
   Future<String> submitApplication(SubmitApplicationPayload payload) async {
     final FormData formData = FormData.fromMap(<String, dynamic>{
       'Name': payload.name,
@@ -101,12 +147,32 @@ class FirstLookRemoteDataSource {
     required String id,
     required PlatformType platform,
   }) async {
+    try {
+      return await _detail(id: id, platform: platform);
+    } on DioException catch (error) {
+      if (platform == PlatformType.both &&
+          (error.response?.statusCode == 404 ||
+              error.response?.statusCode == 500)) {
+        try {
+          return await _detail(id: id, platform: PlatformType.ios);
+        } on DioException {
+          return _detail(id: id, platform: PlatformType.android);
+        }
+      }
+
+      rethrow;
+    }
+  }
+
+  Future<ApplicationDetail> _detail({
+    required String id,
+    required PlatformType platform,
+  }) async {
     final Response<Map<String, dynamic>> response =
         await _dio.get<Map<String, dynamic>>(
       '${ApiPaths.discovery}/$id/detail',
       queryParameters: <String, dynamic>{'platform': platform.label},
     );
-
     final ApiEnvelope<ApplicationDetail> envelope =
         ApiEnvelope<ApplicationDetail>.fromJson(
       response.data ?? <String, dynamic>{},

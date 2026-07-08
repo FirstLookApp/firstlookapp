@@ -64,6 +64,7 @@ class UserProfilePreviewPage extends ConsumerWidget {
                         RouteNames.applicationDetailLocation(
                           id: item.id,
                           platform: item.platform,
+                          currentPath: GoRouterState.of(context).uri.path,
                         ),
                       ),
                     ),

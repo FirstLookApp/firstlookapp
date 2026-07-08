@@ -489,7 +489,6 @@ class _CommentCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const Icon(Icons.thumb_up_alt_outlined, size: 14),
             ],
           ),
           const SizedBox(height: 10),

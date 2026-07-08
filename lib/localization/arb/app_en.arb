@@ -119,6 +119,8 @@
   "profileMyApps": "My applications",
   "profileMyComments": "My comments",
   "profilePromoteApp": "Promote My App",
+  "profilePromoteSoonTitle": "Coming soon",
+  "profilePromoteSoonMessage": "Very soon, we will open new promotion options that help your applications reach more people. Once everything is ready, you will be able to start directly from your profile.",
   "profileCommentsTodo": "Waiting for the mobile profile comments endpoint.",
   "profileStatsApps": "Applications",
   "profileStatsLikes": "Likes",

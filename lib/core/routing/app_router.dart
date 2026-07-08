@@ -114,13 +114,18 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
       ),
       GoRoute(
         path: RouteNames.detailPath,
-        builder: (_, GoRouterState state) => _detailPage(state),
+        redirect: (_, GoRouterState state) =>
+            RouteNames.applicationDetailLocation(
+          id: state.pathParameters['id'] ?? '',
+          platform: int.tryParse(state.uri.queryParameters['platform'] ?? '') ??
+              PlatformType.both.apiValue,
+        ),
       ),
       GoRoute(
         path: RouteNames.userProfilePath,
         name: RouteNames.userProfile,
-        builder: (_, GoRouterState state) => UserProfilePreviewPage(
-          userId: state.pathParameters['id'] ?? '',
+        redirect: (_, GoRouterState state) => RouteNames.userProfileLocation(
+          state.pathParameters['id'] ?? '',
         ),
       ),
       StatefulShellRoute.indexedStack(
@@ -138,7 +143,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.discoverPath,
                 name: RouteNames.discover,
                 builder: (_, __) => const DiscoverPage(),
-                routes: <RouteBase>[_detailRoute()],
+                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],
           ),
@@ -148,7 +153,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.submitPath,
                 name: RouteNames.submit,
                 builder: (_, __) => const SubmitPage(),
-                routes: <RouteBase>[_detailRoute()],
+                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],
           ),
@@ -158,7 +163,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.favoritesPath,
                 name: RouteNames.favorites,
                 builder: (_, __) => const FavoritesPage(),
-                routes: <RouteBase>[_detailRoute()],
+                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],
           ),
@@ -168,7 +173,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.profilePath,
                 name: RouteNames.profile,
                 builder: (_, __) => const ProfilePage(),
-                routes: <RouteBase>[_detailRoute()],
+                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],
           ),
@@ -190,6 +195,15 @@ GoRoute _detailRoute() {
   return GoRoute(
     path: 'applications/:id',
     builder: (_, GoRouterState state) => _detailPage(state),
+  );
+}
+
+GoRoute _userProfileRoute() {
+  return GoRoute(
+    path: 'users/:id',
+    builder: (_, GoRouterState state) => UserProfilePreviewPage(
+      userId: state.pathParameters['id'] ?? '',
+    ),
   );
 }
 

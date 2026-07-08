@@ -35,6 +35,12 @@ class FirstLookRepository {
     );
   }
 
+  Future<ActiveDropBatch?> activeDrop({
+    required PlatformType platform,
+  }) {
+    return _remoteDataSource.activeDrop(platform: platform);
+  }
+
   Future<String> submitApplication(SubmitApplicationPayload payload) {
     return _remoteDataSource.submitApplication(payload);
   }

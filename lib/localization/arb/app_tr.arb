@@ -119,6 +119,8 @@
   "profileMyApps": "Uygulamalarim",
   "profileMyComments": "Yorumlarim",
   "profilePromoteApp": "Uygulamanı Öne Çıkar",
+  "profilePromoteSoonTitle": "Çok yakında",
+  "profilePromoteSoonMessage": "Çok yakında uygulamalarınızın daha fazla kişiye ulaşmasını sağlayacak yeni öne çıkarma seçeneklerini açacağız. Hazırlıklar tamamlandığında profilinizden kolayca başlatabileceksiniz.",
   "profileCommentsTodo": "Yorumlarım için mobil profil endpoint'i bekleniyor.",
   "profileStatsApps": "Uygulama",
   "profileStatsLikes": "Begeni",

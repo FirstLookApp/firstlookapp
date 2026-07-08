@@ -29,7 +29,7 @@ class AppShell extends StatelessWidget {
             onTap: (int index) {
               navigationShell.goBranch(
                 index,
-                initialLocation: index == navigationShell.currentIndex,
+                initialLocation: true,
               );
             },
             type: BottomNavigationBarType.fixed,

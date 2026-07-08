@@ -370,6 +370,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profilePromoteApp => 'Uygulamanı Öne Çıkar';
 
   @override
+  String get profilePromoteSoonTitle => 'Çok yakında';
+
+  @override
+  String get profilePromoteSoonMessage =>
+      'Çok yakında uygulamalarınızın daha fazla kişiye ulaşmasını sağlayacak yeni öne çıkarma seçeneklerini açacağız. Hazırlıklar tamamlandığında profilinizden kolayca başlatabileceksiniz.';
+
+  @override
   String get profileCommentsTodo =>
       'Yorumlarım için mobil profil endpoint\'i bekleniyor.';
 

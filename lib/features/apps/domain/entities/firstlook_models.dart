@@ -88,6 +88,44 @@ class ApplicationListItem {
   final double score;
 }
 
+class ActiveDropBatch {
+  const ActiveDropBatch({
+    required this.id,
+    required this.name,
+    required this.platform,
+    required this.plannedStartAt,
+    required this.publishedAt,
+    required this.items,
+  });
+
+  factory ActiveDropBatch.fromJson(Map<String, dynamic> json) {
+    final List<Object?> rawItems = json['items'] is List<Object?>
+        ? json['items'] as List<Object?>
+        : <Object?>[];
+
+    return ActiveDropBatch(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      platform: json['platform'] as int? ?? PlatformType.both.apiValue,
+      plannedStartAt: DateTime.tryParse(
+        json['plannedStartAt'] as String? ?? '',
+      ),
+      publishedAt: DateTime.tryParse(json['publishedAt'] as String? ?? ''),
+      items: rawItems
+          .whereType<Map<String, dynamic>>()
+          .map<ApplicationListItem>(ApplicationListItem.fromJson)
+          .toList(growable: false),
+    );
+  }
+
+  final String id;
+  final String name;
+  final int platform;
+  final DateTime? plannedStartAt;
+  final DateTime? publishedAt;
+  final List<ApplicationListItem> items;
+}
+
 class SubmitApplicationPayload {
   const SubmitApplicationPayload({
     required this.name,

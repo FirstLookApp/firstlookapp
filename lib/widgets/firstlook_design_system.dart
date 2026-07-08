@@ -344,13 +344,20 @@ Future<void> showFirstLookSearch(
   BuildContext context,
   WidgetRef ref,
 ) {
+  String sourcePath = RouteNames.discoverPath;
+  try {
+    sourcePath = GoRouterState.of(context).uri.path;
+  } catch (_) {
+    sourcePath = RouteNames.discoverPath;
+  }
+
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-    barrierColor: Colors.white,
+    barrierColor: Colors.black.withValues(alpha: 0.18),
     transitionDuration: const Duration(milliseconds: 180),
-    pageBuilder: (_, __, ___) => const _SearchSheet(),
+    pageBuilder: (_, __, ___) => _SearchSheet(sourcePath: sourcePath),
     transitionBuilder: (
       BuildContext context,
       Animation<double> animation,
@@ -363,7 +370,11 @@ Future<void> showFirstLookSearch(
 }
 
 class _SearchSheet extends ConsumerStatefulWidget {
-  const _SearchSheet();
+  const _SearchSheet({
+    required this.sourcePath,
+  });
+
+  final String sourcePath;
 
   @override
   ConsumerState<_SearchSheet> createState() => _SearchSheetState();
@@ -385,28 +396,47 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Size screenSize = MediaQuery.sizeOf(context);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 390),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 30),
-              children: <Widget>[
-                const FirstLookScreenHeader(),
-                const SizedBox(height: 22),
-                FirstLookSoftCard(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Material(
+            color: Colors.transparent,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 430,
+                maxHeight: screenSize.height * 0.72,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(26),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: AppColors.shadow,
+                      blurRadius: 34,
+                      offset: Offset(0, 18),
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 8, 6, 6),
+                      child: Row(
                         children: <Widget>[
-                          IconButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            icon: const Icon(Icons.arrow_back_rounded),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.search_rounded,
+                            color: AppColors.primary,
+                            size: 24,
                           ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               controller: _controller,
@@ -434,69 +464,81 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
                           ),
                         ],
                       ),
-                      const Divider(height: 1),
-                      if (_controller.text.trim().length < 3)
-                        _SearchEmpty(message: l10n.searchMinCharacters)
-                      else
-                        _results.when(
-                          data: (_SearchResults results) => Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              const SizedBox(height: 10),
-                              _SearchSectionTitle(
-                                title: l10n.searchApplications,
+                    ),
+                    const Divider(height: 1),
+                    Flexible(
+                      child: ListView(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                        children: <Widget>[
+                          if (_controller.text.trim().length < 3)
+                            _SearchEmpty(message: l10n.searchMinCharacters)
+                          else
+                            _results.when(
+                              data: (_SearchResults results) => Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  _SearchSectionTitle(
+                                    title: l10n.searchApplications,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  if (results.applications.isEmpty)
+                                    _SearchEmpty(message: l10n.commonNoData)
+                                  else
+                                    ...results.applications.map(
+                                      (ApplicationListItem item) =>
+                                          _SearchResultRow(
+                                        item: item,
+                                        onTap: () {
+                                          Navigator.of(context).pop();
+                                          context.push(
+                                            RouteNames
+                                                .applicationDetailLocation(
+                                              id: item.id,
+                                              platform: item.platform,
+                                              currentPath: widget.sourcePath,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  const SizedBox(height: 16),
+                                  _SearchSectionTitle(title: l10n.searchUsers),
+                                  const SizedBox(height: 8),
+                                  if (results.users.isEmpty)
+                                    _SearchEmpty(message: l10n.commonNoData)
+                                  else
+                                    ...results.users.map(
+                                      (UserSearchItem item) =>
+                                          _UserSearchResultRow(
+                                        item: item,
+                                        onTap: () {
+                                          Navigator.of(context).pop();
+                                          context.push(
+                                            RouteNames.userProfileLocation(
+                                              item.userId,
+                                              currentPath: widget.sourcePath,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                ],
                               ),
-                              const SizedBox(height: 8),
-                              if (results.applications.isEmpty)
-                                _SearchEmpty(message: l10n.commonNoData)
-                              else
-                                ...results.applications.map(
-                                  (ApplicationListItem item) =>
-                                      _SearchResultRow(
-                                    item: item,
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      context.push(
-                                        RouteNames.applicationDetailLocation(
-                                          id: item.id,
-                                          platform: item.platform,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              const SizedBox(height: 16),
-                              _SearchSectionTitle(title: l10n.searchUsers),
-                              const SizedBox(height: 8),
-                              if (results.users.isEmpty)
-                                _SearchEmpty(message: l10n.commonNoData)
-                              else
-                                ...results.users.map(
-                                  (UserSearchItem item) => _UserSearchResultRow(
-                                    item: item,
-                                    onTap: () {
-                                      Navigator.of(context).pop();
-                                      context.push(
-                                        RouteNames.userProfileLocation(
-                                          item.userId,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                            ],
-                          ),
-                          error: (Object error, StackTrace stackTrace) =>
-                              _SearchEmpty(message: error.toString()),
-                          loading: () => const Padding(
-                            padding: EdgeInsets.all(30),
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                        ),
-                    ],
-                  ),
+                              error: (Object error, StackTrace stackTrace) =>
+                                  _SearchEmpty(message: error.toString()),
+                              loading: () => const Padding(
+                                padding: EdgeInsets.all(30),
+                                child:
+                                    Center(child: CircularProgressIndicator()),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -712,6 +754,7 @@ class _UserSearchResultRow extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
+      trailing: const Icon(Icons.chevron_right_rounded),
     );
   }
 }

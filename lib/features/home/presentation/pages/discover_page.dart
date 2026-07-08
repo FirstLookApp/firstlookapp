@@ -20,20 +20,50 @@ class DiscoverPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final AsyncValue<List<DiscoveryItem>> discovery =
-        ref.watch(discoveryProvider);
-    final AsyncValue<PagedResult<ApplicationListItem>> list =
-        ref.watch(applicationListProvider);
     final SubmitDestination destination =
         ref.watch(selectedDestinationProvider);
+    final AsyncValue<ActiveDropBatch?>? activeDrop =
+        destination == SubmitDestination.drop
+            ? ref.watch(activeDropProvider)
+            : null;
+    final AsyncValue<List<DiscoveryItem>>? discovery =
+        destination == SubmitDestination.test
+            ? ref.watch(discoveryProvider)
+            : null;
+    final AsyncValue<PagedResult<ApplicationListItem>>? list =
+        destination == SubmitDestination.test
+            ? ref.watch(applicationListProvider)
+            : null;
+    final String bannerTitle = destination == SubmitDestination.drop
+        ? activeDrop?.maybeWhen(
+              data: (ActiveDropBatch? drop) =>
+                  drop != null && drop.name.isNotEmpty
+                      ? drop.name
+                      : l10n.discoverTitle,
+              orElse: () => l10n.discoverTitle,
+            ) ??
+            l10n.discoverTitle
+        : l10n.testDiscoverTitle;
+    final Set<String> featuredTestIds = destination == SubmitDestination.test
+        ? discovery?.maybeWhen(
+              data: (List<DiscoveryItem> items) =>
+                  items.take(3).map((DiscoveryItem item) => item.id).toSet(),
+              orElse: () => const <String>{},
+            ) ??
+            const <String>{}
+        : const <String>{};
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(discoveryProvider);
-            ref.invalidate(applicationListProvider);
+            if (destination == SubmitDestination.drop) {
+              ref.invalidate(activeDropProvider);
+            } else {
+              ref.invalidate(discoveryProvider);
+              ref.invalidate(applicationListProvider);
+            }
           },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(
@@ -61,9 +91,7 @@ class DiscoverPage extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
               _WeeklyBanner(
-                title: destination == SubmitDestination.drop
-                    ? l10n.discoverTitle
-                    : l10n.testDiscoverTitle,
+                title: bannerTitle,
                 timer: l10n.discoverBannerTimer,
                 badge: l10n.discoverWeekBadge,
               ),
@@ -74,65 +102,119 @@ class DiscoverPage extends ConsumerWidget {
                     : l10n.testStageTitle,
               ),
               const SizedBox(height: 12),
-              discovery.when(
-                data: (List<DiscoveryItem> items) => items.isEmpty
-                    ? const SizedBox.shrink()
-                    : Column(
-                        children: items.take(3).map(
-                          (DiscoveryItem item) {
-                            return _ApplicationRow(
-                              title: item.name,
-                              subtitle: item.shortDescription,
-                              imagePath: item.mainScreenshot,
-                              buttonLabel: destination == SubmitDestination.drop
-                                  ? l10n.discoverReviewButton
-                                  : l10n.testJoinButton,
-                              isPrimaryAction:
-                                  destination == SubmitDestination.test,
-                              onTap: () => context.push(
-                                RouteNames.applicationDetailLocation(
-                                  id: item.id,
-                                  platform: PlatformType.both.apiValue,
-                                ),
-                              ),
-                            );
-                          },
-                        ).toList(),
-                      ),
-                error: (Object error, StackTrace stackTrace) => AppErrorState(
-                  message: error.toString(),
-                  onRetry: () => ref.invalidate(discoveryProvider),
-                ),
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(40),
-                  child: AppLoadingIndicator(),
-                ),
-              ),
-              list.when(
-                data: (PagedResult<ApplicationListItem> result) => Column(
-                  children: result.items
-                      .map<Widget>(
-                        (ApplicationListItem item) => _CompactAppRow(
-                          item: item,
-                          buttonLabel: destination == SubmitDestination.drop
-                              ? l10n.discoverReviewButton
-                              : l10n.testJoinButton,
-                          isPrimaryAction:
-                              destination == SubmitDestination.test,
-                          onTap: () => context.push(
-                            RouteNames.applicationDetailLocation(
-                              id: item.id,
-                              platform: item.platform,
+              if (destination == SubmitDestination.drop)
+                activeDrop!.when(
+                  data: (ActiveDropBatch? drop) {
+                    final List<ApplicationListItem> items =
+                        drop?.items ?? <ApplicationListItem>[];
+
+                    if (items.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 32),
+                        child: Center(
+                          child: Text(
+                            l10n.commonNoData,
+                            style: const TextStyle(
+                              color: AppColors.textMuted,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                      )
-                      .toList(),
+                      );
+                    }
+
+                    return Column(
+                      children: items.asMap().entries.map<Widget>(
+                        (MapEntry<int, ApplicationListItem> entry) {
+                          final ApplicationListItem item = entry.value;
+                          return _DropAppCard(
+                            rank: entry.key + 1,
+                            item: item,
+                            buttonLabel: l10n.discoverReviewButton,
+                            onTap: () => context.push(
+                              RouteNames.applicationDetailLocation(
+                                id: item.id,
+                                platform: item.platform,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                    );
+                  },
+                  error: (Object error, StackTrace stackTrace) => AppErrorState(
+                    message: error.toString(),
+                    onRetry: () => ref.invalidate(activeDropProvider),
+                  ),
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: AppLoadingIndicator(),
+                  ),
+                )
+              else ...<Widget>[
+                discovery!.when(
+                  data: (List<DiscoveryItem> items) => items.isEmpty
+                      ? const SizedBox.shrink()
+                      : Column(
+                          children: items.take(3).map(
+                            (DiscoveryItem item) {
+                              return _ApplicationRow(
+                                title: item.name,
+                                subtitle: item.shortDescription,
+                                imagePath: item.mainScreenshot,
+                                buttonLabel: l10n.testJoinButton,
+                                isPrimaryAction: true,
+                                onTap: () => context.push(
+                                  RouteNames.applicationDetailLocation(
+                                    id: item.id,
+                                    platform: PlatformType.both.apiValue,
+                                  ),
+                                ),
+                              );
+                            },
+                          ).toList(),
+                        ),
+                  error: (Object error, StackTrace stackTrace) => AppErrorState(
+                    message: error.toString(),
+                    onRetry: () => ref.invalidate(discoveryProvider),
+                  ),
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(40),
+                    child: AppLoadingIndicator(),
+                  ),
                 ),
-                error: (Object error, StackTrace stackTrace) =>
-                    const SizedBox.shrink(),
-                loading: () => const SizedBox.shrink(),
-              ),
+                list!.when(
+                  data: (PagedResult<ApplicationListItem> result) {
+                    final Iterable<ApplicationListItem> remainingItems =
+                        result.items.where(
+                      (ApplicationListItem item) =>
+                          !featuredTestIds.contains(item.id),
+                    );
+
+                    return Column(
+                      children: remainingItems
+                          .map<Widget>(
+                            (ApplicationListItem item) => _CompactAppRow(
+                              item: item,
+                              buttonLabel: l10n.testJoinButton,
+                              isPrimaryAction: true,
+                              onTap: () => context.push(
+                                RouteNames.applicationDetailLocation(
+                                  id: item.id,
+                                  platform: item.platform,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    );
+                  },
+                  error: (Object error, StackTrace stackTrace) =>
+                      const SizedBox.shrink(),
+                  loading: () => const SizedBox.shrink(),
+                ),
+              ],
             ],
           ),
         ),
@@ -283,6 +365,133 @@ class _SectionTitle extends StatelessWidget {
         fontSize: 20,
         fontWeight: FontWeight.w900,
         letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+class _DropAppCard extends StatelessWidget {
+  const _DropAppCard({
+    required this.rank,
+    required this.item,
+    required this.buttonLabel,
+    required this.onTap,
+  });
+
+  final int rank;
+  final ApplicationListItem item;
+  final String buttonLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 20,
+              offset: Offset(0, 9),
+            ),
+          ],
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: 28,
+              child: Text(
+                rank.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.secondary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: SizedBox(
+                width: 64,
+                height: 64,
+                child: item.mainScreenshot.isEmpty
+                    ? const ColoredBox(
+                        color: AppColors.primarySoft,
+                        child: Icon(
+                          Icons.apps_rounded,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : Image.network(
+                        UrlResolver.media(item.mainScreenshot),
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    item.shortDescription,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontSize: 12,
+                      height: 1.3,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              onPressed: onTap,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(74, 36),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+              child: Text(buttonLabel),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -77,6 +77,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                           RouteNames.applicationDetailLocation(
                             id: item.id,
                             platform: item.platform,
+                            currentPath: RouteNames.favoritesPath,
                           ),
                         ),
                       ),

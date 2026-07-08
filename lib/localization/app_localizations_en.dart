@@ -371,6 +371,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePromoteApp => 'Promote My App';
 
   @override
+  String get profilePromoteSoonTitle => 'Coming soon';
+
+  @override
+  String get profilePromoteSoonMessage =>
+      'Very soon, we will open new promotion options that help your applications reach more people. Once everything is ready, you will be able to start directly from your profile.';
+
+  @override
   String get profileCommentsTodo =>
       'Waiting for the mobile profile comments endpoint.';
 
