@@ -342,6 +342,20 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<PublicUserProfile> userProfile(String userId) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(ApiPaths.userProfile(userId));
+    final ApiEnvelope<PublicUserProfile> envelope =
+        ApiEnvelope<PublicUserProfile>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PublicUserProfile.fromJson(
+        json is Map<String, dynamic> ? json : <String, dynamic>{},
+      ),
+    );
+
+    return envelope.data;
+  }
+
   Future<PagedResult<ApplicationListItem>> myApplications({
     int pageNumber = 1,
     int pageSize = 20,

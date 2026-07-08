@@ -392,6 +392,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileCommentOwnApp => 'Kendi uygulamana yorumun';
 
   @override
+  String get userProfilePublishedApps => 'Yayınlanan Uygulamaları';
+
+  @override
+  String get userProfileNoApps => 'Henüz yayınlanan uygulama yok.';
+
+  @override
   String get profileAvatarTitle => 'Avatar Seç';
 
   @override

@@ -13,6 +13,7 @@ import 'package:firstlook/features/favorites/presentation/pages/favorites_page.d
 import 'package:firstlook/features/home/presentation/pages/discover_page.dart';
 import 'package:firstlook/features/notifications/presentation/pages/notifications_page.dart';
 import 'package:firstlook/features/profile/presentation/pages/profile_page.dart';
+import 'package:firstlook/features/profile/presentation/pages/user_profile_preview_page.dart';
 import 'package:firstlook/features/submit/presentation/pages/submit_page.dart';
 import 'package:firstlook/widgets/app_shell.dart';
 import 'package:flutter/material.dart';
@@ -114,6 +115,13 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
       GoRoute(
         path: RouteNames.detailPath,
         builder: (_, GoRouterState state) => _detailPage(state),
+      ),
+      GoRoute(
+        path: RouteNames.userProfilePath,
+        name: RouteNames.userProfile,
+        builder: (_, GoRouterState state) => UserProfilePreviewPage(
+          userId: state.pathParameters['id'] ?? '',
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (

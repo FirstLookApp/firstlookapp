@@ -393,6 +393,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileCommentOwnApp => 'Your comment on your app';
 
   @override
+  String get userProfilePublishedApps => 'Published Apps';
+
+  @override
+  String get userProfileNoApps => 'No published apps yet.';
+
+  @override
   String get profileAvatarTitle => 'Choose Avatar';
 
   @override

@@ -322,6 +322,51 @@ class UserSearchItem {
   final int totalApplications;
 }
 
+class PublicUserProfile {
+  const PublicUserProfile({
+    required this.userId,
+    required this.username,
+    required this.fullName,
+    required this.biography,
+    required this.avatarUrl,
+    required this.totalReceivedLikes,
+    required this.totalReceivedComments,
+    required this.totalApplications,
+    required this.applications,
+  });
+
+  factory PublicUserProfile.fromJson(Map<String, dynamic> json) {
+    final List<Object?> rawApplications = json['applications'] is List<Object?>
+        ? json['applications'] as List<Object?>
+        : <Object?>[];
+
+    return PublicUserProfile(
+      userId: json['userId'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      biography: json['biography'] as String? ?? '',
+      avatarUrl: json['avatarUrl'] as String?,
+      totalReceivedLikes: json['totalReceivedLikes'] as int? ?? 0,
+      totalReceivedComments: json['totalReceivedComments'] as int? ?? 0,
+      totalApplications: json['totalApplications'] as int? ?? 0,
+      applications: rawApplications
+          .whereType<Map<String, dynamic>>()
+          .map<ApplicationListItem>(ApplicationListItem.fromJson)
+          .toList(growable: false),
+    );
+  }
+
+  final String userId;
+  final String username;
+  final String fullName;
+  final String biography;
+  final String? avatarUrl;
+  final int totalReceivedLikes;
+  final int totalReceivedComments;
+  final int totalApplications;
+  final List<ApplicationListItem> applications;
+}
+
 class AvatarOption {
   const AvatarOption({
     required this.id,

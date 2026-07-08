@@ -47,6 +47,11 @@ final profileProvider = FutureProvider<UserProfile>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).profile();
 });
 
+final publicUserProfileProvider =
+    FutureProvider.family<PublicUserProfile, String>((Ref ref, String userId) {
+  return ref.watch(firstLookRepositoryProvider).userProfile(userId);
+});
+
 final profileAvatarsProvider = FutureProvider<List<AvatarOption>>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).avatars();
 });

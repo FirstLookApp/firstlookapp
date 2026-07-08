@@ -472,8 +472,17 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
                                 _SearchEmpty(message: l10n.commonNoData)
                               else
                                 ...results.users.map(
-                                  (UserSearchItem item) =>
-                                      _UserSearchResultRow(item: item),
+                                  (UserSearchItem item) => _UserSearchResultRow(
+                                    item: item,
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                      context.push(
+                                        RouteNames.userProfileLocation(
+                                          item.userId,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
                             ],
                           ),
@@ -659,9 +668,11 @@ class _SearchResultRow extends StatelessWidget {
 class _UserSearchResultRow extends StatelessWidget {
   const _UserSearchResultRow({
     required this.item,
+    required this.onTap,
   });
 
   final UserSearchItem item;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -672,6 +683,7 @@ class _UserSearchResultRow extends StatelessWidget {
     final String? avatarUrl = item.avatarUrl;
 
     return ListTile(
+      onTap: onTap,
       contentPadding: EdgeInsets.zero,
       leading: CircleAvatar(
         radius: 22,

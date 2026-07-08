@@ -848,6 +848,18 @@ abstract class AppLocalizations {
   /// **'Your comment on your app'**
   String get profileCommentOwnApp;
 
+  /// No description provided for @userProfilePublishedApps.
+  ///
+  /// In en, this message translates to:
+  /// **'Published Apps'**
+  String get userProfilePublishedApps;
+
+  /// No description provided for @userProfileNoApps.
+  ///
+  /// In en, this message translates to:
+  /// **'No published apps yet.'**
+  String get userProfileNoApps;
+
   /// No description provided for @profileAvatarTitle.
   ///
   /// In en, this message translates to:

@@ -126,6 +126,8 @@
   "profileCommentOwn": "Senin yorumun",
   "profileCommentReceived": "Uygulamana gelen yorum",
   "profileCommentOwnApp": "Kendi uygulamana yorumun",
+  "userProfilePublishedApps": "Yayınlanan Uygulamaları",
+  "userProfileNoApps": "Henüz yayınlanan uygulama yok.",
   "profileAvatarTitle": "Avatar Seç",
   "profileAvatarSubtitle": "Profil fotoğrafın için bir avatar seç.",
   "profileAvatarSave": "Kaydet",

@@ -9,6 +9,7 @@ abstract final class RouteNames {
   static const String submit = 'submit';
   static const String favorites = 'favorites';
   static const String profile = 'profile';
+  static const String userProfile = 'userProfile';
   static const String notifications = 'notifications';
 
   static const String splashPath = '/';
@@ -21,6 +22,7 @@ abstract final class RouteNames {
   static const String submitPath = '/submit';
   static const String favoritesPath = '/favorites';
   static const String profilePath = '/profile';
+  static const String userProfilePath = '/users/:id';
   static const String notificationsPath = '/notifications';
 
   static String applicationDetailLocation({
@@ -28,5 +30,9 @@ abstract final class RouteNames {
     required int platform,
   }) {
     return '/applications/$id?platform=$platform';
+  }
+
+  static String userProfileLocation(String id) {
+    return '/users/$id';
   }
 }

@@ -133,6 +133,10 @@ class FirstLookRepository {
     );
   }
 
+  Future<PublicUserProfile> userProfile(String userId) {
+    return _remoteDataSource.userProfile(userId);
+  }
+
   Future<PagedResult<ApplicationListItem>> myApplications({
     int pageNumber = 1,
     int pageSize = 20,

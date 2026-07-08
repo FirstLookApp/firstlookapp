@@ -126,6 +126,8 @@
   "profileCommentOwn": "Your comment",
   "profileCommentReceived": "Comment on your app",
   "profileCommentOwnApp": "Your comment on your app",
+  "userProfilePublishedApps": "Published Apps",
+  "userProfileNoApps": "No published apps yet.",
   "profileAvatarTitle": "Choose Avatar",
   "profileAvatarSubtitle": "Choose an avatar for your profile photo.",
   "profileAvatarSave": "Save",
