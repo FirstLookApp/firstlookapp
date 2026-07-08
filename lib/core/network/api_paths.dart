@@ -9,8 +9,11 @@ abstract final class ApiPaths {
   static const String logout = '/api/auth/logout';
   static const String usernameAvailability = '/api/auth/username-availability';
   static const String profileMe = '/api/profile/me';
+  static const String profileAvatars = '/api/profile/avatars';
+  static const String selectAvatar = '/api/profile/select-avatar';
   static const String profileFavorites = '/api/profile/favorites';
   static const String profileNotifications = '/api/profile/notifications';
+  static const String profileComments = '/api/profile/comments';
   static const String applications = '/api/applications';
   static const String myApplications = '/api/applications/mine';
   static const String myBetaRequests = '/api/applications/my-beta-requests';

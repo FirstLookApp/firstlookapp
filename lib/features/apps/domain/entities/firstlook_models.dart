@@ -215,6 +215,46 @@ class CommentItem {
   final DateTime createdAt;
 }
 
+class ProfileCommentItem {
+  const ProfileCommentItem({
+    required this.id,
+    required this.applicationId,
+    required this.applicationName,
+    required this.applicationMainScreenshot,
+    required this.commenterUsername,
+    required this.content,
+    required this.createdAt,
+    required this.isOwnComment,
+    required this.isOnOwnApplication,
+  });
+
+  factory ProfileCommentItem.fromJson(Map<String, dynamic> json) {
+    return ProfileCommentItem(
+      id: json['id'] as String? ?? '',
+      applicationId: json['applicationId'] as String? ?? '',
+      applicationName: json['applicationName'] as String? ?? '',
+      applicationMainScreenshot:
+          json['applicationMainScreenshot'] as String? ?? '',
+      commenterUsername: json['commenterUsername'] as String? ?? '',
+      content: json['content'] as String? ?? '',
+      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0),
+      isOwnComment: json['isOwnComment'] as bool? ?? true,
+      isOnOwnApplication: json['isOnOwnApplication'] as bool? ?? false,
+    );
+  }
+
+  final String id;
+  final String applicationId;
+  final String applicationName;
+  final String applicationMainScreenshot;
+  final String commenterUsername;
+  final String content;
+  final DateTime createdAt;
+  final bool isOwnComment;
+  final bool isOnOwnApplication;
+}
+
 class UserProfile {
   const UserProfile({
     required this.userId,
@@ -251,6 +291,26 @@ class UserProfile {
   final int totalReceivedLikes;
   final int totalReceivedComments;
   final int totalApplications;
+}
+
+class AvatarOption {
+  const AvatarOption({
+    required this.id,
+    required this.name,
+    required this.filePath,
+  });
+
+  factory AvatarOption.fromJson(Map<String, dynamic> json) {
+    return AvatarOption(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      filePath: json['filePath'] as String? ?? '',
+    );
+  }
+
+  final String id;
+  final String name;
+  final String filePath;
 }
 
 class NotificationItem {

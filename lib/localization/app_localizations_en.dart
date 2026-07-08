@@ -199,7 +199,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToRegister => 'Create account';
 
   @override
-  String get goToLogin => 'I already have an account';
+  String get goToLogin => 'Already have an account?';
 
   @override
   String get discoverTitle => 'This Week: Mobile Apps';
@@ -224,6 +224,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get testTab => 'Test';
+
+  @override
+  String get testStageTitle => 'In testing';
+
+  @override
+  String get testJoinButton => 'Join Test';
 
   @override
   String get iosTab => 'iOS';
@@ -376,4 +382,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileStatsComments => 'Comments';
+
+  @override
+  String get profileCommentOwn => 'Your comment';
+
+  @override
+  String get profileCommentReceived => 'Comment on your app';
+
+  @override
+  String get profileCommentOwnApp => 'Your comment on your app';
+
+  @override
+  String get profileAvatarTitle => 'Choose Avatar';
+
+  @override
+  String get profileAvatarSubtitle =>
+      'Choose an avatar for your profile photo.';
+
+  @override
+  String get profileAvatarSave => 'Save';
+
+  @override
+  String get profileAvatarSaving => 'Saving';
+
+  @override
+  String get profileAvatarSaved => 'Avatar updated.';
+
+  @override
+  String get profileAvatarEmpty => 'There are no selectable avatars yet.';
+
+  @override
+  String get profileAvatarLoadError =>
+      'Waiting for the mobile avatar list endpoint.';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsNotifications => 'Notifications';
+
+  @override
+  String get settingsVibration => 'Vibration';
+
+  @override
+  String get settingsOn => 'On';
+
+  @override
+  String get settingsOff => 'Off';
+
+  @override
+  String get searchHint => 'Search apps or users';
+
+  @override
+  String get searchMinCharacters =>
+      'Enter at least 3 characters to see results.';
+
+  @override
+  String get searchApplications => 'Applications';
+
+  @override
+  String get searchUsers => 'Users';
+
+  @override
+  String get searchUsersTodo => 'Waiting for the user search endpoint.';
 }

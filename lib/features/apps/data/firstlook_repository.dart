@@ -79,6 +79,14 @@ class FirstLookRepository {
     return _remoteDataSource.profile();
   }
 
+  Future<List<AvatarOption>> avatars() {
+    return _remoteDataSource.avatars();
+  }
+
+  Future<void> selectAvatar(String avatarId) {
+    return _remoteDataSource.selectAvatar(avatarId);
+  }
+
   Future<PagedResult<ApplicationListItem>> favorites({
     int pageNumber = 1,
     int pageSize = 20,
@@ -101,13 +109,27 @@ class FirstLookRepository {
     );
   }
 
+  Future<PagedResult<ProfileCommentItem>> profileComments({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  }) {
+    return _remoteDataSource.profileComments(
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      search: search,
+    );
+  }
+
   Future<PagedResult<ApplicationListItem>> myApplications({
     int pageNumber = 1,
     int pageSize = 20,
+    String? search,
   }) {
     return _remoteDataSource.myApplications(
       pageNumber: pageNumber,
       pageSize: pageSize,
+      search: search,
     );
   }
 }

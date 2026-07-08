@@ -22,47 +22,53 @@ class AppShell extends StatelessWidget {
           color: Colors.white,
           border: Border(top: BorderSide(color: AppColors.border)),
         ),
-        child: NavigationBar(
-          height: 64,
-          elevation: 0,
-          backgroundColor: Colors.white,
-          indicatorColor: AppColors.primarySoft,
-          selectedIndex: navigationShell.currentIndex,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          onDestinationSelected: (int index) {
-            navigationShell.goBranch(
-              index,
-              initialLocation: index == navigationShell.currentIndex,
-            );
-          },
-          destinations: <Widget>[
-            NavigationDestination(
-              icon: const Icon(Icons.explore_outlined, size: 20),
-              selectedIcon: const Icon(Icons.explore, size: 20),
-              label: l10n.navDiscover,
+        child: SafeArea(
+          top: false,
+          child: BottomNavigationBar(
+            currentIndex: navigationShell.currentIndex,
+            onTap: (int index) {
+              navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              );
+            },
+            type: BottomNavigationBarType.fixed,
+            elevation: 0,
+            backgroundColor: Colors.white,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.textSoft,
+            selectedLabelStyle: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0,
             ),
-            NavigationDestination(
-              icon: const Icon(Icons.article_outlined, size: 20),
-              selectedIcon: const Icon(Icons.article, size: 20),
-              label: l10n.navSubmit,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.star_border_rounded, size: 20),
-              selectedIcon: const Icon(Icons.star_rounded, size: 20),
-              label: l10n.navFavorites,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline, size: 20),
-              selectedIcon: const Icon(Icons.person, size: 20),
-              label: l10n.navProfile,
-            ),
-          ],
-          labelTextStyle: const WidgetStatePropertyAll<TextStyle>(
-            TextStyle(
+            unselectedLabelStyle: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0,
             ),
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.explore_outlined, size: 20),
+                activeIcon: const Icon(Icons.explore, size: 20),
+                label: l10n.navDiscover,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.article_outlined, size: 20),
+                activeIcon: const Icon(Icons.article, size: 20),
+                label: l10n.navSubmit,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.star_border_rounded, size: 20),
+                activeIcon: const Icon(Icons.star_rounded, size: 20),
+                label: l10n.navFavorites,
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.person_outline, size: 20),
+                activeIcon: const Icon(Icons.person, size: 20),
+                label: l10n.navProfile,
+              ),
+            ],
           ),
         ),
       ),

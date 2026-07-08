@@ -105,7 +105,6 @@ class FirstLookRemoteDataSource {
         await _dio.get<Map<String, dynamic>>(
       '${ApiPaths.discovery}/$id/detail',
       queryParameters: <String, dynamic>{'platform': platform.label},
-      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
     );
 
     final ApiEnvelope<ApplicationDetail> envelope =
@@ -212,6 +211,31 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<List<AvatarOption>> avatars() async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(ApiPaths.profileAvatars);
+    final ApiEnvelope<List<AvatarOption>> envelope =
+        ApiEnvelope<List<AvatarOption>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) {
+        final List<Object?> items = json is List<Object?> ? json : <Object?>[];
+        return items
+            .whereType<Map<String, dynamic>>()
+            .map<AvatarOption>(AvatarOption.fromJson)
+            .toList(growable: false);
+      },
+    );
+
+    return envelope.data;
+  }
+
+  Future<void> selectAvatar(String avatarId) async {
+    await _dio.post<Map<String, dynamic>>(
+      ApiPaths.selectAvatar,
+      data: <String, dynamic>{'avatarId': avatarId},
+    );
+  }
+
   Future<PagedResult<ApplicationListItem>> favorites({
     int pageNumber = 1,
     int pageSize = 20,
@@ -264,9 +288,37 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<PagedResult<ProfileCommentItem>> profileComments({
+    int pageNumber = 1,
+    int pageSize = 20,
+    String? search,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.profileComments,
+      queryParameters: <String, dynamic>{
+        'pageNumber': pageNumber,
+        'pageSize': pageSize,
+        if (search != null && search.isNotEmpty) 'search': search,
+      },
+    );
+
+    final ApiEnvelope<PagedResult<ProfileCommentItem>> envelope =
+        ApiEnvelope<PagedResult<ProfileCommentItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<ProfileCommentItem>.fromJson(
+        json,
+        ProfileCommentItem.fromJson,
+      ),
+    );
+
+    return envelope.data;
+  }
+
   Future<PagedResult<ApplicationListItem>> myApplications({
     int pageNumber = 1,
     int pageSize = 20,
+    String? search,
   }) async {
     final Response<Map<String, dynamic>> response =
         await _dio.get<Map<String, dynamic>>(
@@ -274,6 +326,7 @@ class FirstLookRemoteDataSource {
       queryParameters: <String, dynamic>{
         'PageNumber': pageNumber,
         'PageSize': pageSize,
+        if (search != null && search.isNotEmpty) 'Search': search,
       },
     );
 

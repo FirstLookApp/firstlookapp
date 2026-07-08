@@ -22,4 +22,11 @@ abstract final class RouteNames {
   static const String favoritesPath = '/favorites';
   static const String profilePath = '/profile';
   static const String notificationsPath = '/notifications';
+
+  static String applicationDetailLocation({
+    required String id,
+    required int platform,
+  }) {
+    return '/applications/$id?platform=$platform';
+  }
 }

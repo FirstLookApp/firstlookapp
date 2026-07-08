@@ -198,7 +198,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get goToRegister => 'Hesap olustur';
 
   @override
-  String get goToLogin => 'Zaten hesabim var';
+  String get goToLogin => 'Zaten hesabınız var mı?';
 
   @override
   String get discoverTitle => 'Bu Hafta: Mobil Oyunlar';
@@ -223,6 +223,12 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get testTab => 'Test';
+
+  @override
+  String get testStageTitle => 'Test Aşamasındakiler';
+
+  @override
+  String get testJoinButton => 'Teste Katıl';
 
   @override
   String get iosTab => 'iOS';
@@ -375,4 +381,66 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get profileStatsComments => 'Yorum';
+
+  @override
+  String get profileCommentOwn => 'Senin yorumun';
+
+  @override
+  String get profileCommentReceived => 'Uygulamana gelen yorum';
+
+  @override
+  String get profileCommentOwnApp => 'Kendi uygulamana yorumun';
+
+  @override
+  String get profileAvatarTitle => 'Avatar Seç';
+
+  @override
+  String get profileAvatarSubtitle => 'Profil fotoğrafın için bir avatar seç.';
+
+  @override
+  String get profileAvatarSave => 'Kaydet';
+
+  @override
+  String get profileAvatarSaving => 'Kaydediliyor';
+
+  @override
+  String get profileAvatarSaved => 'Avatar güncellendi.';
+
+  @override
+  String get profileAvatarEmpty => 'Henüz seçilebilir avatar yok.';
+
+  @override
+  String get profileAvatarLoadError =>
+      'Avatar listesi için mobil endpoint bekleniyor.';
+
+  @override
+  String get settingsLanguage => 'Dil Seçeneği';
+
+  @override
+  String get settingsNotifications => 'Bildirimler';
+
+  @override
+  String get settingsVibration => 'Titreşim';
+
+  @override
+  String get settingsOn => 'Açık';
+
+  @override
+  String get settingsOff => 'Kapalı';
+
+  @override
+  String get searchHint => 'Uygulama veya kullanıcı ara';
+
+  @override
+  String get searchMinCharacters =>
+      'Sonuçları görmek için en az 3 karakter girin.';
+
+  @override
+  String get searchApplications => 'Uygulamalar';
+
+  @override
+  String get searchUsers => 'Kullanıcılar';
+
+  @override
+  String get searchUsersTodo => 'Kullanıcı arama endpoint\'i bekleniyor.';
 }

@@ -27,8 +27,8 @@ final applicationListProvider =
       );
 });
 
-final applicationDetailProvider = FutureProvider.family<ApplicationDetail,
-    ApplicationDetailRequest>(
+final applicationDetailProvider =
+    FutureProvider.family<ApplicationDetail, ApplicationDetailRequest>(
   (Ref ref, ApplicationDetailRequest request) {
     return ref.watch(firstLookRepositoryProvider).detail(
           id: request.id,
@@ -47,6 +47,10 @@ final profileProvider = FutureProvider<UserProfile>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).profile();
 });
 
+final profileAvatarsProvider = FutureProvider<List<AvatarOption>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).avatars();
+});
+
 final favoritesProvider =
     FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).favorites();
@@ -55,6 +59,11 @@ final favoritesProvider =
 final notificationsProvider =
     FutureProvider<PagedResult<NotificationItem>>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).notifications();
+});
+
+final profileCommentsProvider =
+    FutureProvider<PagedResult<ProfileCommentItem>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).profileComments();
 });
 
 final myApplicationsProvider =

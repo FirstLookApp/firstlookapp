@@ -1,10 +1,12 @@
 import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/network/url_resolver.dart';
+import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
@@ -41,14 +43,19 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                   .toList(growable: false);
 
               return ListView(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 92),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenHorizontal,
+                  12,
+                  AppSpacing.screenHorizontal,
+                  92,
+                ),
                 children: <Widget>[
                   const FirstLookAppHeader(),
                   const SizedBox(height: 30),
                   Text(
                     l10n.favoritesTitle,
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: AppColors.secondary,
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
                     ),
@@ -67,7 +74,10 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                       (ApplicationListItem item) => _FavoriteAppCard(
                         item: item,
                         onTap: () => context.push(
-                          'applications/${item.id}?platform=${item.platform}',
+                          RouteNames.applicationDetailLocation(
+                            id: item.id,
+                            platform: item.platform,
+                          ),
                         ),
                       ),
                     ),
@@ -150,8 +160,16 @@ class _FavoriteAppCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFB),
+          color: Colors.white,
+          border: Border.all(color: AppColors.border),
           borderRadius: BorderRadius.circular(18),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 18,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: <Widget>[

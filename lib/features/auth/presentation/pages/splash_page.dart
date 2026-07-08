@@ -1,5 +1,6 @@
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:firstlook/widgets/firstlook_logo.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +17,10 @@ class SplashPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const FirstLookLogo(size: 28),
-            const SizedBox(height: 12),
+            const FirstLookAppIcon(size: 104),
+            const SizedBox(height: 18),
+            const FirstLookLogo(size: 30),
+            const SizedBox(height: 10),
             Text(
               l10n.splashTagline,
               style: const TextStyle(

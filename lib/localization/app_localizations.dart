@@ -473,7 +473,7 @@ abstract class AppLocalizations {
   /// No description provided for @goToLogin.
   ///
   /// In en, this message translates to:
-  /// **'I already have an account'**
+  /// **'Already have an account?'**
   String get goToLogin;
 
   /// No description provided for @discoverTitle.
@@ -523,6 +523,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Test'**
   String get testTab;
+
+  /// No description provided for @testStageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'In testing'**
+  String get testStageTitle;
+
+  /// No description provided for @testJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Test'**
+  String get testJoinButton;
 
   /// No description provided for @iosTab.
   ///
@@ -817,6 +829,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Comments'**
   String get profileStatsComments;
+
+  /// No description provided for @profileCommentOwn.
+  ///
+  /// In en, this message translates to:
+  /// **'Your comment'**
+  String get profileCommentOwn;
+
+  /// No description provided for @profileCommentReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment on your app'**
+  String get profileCommentReceived;
+
+  /// No description provided for @profileCommentOwnApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Your comment on your app'**
+  String get profileCommentOwnApp;
+
+  /// No description provided for @profileAvatarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Avatar'**
+  String get profileAvatarTitle;
+
+  /// No description provided for @profileAvatarSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an avatar for your profile photo.'**
+  String get profileAvatarSubtitle;
+
+  /// No description provided for @profileAvatarSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get profileAvatarSave;
+
+  /// No description provided for @profileAvatarSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving'**
+  String get profileAvatarSaving;
+
+  /// No description provided for @profileAvatarSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar updated.'**
+  String get profileAvatarSaved;
+
+  /// No description provided for @profileAvatarEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no selectable avatars yet.'**
+  String get profileAvatarEmpty;
+
+  /// No description provided for @profileAvatarLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the mobile avatar list endpoint.'**
+  String get profileAvatarLoadError;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsNotifications;
+
+  /// No description provided for @settingsVibration.
+  ///
+  /// In en, this message translates to:
+  /// **'Vibration'**
+  String get settingsVibration;
+
+  /// No description provided for @settingsOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get settingsOn;
+
+  /// No description provided for @settingsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get settingsOff;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search apps or users'**
+  String get searchHint;
+
+  /// No description provided for @searchMinCharacters.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 3 characters to see results.'**
+  String get searchMinCharacters;
+
+  /// No description provided for @searchApplications.
+  ///
+  /// In en, this message translates to:
+  /// **'Applications'**
+  String get searchApplications;
+
+  /// No description provided for @searchUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get searchUsers;
+
+  /// No description provided for @searchUsersTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the user search endpoint.'**
+  String get searchUsersTodo;
 }
 
 class _AppLocalizationsDelegate

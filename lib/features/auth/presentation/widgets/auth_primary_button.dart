@@ -23,7 +23,9 @@ class AuthPrimaryButton extends StatelessWidget {
         (Set<WidgetState> states) =>
             states.contains(WidgetState.disabled) || outlined ? 0 : 8,
       ),
-      shadowColor: const WidgetStatePropertyAll<Color>(Color(0x33FF315F)),
+      shadowColor: WidgetStatePropertyAll<Color>(
+        AppColors.primary.withValues(alpha: 0.22),
+      ),
       backgroundColor: WidgetStateProperty.resolveWith<Color>(
         (Set<WidgetState> states) {
           if (states.contains(WidgetState.disabled)) {

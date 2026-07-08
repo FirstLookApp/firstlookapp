@@ -6,6 +6,7 @@ abstract final class AppSpacing {
   static const double xLarge = 32;
 
   static const double radiusSmall = 8;
-  static const double radiusMedium = 12;
-  static const double radiusLarge = 20;
+  static const double radiusMedium = 14;
+  static const double radiusLarge = 22;
+  static const double screenHorizontal = 18;
 }

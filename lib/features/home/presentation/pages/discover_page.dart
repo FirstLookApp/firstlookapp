@@ -1,11 +1,14 @@
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
+import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
+import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,15 +36,28 @@ class DiscoverPage extends ConsumerWidget {
             ref.invalidate(applicationListProvider);
           },
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenHorizontal,
+              12,
+              AppSpacing.screenHorizontal,
+              24,
+            ),
             children: <Widget>[
               const FirstLookAppHeader(),
               const SizedBox(height: 24),
-              _DestinationSwitch(
-                selected: destination,
-                onChanged: (SubmitDestination value) => ref
-                    .read(selectedDestinationProvider.notifier)
-                    .state = value,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 34),
+                child: FirstLookSegmentedControl<SubmitDestination>(
+                  values: SubmitDestination.values,
+                  selected: destination,
+                  labelBuilder: (SubmitDestination value) =>
+                      value == SubmitDestination.drop
+                          ? l10n.dropTab
+                          : l10n.testTab,
+                  onChanged: (SubmitDestination value) => ref
+                      .read(selectedDestinationProvider.notifier)
+                      .state = value,
+                ),
               ),
               const SizedBox(height: 24),
               _WeeklyBanner(
@@ -52,7 +68,11 @@ class DiscoverPage extends ConsumerWidget {
                 badge: l10n.discoverWeekBadge,
               ),
               const SizedBox(height: 22),
-              _SectionTitle(title: l10n.discoverSubtitle),
+              _SectionTitle(
+                title: destination == SubmitDestination.drop
+                    ? l10n.discoverSubtitle
+                    : l10n.testStageTitle,
+              ),
               const SizedBox(height: 12),
               discovery.when(
                 data: (List<DiscoveryItem> items) => items.isEmpty
@@ -66,9 +86,14 @@ class DiscoverPage extends ConsumerWidget {
                               imagePath: item.mainScreenshot,
                               buttonLabel: destination == SubmitDestination.drop
                                   ? l10n.discoverReviewButton
-                                  : l10n.detailJoinBeta,
+                                  : l10n.testJoinButton,
+                              isPrimaryAction:
+                                  destination == SubmitDestination.test,
                               onTap: () => context.push(
-                                'applications/${item.id}?platform=${PlatformType.both.apiValue}',
+                                RouteNames.applicationDetailLocation(
+                                  id: item.id,
+                                  platform: PlatformType.both.apiValue,
+                                ),
                               ),
                             );
                           },
@@ -91,9 +116,14 @@ class DiscoverPage extends ConsumerWidget {
                           item: item,
                           buttonLabel: destination == SubmitDestination.drop
                               ? l10n.discoverReviewButton
-                              : l10n.detailJoinBeta,
+                              : l10n.testJoinButton,
+                          isPrimaryAction:
+                              destination == SubmitDestination.test,
                           onTap: () => context.push(
-                            'applications/${item.id}?platform=${item.platform}',
+                            RouteNames.applicationDetailLocation(
+                              id: item.id,
+                              platform: item.platform,
+                            ),
                           ),
                         ),
                       )
@@ -106,60 +136,6 @@ class DiscoverPage extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DestinationSwitch extends StatelessWidget {
-  const _DestinationSwitch({
-    required this.selected,
-    required this.onChanged,
-  });
-
-  final SubmitDestination selected;
-  final ValueChanged<SubmitDestination> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    return Container(
-      height: 38,
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF1F1F4),
-        borderRadius: BorderRadius.circular(22),
-      ),
-      child: Row(
-        children: SubmitDestination.values.map((SubmitDestination value) {
-          final bool isSelected = value == selected;
-          final String label =
-              value == SubmitDestination.drop ? l10n.dropTab : l10n.testTab;
-
-          return Expanded(
-            child: GestureDetector(
-              onTap: () => onChanged(value),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.textMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }
@@ -184,22 +160,28 @@ class _WeeklyBanner extends StatelessWidget {
         height: 132,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: <Color>[Color(0xFFFFF3F5), Color(0xFFFFD8E0)],
+            colors: <Color>[Color(0xFFFFF1F2), Color(0xFFFFD9DD)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Stack(
           children: <Widget>[
-            const Positioned(
-              left: -16,
-              top: -18,
-              child: _BannerOrb(size: 66, opacity: 0.38),
+            Positioned(
+              left: -24,
+              top: 18,
+              child: Transform.rotate(
+                angle: -0.28,
+                child: const _BannerPill(width: 92, height: 28),
+              ),
             ),
-            const Positioned(
+            Positioned(
               right: -18,
-              bottom: -22,
-              child: _BannerOrb(size: 96, opacity: 0.28),
+              bottom: 22,
+              child: Transform.rotate(
+                angle: -0.42,
+                child: const _BannerPill(width: 96, height: 32),
+              ),
             ),
             Center(
               child: Column(
@@ -263,23 +245,23 @@ class _WeeklyBanner extends StatelessWidget {
   }
 }
 
-class _BannerOrb extends StatelessWidget {
-  const _BannerOrb({
-    required this.size,
-    required this.opacity,
+class _BannerPill extends StatelessWidget {
+  const _BannerPill({
+    required this.width,
+    required this.height,
   });
 
-  final double size;
-  final double opacity;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
+      width: width,
+      height: height,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: opacity),
-        shape: BoxShape.circle,
+        color: AppColors.primary.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(height / 2),
       ),
     );
   }
@@ -313,6 +295,7 @@ class _ApplicationRow extends StatelessWidget {
     required this.imagePath,
     required this.buttonLabel,
     required this.onTap,
+    required this.isPrimaryAction,
   });
 
   final String title;
@@ -320,6 +303,7 @@ class _ApplicationRow extends StatelessWidget {
   final String imagePath;
   final String buttonLabel;
   final VoidCallback onTap;
+  final bool isPrimaryAction;
 
   @override
   Widget build(BuildContext context) {
@@ -384,8 +368,10 @@ class _ApplicationRow extends StatelessWidget {
               style: FilledButton.styleFrom(
                 minimumSize: const Size(60, 34),
                 padding: const EdgeInsets.symmetric(horizontal: 14),
-                backgroundColor: const Color(0xFFF4F4F6),
-                foregroundColor: Colors.black,
+                backgroundColor:
+                    isPrimaryAction ? AppColors.primary : AppColors.chipFill,
+                foregroundColor:
+                    isPrimaryAction ? Colors.white : AppColors.secondary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
@@ -415,11 +401,13 @@ class _CompactAppRow extends StatelessWidget {
     required this.item,
     required this.buttonLabel,
     required this.onTap,
+    required this.isPrimaryAction,
   });
 
   final ApplicationListItem item;
   final String buttonLabel;
   final VoidCallback onTap;
+  final bool isPrimaryAction;
 
   @override
   Widget build(BuildContext context) {
@@ -429,6 +417,7 @@ class _CompactAppRow extends StatelessWidget {
       imagePath: item.mainScreenshot,
       buttonLabel: buttonLabel,
       onTap: onTap,
+      isPrimaryAction: isPrimaryAction,
     );
   }
 }

@@ -4,12 +4,13 @@ import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
-import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
+import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -69,7 +70,12 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
       body: detail.when(
         data: (ApplicationDetail app) => SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenHorizontal,
+              8,
+              AppSpacing.screenHorizontal,
+              24,
+            ),
             children: <Widget>[
               _DetailHeader(
                 app: app,
@@ -102,7 +108,7 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
               Text(
                 l10n.detailAbout,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: AppColors.secondary,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                 ),
@@ -121,7 +127,7 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
               Text(
                 l10n.detailComments,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: AppColors.secondary,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                 ),
@@ -163,8 +169,9 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
               if (app.destination !=
                   SubmitDestination.test.apiValue) ...<Widget>[
                 const SizedBox(height: 22),
-                AuthPrimaryButton(
+                FirstLookPrimaryButton(
                   label: l10n.detailOpenStore,
+                  icon: Icons.file_download_outlined,
                   onPressed: () async {
                     final String url = await ref
                         .read(firstLookRepositoryProvider)
@@ -209,6 +216,7 @@ class _DetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final String imagePath =
         app.screenshots.isEmpty ? '' : app.screenshots.first;
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: <Widget>[
@@ -221,7 +229,7 @@ class _DetailHeader extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: AppColors.secondary,
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
@@ -291,8 +299,8 @@ class _DetailHeader extends StatelessWidget {
                       _MetaChip(
                         label:
                             app.destination == SubmitDestination.test.apiValue
-                                ? 'EARLY ACCESS'
-                                : 'DROP',
+                                ? l10n.detailJoinBeta
+                                : l10n.dropTab,
                       ),
                     ],
                   ),
@@ -318,13 +326,13 @@ class _MetaChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F7F8),
+        color: AppColors.chipFill,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label.toUpperCase(),
         style: const TextStyle(
-          color: Colors.black,
+          color: AppColors.secondary,
           fontSize: 9,
           fontWeight: FontWeight.w800,
         ),
@@ -346,13 +354,8 @@ class _BetaAccessCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
-      ),
+    return FirstLookSoftCard(
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -367,7 +370,7 @@ class _BetaAccessCard extends StatelessWidget {
               Text(
                 l10n.detailJoinBeta,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: AppColors.secondary,
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                 ),
@@ -382,7 +385,7 @@ class _BetaAccessCard extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 12),
-          AuthPrimaryButton(
+          FirstLookPrimaryButton(
             label: l10n.betaAccessRequestButton,
             onPressed: onSubmit,
           ),
@@ -414,7 +417,11 @@ class _ScreenshotRail extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
             child: Container(
               width: 172,
-              color: AppColors.primarySoft,
+              decoration: BoxDecoration(
+                color: AppColors.primarySoft,
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(18),
+              ),
               child: path.isEmpty
                   ? const Icon(Icons.phone_iphone, color: AppColors.primary)
                   : Image.network(UrlResolver.media(path), fit: BoxFit.cover),
@@ -442,9 +449,16 @@ class _CommentCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFFAFAFB),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +483,7 @@ class _CommentCard extends StatelessWidget {
                 child: Text(
                   item.username,
                   style: const TextStyle(
-                    color: Colors.black,
+                    color: AppColors.secondary,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),

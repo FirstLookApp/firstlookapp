@@ -1,6 +1,7 @@
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
+import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/features/apps/presentation/pages/application_detail_page.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/features/auth/presentation/pages/forgot_password_page.dart';
@@ -24,7 +25,20 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
 
   ref.listen<AsyncValue<AuthState>>(
     authControllerProvider,
-    (_, __) => refreshNotifier.notify(),
+    (AsyncValue<AuthState>? previous, AsyncValue<AuthState> next) {
+      refreshNotifier.notify();
+
+      final AuthState? previousState = previous?.valueOrNull;
+      final AuthState? nextState = next.valueOrNull;
+      final String? previousSessionKey = previousState?.session?.email;
+      final String? nextSessionKey = nextState?.session?.email;
+      final bool loggedOut = nextState?.status == AuthStatus.unauthenticated;
+      final bool accountChanged = previousSessionKey != nextSessionKey;
+
+      if (loggedOut || accountChanged) {
+        _invalidateUserScopedData(ref);
+      }
+    },
   );
   ref.onDispose(refreshNotifier.dispose);
 
@@ -97,6 +111,10 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         name: RouteNames.notifications,
         builder: (_, __) => const NotificationsPage(),
       ),
+      GoRoute(
+        path: RouteNames.detailPath,
+        builder: (_, GoRouterState state) => _detailPage(state),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (
           BuildContext context,
@@ -152,15 +170,27 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
   );
 });
 
+void _invalidateUserScopedData(Ref ref) {
+  ref
+    ..invalidate(profileProvider)
+    ..invalidate(favoritesProvider)
+    ..invalidate(notificationsProvider)
+    ..invalidate(myApplicationsProvider);
+}
+
 GoRoute _detailRoute() {
   return GoRoute(
     path: 'applications/:id',
-    builder: (_, GoRouterState state) => ApplicationDetailPage(
-      applicationId: state.pathParameters['id'] ?? '',
-      initialPlatform: PlatformType.fromApiValue(
-        int.tryParse(state.uri.queryParameters['platform'] ?? '') ??
-            PlatformType.both.apiValue,
-      ),
+    builder: (_, GoRouterState state) => _detailPage(state),
+  );
+}
+
+ApplicationDetailPage _detailPage(GoRouterState state) {
+  return ApplicationDetailPage(
+    applicationId: state.pathParameters['id'] ?? '',
+    initialPlatform: PlatformType.fromApiValue(
+      int.tryParse(state.uri.queryParameters['platform'] ?? '') ??
+          PlatformType.both.apiValue,
     ),
   );
 }

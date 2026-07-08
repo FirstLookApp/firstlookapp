@@ -2,10 +2,11 @@ import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:firstlook/features/auth/presentation/widgets/auth_header.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -46,12 +47,15 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const AuthHeader(),
         const SizedBox(height: 30),
+        const Center(child: FirstLookAppIcon(size: 106)),
+        const SizedBox(height: 46),
         Text(
           l10n.authDiscoverTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: Colors.black,
+                color: AppColors.secondary,
+                fontSize: 26,
+                height: 1,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0,
               ),
@@ -60,13 +64,13 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         Text(
           l10n.authDiscoverSubtitle,
           style: const TextStyle(
-            color: Color(0xFF7C7C84),
+            color: AppColors.textMuted,
             fontSize: 12,
             height: 1.45,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 34),
+        const SizedBox(height: 30),
         AuthTextField(
           controller: _emailController,
           label: l10n.authEmailAddressLabel,

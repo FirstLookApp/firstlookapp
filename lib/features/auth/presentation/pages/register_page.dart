@@ -1,11 +1,12 @@
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:firstlook/features/auth/presentation/widgets/auth_header.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
+import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,6 +24,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _passwordConfirmation = TextEditingController();
   String? _formError;
+
+  bool get _passwordsDoNotMatch {
+    return _passwordConfirmation.text.isNotEmpty &&
+        _password.text != _passwordConfirmation.text;
+  }
 
   @override
   void dispose() {
@@ -60,12 +66,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 AppSpacing.large,
               ),
               children: <Widget>[
-                const AuthHeader(),
-                const SizedBox(height: 28),
+                const SizedBox(height: 30),
+                const Center(child: FirstLookAppIcon(size: 104)),
+                const SizedBox(height: 46),
                 Text(
                   l10n.authDiscoverTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.black,
+                        color: AppColors.secondary,
+                        fontSize: 26,
+                        height: 1,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0,
                       ),
@@ -74,10 +83,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 Text(
                   l10n.authDiscoverSubtitle,
                   style: const TextStyle(
-                    color: Color(0xFF7C7C84),
+                    color: AppColors.textMuted,
                     fontSize: 12,
                     height: 1.45,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -100,6 +109,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   label: l10n.authPasswordLabel,
                   hint: l10n.loginPasswordHint,
                   obscureText: true,
+                  onChanged: (_) => setState(() => _formError = null),
                 ),
                 const SizedBox(height: 14),
                 AuthTextField(
@@ -107,12 +117,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   label: l10n.authPasswordConfirmationLabel,
                   hint: l10n.registerConfirmPasswordHint,
                   obscureText: true,
+                  errorText:
+                      _passwordsDoNotMatch ? l10n.authPasswordMismatch : null,
+                  onChanged: (_) => setState(() => _formError = null),
                 ),
                 const SizedBox(height: 42),
                 AuthPrimaryButton(
                   label: l10n.authRegisterCta,
                   isLoading: authState.isLoading,
                   onPressed: () => _submit(context, l10n),
+                ),
+                const SizedBox(height: 14),
+                TextButton(
+                  onPressed: () => context.go(RouteNames.loginPath),
+                  child: Text(
+                    l10n.goToLogin,
+                    style: const TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
                 ),
                 if (_formError != null || authState.hasError)
                   Padding(
@@ -145,7 +170,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       return;
     }
 
-    if (password != _passwordConfirmation.text) {
+    if (_passwordsDoNotMatch || password != _passwordConfirmation.text) {
       setState(() => _formError = l10n.authPasswordMismatch);
       return;
     }

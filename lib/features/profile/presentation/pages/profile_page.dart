@@ -2,14 +2,17 @@ import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
+import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
-import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
+import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
+import 'package:firstlook/widgets/app_snackbar.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
+import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,19 +40,29 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             onRefresh: () async {
               ref.invalidate(profileProvider);
               ref.invalidate(myApplicationsProvider);
+              ref.invalidate(profileCommentsProvider);
             },
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 92),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenHorizontal,
+                12,
+                AppSpacing.screenHorizontal,
+                92,
+              ),
               children: <Widget>[
                 const FirstLookAppHeader(),
                 const SizedBox(height: 28),
-                _ProfileIdentity(user: user),
+                _ProfileIdentity(
+                  user: user,
+                  onAvatarTap: () => _showAvatarPicker(context),
+                ),
                 const SizedBox(height: 20),
                 _StatsCard(user: user),
                 const SizedBox(height: 20),
-                AuthPrimaryButton(
+                FirstLookPrimaryButton(
                   label: l10n.profilePromoteApp,
-                  onPressed: null,
+                  icon: Icons.rocket_launch_rounded,
+                  onPressed: () {},
                 ),
                 const SizedBox(height: 20),
                 _ProfileTabs(
@@ -61,14 +74,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 if (_showApplications)
                   const _MyApplicationsList()
                 else
-                  _CommentsPlaceholder(message: l10n.profileCommentsTodo),
-                const SizedBox(height: 18),
-                OutlinedButton(
-                  onPressed: () {
-                    ref.read(authControllerProvider.notifier).logout();
-                  },
-                  child: Text(l10n.logoutButton),
-                ),
+                  const _ProfileCommentsList(),
               ],
             ),
           ),
@@ -83,14 +89,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       ),
     );
   }
+
+  Future<void> _showAvatarPicker(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _AvatarPickerSheet(),
+    );
+  }
 }
 
 class _ProfileIdentity extends StatelessWidget {
   const _ProfileIdentity({
     required this.user,
+    required this.onAvatarTap,
   });
 
   final UserProfile user;
+  final VoidCallback onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
@@ -98,30 +115,39 @@ class _ProfileIdentity extends StatelessWidget {
 
     return Column(
       children: <Widget>[
-        CircleAvatar(
-          radius: 42,
-          backgroundColor: AppColors.primarySoft,
-          backgroundImage:
-              user.avatarUrl == null ? null : NetworkImage(user.avatarUrl!),
-          child: user.avatarUrl == null
-              ? Text(
-                  user.firstName.isEmpty
-                      ? '?'
-                      : user.firstName.characters.first.toUpperCase(),
-                  style: const TextStyle(
+        GestureDetector(
+          onTap: onAvatarTap,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: <Widget>[
+              _ProfileAvatar(user: user, radius: 42),
+              Positioned(
+                right: -2,
+                bottom: -2,
+                child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
                     color: AppColors.primary,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
                   ),
-                )
-              : null,
+                  child: const Icon(
+                    Icons.edit_rounded,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         Text(
           displayName.isEmpty ? user.username : displayName,
           textAlign: TextAlign.center,
           style: const TextStyle(
-            color: Colors.black,
+            color: AppColors.secondary,
             fontSize: 20,
             fontWeight: FontWeight.w900,
           ),
@@ -137,6 +163,269 @@ class _ProfileIdentity extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ProfileAvatar extends StatelessWidget {
+  const _ProfileAvatar({
+    required this.user,
+    required this.radius,
+  });
+
+  final UserProfile user;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? avatarUrl = user.avatarUrl;
+
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: AppColors.primarySoft,
+      backgroundImage: avatarUrl == null || avatarUrl.isEmpty
+          ? null
+          : NetworkImage(UrlResolver.media(avatarUrl)),
+      child: avatarUrl == null || avatarUrl.isEmpty
+          ? Text(
+              user.firstName.isEmpty
+                  ? '?'
+                  : user.firstName.characters.first.toUpperCase(),
+              style: TextStyle(
+                color: AppColors.primary,
+                fontSize: radius * 0.62,
+                fontWeight: FontWeight.w900,
+              ),
+            )
+          : null,
+    );
+  }
+}
+
+class _AvatarPickerSheet extends ConsumerStatefulWidget {
+  const _AvatarPickerSheet();
+
+  @override
+  ConsumerState<_AvatarPickerSheet> createState() => _AvatarPickerSheetState();
+}
+
+class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
+  String? _selectedAvatarId;
+  bool _isSaving = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final AsyncValue<List<AvatarOption>> avatars =
+        ref.watch(profileAvatarsProvider);
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        18,
+        20,
+        MediaQuery.of(context).padding.bottom + 22,
+      ),
+      child: SafeArea(
+        top: false,
+        child: avatars.when(
+          data: (List<AvatarOption> items) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        l10n.profileAvatarTitle,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: AppColors.secondary,
+                              fontWeight: FontWeight.w900,
+                            ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ],
+                ),
+                Text(
+                  l10n.profileAvatarSubtitle,
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                if (items.isEmpty)
+                  _AvatarEmpty(message: l10n.profileAvatarEmpty)
+                else
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: items.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: 0.82,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      final AvatarOption avatar = items[index];
+                      final bool selected = avatar.id == _selectedAvatarId;
+                      return _AvatarOptionTile(
+                        avatar: avatar,
+                        selected: selected,
+                        onTap: () => setState(
+                          () => _selectedAvatarId = avatar.id,
+                        ),
+                      );
+                    },
+                  ),
+                const SizedBox(height: 20),
+                FirstLookPrimaryButton(
+                  label: _isSaving
+                      ? l10n.profileAvatarSaving
+                      : l10n.profileAvatarSave,
+                  onPressed: _selectedAvatarId == null || _isSaving
+                      ? null
+                      : () => _saveAvatar(context),
+                ),
+              ],
+            );
+          },
+          error: (Object error, StackTrace stackTrace) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              _AvatarEmpty(message: l10n.profileAvatarLoadError),
+              const SizedBox(height: 14),
+              OutlinedButton(
+                onPressed: () => ref.invalidate(profileAvatarsProvider),
+                child: Text(l10n.commonRetry),
+              ),
+            ],
+          ),
+          loading: () => const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: AppLoadingIndicator()),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _saveAvatar(BuildContext context) async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final String? avatarId = _selectedAvatarId;
+    if (avatarId == null) {
+      return;
+    }
+
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(firstLookRepositoryProvider).selectAvatar(avatarId);
+      ref.invalidate(profileProvider);
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        AppSnackbar.show(context, message: l10n.profileAvatarSaved);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        AppSnackbar.show(context, message: l10n.commonUnexpectedError);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSaving = false);
+      }
+    }
+  }
+}
+
+class _AvatarOptionTile extends StatelessWidget {
+  const _AvatarOptionTile({
+    required this.avatar,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final AvatarOption avatar;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: <Widget>[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: selected ? AppColors.primary : AppColors.border,
+                width: selected ? 3 : 1,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 27,
+              backgroundColor: AppColors.primarySoft,
+              backgroundImage: avatar.filePath.isEmpty
+                  ? null
+                  : NetworkImage(UrlResolver.media(avatar.filePath)),
+              child: avatar.filePath.isEmpty
+                  ? const Icon(Icons.person_rounded, color: AppColors.primary)
+                  : null,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            avatar.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.secondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AvatarEmpty extends StatelessWidget {
+  const _AvatarEmpty({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      child: Center(
+        child: Text(
+          message,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.textMuted,
+            fontSize: 13,
+            height: 1.4,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -158,6 +447,13 @@ class _StatsCard extends StatelessWidget {
         color: Colors.white,
         border: Border.all(color: AppColors.border),
         borderRadius: BorderRadius.circular(18),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: AppColors.shadow,
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: <Widget>[
@@ -189,7 +485,7 @@ class _Stat extends StatelessWidget {
           Text(
             _compactCount(value),
             style: const TextStyle(
-              color: Colors.black,
+              color: AppColors.secondary,
               fontSize: 17,
               fontWeight: FontWeight.w900,
             ),
@@ -226,7 +522,7 @@ class _ProfileTabs extends StatelessWidget {
       height: 42,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF4F4F6),
+        color: AppColors.chipFill,
         borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
@@ -272,7 +568,7 @@ class _TabButton extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? Colors.black : AppColors.textMuted,
+              color: selected ? AppColors.secondary : AppColors.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
@@ -303,7 +599,10 @@ class _MyApplicationsList extends ConsumerWidget {
                 (ApplicationListItem item) => _ProfileApplicationCard(
                   item: item,
                   onTap: () => context.push(
-                    'applications/${item.id}?platform=${item.platform}',
+                    RouteNames.applicationDetailLocation(
+                      id: item.id,
+                      platform: item.platform,
+                    ),
                   ),
                 ),
               )
@@ -342,6 +641,13 @@ class _ProfileApplicationCard extends StatelessWidget {
           color: Colors.white,
           border: Border.all(color: AppColors.border),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: <Widget>[
@@ -372,7 +678,7 @@ class _ProfileApplicationCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: AppColors.secondary,
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
@@ -390,6 +696,198 @@ class _ProfileApplicationCard extends StatelessWidget {
                 ],
               ),
             ),
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileCommentsList extends ConsumerWidget {
+  const _ProfileCommentsList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<PagedResult<ProfileCommentItem>> comments =
+        ref.watch(profileCommentsProvider);
+
+    return comments.when(
+      data: (PagedResult<ProfileCommentItem> result) {
+        if (result.items.isEmpty) {
+          return const _CommentsPlaceholder(message: '');
+        }
+
+        return Column(
+          children: result.items
+              .map<Widget>(
+                (ProfileCommentItem item) => _ProfileCommentCard(
+                  item: item,
+                  onTap: () => context.push(
+                    RouteNames.applicationDetailLocation(
+                      id: item.applicationId,
+                      platform: PlatformType.both.apiValue,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+      error: (Object error, StackTrace stackTrace) => AppErrorState(
+        message: error is AppException
+            ? error.message
+            : AppLocalizations.of(context)?.commonUnexpectedError ??
+                'Something went wrong. Please try again.',
+        onRetry: () => ref.invalidate(profileCommentsProvider),
+      ),
+      loading: () => const AppLoadingIndicator(),
+    );
+  }
+}
+
+class _ProfileCommentCard extends StatelessWidget {
+  const _ProfileCommentCard({
+    required this.item,
+    required this.onTap,
+  });
+
+  final ProfileCommentItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final String badgeLabel = _profileCommentBadgeLabel(l10n, item);
+    final bool receivedComment = item.isOnOwnApplication && !item.isOwnComment;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 16,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: item.applicationMainScreenshot.isEmpty
+                    ? const ColoredBox(
+                        color: AppColors.primarySoft,
+                        child: Icon(
+                          Icons.chat_bubble_rounded,
+                          color: AppColors.primary,
+                        ),
+                      )
+                    : Image.network(
+                        UrlResolver.media(item.applicationMainScreenshot),
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          item.applicationName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.secondary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _formatProfileCommentDate(item.createdAt),
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 9,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: receivedComment
+                              ? AppColors.primarySoft
+                              : AppColors.chipFill,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          badgeLabel,
+                          style: TextStyle(
+                            color: receivedComment
+                                ? AppColors.primary
+                                : AppColors.secondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      if (item.commenterUsername.isNotEmpty)
+                        Text(
+                          '@${item.commenterUsername}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.content,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                      height: 1.35,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
             const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
           ],
         ),
@@ -430,4 +928,30 @@ String _compactCount(int value) {
     return '${compact.toStringAsFixed(compact >= 10 ? 0 : 1)}B';
   }
   return value.toString();
+}
+
+String _formatProfileCommentDate(DateTime value) {
+  if (value.millisecondsSinceEpoch == 0) {
+    return '';
+  }
+
+  final DateTime local = value.toLocal();
+  final String day = local.day.toString().padLeft(2, '0');
+  final String month = local.month.toString().padLeft(2, '0');
+  return '$day.$month.${local.year}';
+}
+
+String _profileCommentBadgeLabel(
+  AppLocalizations l10n,
+  ProfileCommentItem item,
+) {
+  if (item.isOwnComment && item.isOnOwnApplication) {
+    return l10n.profileCommentOwnApp;
+  }
+
+  if (item.isOnOwnApplication) {
+    return l10n.profileCommentReceived;
+  }
+
+  return l10n.profileCommentOwn;
 }

@@ -8,6 +8,8 @@ class AuthTextField extends StatelessWidget {
     required this.hint,
     this.obscureText = false,
     this.keyboardType,
+    this.onChanged,
+    this.errorText,
     super.key,
   });
 
@@ -16,6 +18,8 @@ class AuthTextField extends StatelessWidget {
   final String hint;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final ValueChanged<String>? onChanged;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,7 @@ class AuthTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          onChanged: onChanged,
           style: const TextStyle(
             color: AppColors.secondary,
             fontSize: 14,
@@ -43,6 +48,12 @@ class AuthTextField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             hintText: hint,
+            errorText: errorText,
+            errorStyle: const TextStyle(
+              color: AppColors.primary,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
             hintStyle: const TextStyle(
               color: Color(0xFFC9C9CF),
               fontSize: 14,
