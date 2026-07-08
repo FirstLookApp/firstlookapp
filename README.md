@@ -1,20 +1,20 @@
 # FirstLook Mobile App
 
-FirstLook mobile app is a Flutter application for discovering, testing, liking, commenting on and submitting mobile applications.
+Flutter mobile client for FirstLook. The app lets users discover mobile products, join tests, like and comment on apps, submit their own applications, track notifications, and manage their profile.
 
-The app follows the existing clean architecture approach and uses real staging API endpoints whenever they are available.
+The UI follows the Figma file as the source of truth. API integrations target the staging backend by default.
 
 ## Current Status
 
-The Flutter project foundation is ready and buildable.
+The app is buildable and wired to real staging endpoints for the implemented flows.
 
-Implemented app areas:
+Implemented areas:
 
-- Splash
+- Splash and auth gate
 - Login
 - Register
 - OTP verification
-- Forgot password
+- Forgot/reset password
 - Discover
 - Drop / Test tabs
 - Application detail
@@ -23,9 +23,10 @@ Implemented app areas:
 - Comments
 - Liked items
 - Profile
-- Submit application placeholder
+- Submit application with multipart screenshot upload
 - Beta access request
 - Notifications
+- Logout with access/refresh token cache clearing
 
 ## Tech Stack
 
@@ -37,7 +38,9 @@ Implemented app areas:
 - Flutter Secure Storage
 - Hive
 - Flutter localization
-- Environment-based configuration
+- `file_picker`
+- `url_launcher`
+- Environment-based configuration with `flutter_dotenv`
 
 ## Requirements
 
@@ -73,7 +76,7 @@ RECEIVE_TIMEOUT_MS=30000
 SEND_TIMEOUT_MS=30000
 ```
 
-Do not hardcode API URLs in widgets or feature files. Use the environment configuration.
+Do not hardcode API URLs in widgets or feature files. Use the environment configuration and `ApiPaths`.
 
 ## API
 
@@ -101,7 +104,8 @@ Connected endpoints:
 - `POST /api/auth/forgot-password`
 - `POST /api/auth/reset-password`
 - `GET /api/profile/me`
-- `POST /api/profile/select-avatar`
+- `GET /api/profile/favorites`
+- `GET /api/profile/notifications`
 - `GET /api/discovery/{destination}`
 - `GET /api/discovery/{destination}/list`
 - `GET /api/discovery/{applicationId}/detail`
@@ -110,25 +114,22 @@ Connected endpoints:
 - `POST /api/interactions/{applicationId}/comments`
 - `POST /api/interactions/{applicationId}/store-click`
 - `POST /api/interactions/{applicationId}/beta-request`
-- `GET /api/profile/favorites`
-- `GET /api/profile/notifications`
 - `POST /api/applications`
 - `GET /api/applications/mine`
 
-Available but not fully wired yet:
+Available but not fully wired in the mobile UI yet:
 
+- `POST /api/profile/select-avatar`
 - `PUT /api/applications/{applicationId}`
 - `GET /api/applications/my-beta-requests`
+- `POST /api/interactions/comments/{commentId}/report`
 
-## Missing API / TODO
-
-These are intentionally left as clean TODOs because the matching endpoint or final wiring is not available yet.
+## Known Product / API Gaps
 
 - Profile comments: the mobile UI has a clean placeholder because Swagger does not expose a dedicated "my comments" endpoint for the current user.
-- Edit submitted application: `PUT /api/applications/{applicationId}` exists, but the edit flow is not part of the current Figma pass yet.
-- My beta requests: `GET /api/applications/my-beta-requests` exists, but no matching Figma screen has been implemented yet.
-
-When new API endpoints arrive, update this section first and then wire the related feature.
+- Edit submitted application: the backend has `PUT /api/applications/{applicationId}`, but the edit flow is not part of the current Figma pass yet.
+- My beta requests: the backend has `GET /api/applications/my-beta-requests`, but no matching mobile screen has been implemented yet.
+- Avatar selection: the backend has `POST /api/profile/select-avatar`, but the current profile screen only displays the selected avatar/initial.
 
 ## Run
 
@@ -144,10 +145,10 @@ Generate localization files:
 flutter gen-l10n
 ```
 
-Run the app:
+Run on a connected emulator/device:
 
 ```bash
-flutter run
+flutter run -d emulator-5554
 ```
 
 Build Android debug APK:
@@ -167,36 +168,31 @@ flutter test
 flutter build apk --debug
 ```
 
-Last verified checks:
+Last verified during emulator QA:
 
-- `dart format .`
 - `flutter analyze`
 - `flutter test`
 - `flutter build apk --debug`
 
-## Project Notes
+## Architecture Notes
 
-- Figma is the single source of truth for UI.
+- Keep business logic out of widgets.
+- Use Riverpod providers/controllers for feature state and API actions.
+- Use Dio through the configured API client.
+- Store tokens only through secure token storage.
+- Keep user-facing strings in localization files.
+- Keep API paths centralized in `lib/core/network/api_paths.dart`.
+- Keep reusable visual pieces under `lib/widgets` or feature widgets.
+
+## UI Rules
+
+- Figma is the single source of truth.
 - Do not redesign screens without a matching Figma update.
 - Do not use mock data when a real endpoint exists.
-- Do not put business logic inside widgets.
-- Do not hardcode user-facing strings.
-- Do not hardcode API URLs.
-- Keep reusable widgets and feature logic deduplicated.
+- Do not hardcode URLs or strings.
 - Keep the app buildable after every change.
 
-## Git Notes
-
-The local implementation commit exists, but pushing to GitHub currently fails because the authenticated account does not have write access to the repository.
-
-Observed push error:
-
-```text
-Write access to repository not granted.
-HTTP 403
-```
-
-Repository:
+## Repository
 
 ```text
 https://github.com/FirstLookApp/firstlookapp
