@@ -293,6 +293,35 @@ class UserProfile {
   final int totalApplications;
 }
 
+class UserSearchItem {
+  const UserSearchItem({
+    required this.userId,
+    required this.username,
+    required this.fullName,
+    required this.biography,
+    required this.avatarUrl,
+    required this.totalApplications,
+  });
+
+  factory UserSearchItem.fromJson(Map<String, dynamic> json) {
+    return UserSearchItem(
+      userId: json['userId'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      biography: json['biography'] as String? ?? '',
+      avatarUrl: json['avatarUrl'] as String?,
+      totalApplications: json['totalApplications'] as int? ?? 0,
+    );
+  }
+
+  final String userId;
+  final String username;
+  final String fullName;
+  final String biography;
+  final String? avatarUrl;
+  final int totalApplications;
+}
+
 class AvatarOption {
   const AvatarOption({
     required this.id,

@@ -372,8 +372,8 @@ class _SearchSheet extends ConsumerStatefulWidget {
 class _SearchSheetState extends ConsumerState<_SearchSheet> {
   final TextEditingController _controller = TextEditingController();
   Timer? _debounce;
-  AsyncValue<List<ApplicationListItem>> _results =
-      const AsyncData<List<ApplicationListItem>>(<ApplicationListItem>[]);
+  AsyncValue<_SearchResults> _results =
+      const AsyncData<_SearchResults>(_SearchResults.empty());
 
   @override
   void dispose() {
@@ -439,7 +439,7 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
                         _SearchEmpty(message: l10n.searchMinCharacters)
                       else
                         _results.when(
-                          data: (List<ApplicationListItem> items) => Column(
+                          data: (_SearchResults results) => Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               const SizedBox(height: 10),
@@ -447,10 +447,10 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
                                 title: l10n.searchApplications,
                               ),
                               const SizedBox(height: 8),
-                              if (items.isEmpty)
+                              if (results.applications.isEmpty)
                                 _SearchEmpty(message: l10n.commonNoData)
                               else
-                                ...items.map(
+                                ...results.applications.map(
                                   (ApplicationListItem item) =>
                                       _SearchResultRow(
                                     item: item,
@@ -468,7 +468,13 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
                               const SizedBox(height: 16),
                               _SearchSectionTitle(title: l10n.searchUsers),
                               const SizedBox(height: 8),
-                              _SearchEmpty(message: l10n.searchUsersTodo),
+                              if (results.users.isEmpty)
+                                _SearchEmpty(message: l10n.commonNoData)
+                              else
+                                ...results.users.map(
+                                  (UserSearchItem item) =>
+                                      _UserSearchResultRow(item: item),
+                                ),
                             ],
                           ),
                           error: (Object error, StackTrace stackTrace) =>
@@ -496,15 +502,14 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
     final String query = value.trim();
     if (query.length < 3) {
       setState(
-        () => _results =
-            const AsyncData<List<ApplicationListItem>>(<ApplicationListItem>[]),
+        () =>
+            _results = const AsyncData<_SearchResults>(_SearchResults.empty()),
       );
       return;
     }
 
     _debounce = Timer(const Duration(milliseconds: 360), () async {
-      setState(
-          () => _results = const AsyncLoading<List<ApplicationListItem>>());
+      setState(() => _results = const AsyncLoading<_SearchResults>());
 
       try {
         final repository = ref.read(firstLookRepositoryProvider);
@@ -544,22 +549,49 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
           }
         }
 
+        final PagedResult<UserSearchItem> userPage =
+            await repository.searchUsers(search: query).catchError(
+                  (_) => const PagedResult<UserSearchItem>(
+                    items: <UserSearchItem>[],
+                    pageNumber: 1,
+                    pageSize: 20,
+                    totalCount: 0,
+                  ),
+                );
+
         if (mounted) {
           setState(
-            () => _results =
-                AsyncData<List<ApplicationListItem>>(unique.values.toList()),
+            () => _results = AsyncData<_SearchResults>(
+              _SearchResults(
+                applications: unique.values.toList(),
+                users: userPage.items,
+              ),
+            ),
           );
         }
       } catch (error, stackTrace) {
         if (mounted) {
           setState(
-            () => _results =
-                AsyncError<List<ApplicationListItem>>(error, stackTrace),
+            () => _results = AsyncError<_SearchResults>(error, stackTrace),
           );
         }
       }
     });
   }
+}
+
+class _SearchResults {
+  const _SearchResults({
+    required this.applications,
+    required this.users,
+  });
+
+  const _SearchResults.empty()
+      : applications = const <ApplicationListItem>[],
+        users = const <UserSearchItem>[];
+
+  final List<ApplicationListItem> applications;
+  final List<UserSearchItem> users;
 }
 
 class _SearchSectionTitle extends StatelessWidget {
@@ -620,6 +652,54 @@ class _SearchResultRow extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: const Icon(Icons.chevron_right_rounded),
+    );
+  }
+}
+
+class _UserSearchResultRow extends StatelessWidget {
+  const _UserSearchResultRow({
+    required this.item,
+  });
+
+  final UserSearchItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final String title =
+        item.fullName.trim().isEmpty ? item.username : item.fullName.trim();
+    final String fallback = title.isEmpty ? '?' : title.characters.first;
+    final String? avatarUrl = item.avatarUrl;
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        radius: 22,
+        backgroundColor: AppColors.primarySoft,
+        backgroundImage: avatarUrl == null || avatarUrl.isEmpty
+            ? null
+            : NetworkImage(UrlResolver.media(avatarUrl)),
+        child: avatarUrl == null || avatarUrl.isEmpty
+            ? Text(
+                fallback.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w900,
+                ),
+              )
+            : null,
+      ),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.w900),
+      ),
+      subtitle: Text(
+        '@${item.username} - ${item.totalApplications} ${l10n.profileStatsApps}',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }

@@ -17,6 +17,7 @@ abstract final class ApiPaths {
   static const String applications = '/api/applications';
   static const String myApplications = '/api/applications/mine';
   static const String myBetaRequests = '/api/applications/my-beta-requests';
+  static const String userSearch = '/api/users/search';
   static const String discovery = '/api/discovery';
   static const String interactions = '/api/interactions';
 }

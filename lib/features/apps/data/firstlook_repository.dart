@@ -121,6 +121,18 @@ class FirstLookRepository {
     );
   }
 
+  Future<PagedResult<UserSearchItem>> searchUsers({
+    required String search,
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) {
+    return _remoteDataSource.searchUsers(
+      search: search,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+    );
+  }
+
   Future<PagedResult<ApplicationListItem>> myApplications({
     int pageNumber = 1,
     int pageSize = 20,
