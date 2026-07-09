@@ -15,6 +15,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonRetry => 'Tekrar Dene';
 
   @override
+  String get commonBack => 'Geri';
+
+  @override
   String get commonCancel => 'İptal';
 
   @override

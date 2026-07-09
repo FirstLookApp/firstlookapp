@@ -55,12 +55,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         Text(
           l10n.authDiscoverTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            color: AppColors.secondary,
-            fontSize: 26,
-            height: 1,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 0,
-          ),
+                color: AppColors.secondary,
+                fontSize: 26,
+                height: 1,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0,
+              ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -107,23 +107,21 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         ),
         const SizedBox(height: 24),
         AuthPrimaryButton(
-          label: l10n.authRegisterCta,
-          outlined: true,
-          onPressed: () => context.go(RouteNames.registerPath),
-        ),
-        const SizedBox(height: 14),
-        AuthPrimaryButton(
           label: l10n.authLoginCta,
           isLoading: authState.isLoading,
           onPressed: () {
-            ref
-                .read(authControllerProvider.notifier)
-                .login(
+            ref.read(authControllerProvider.notifier).login(
                   login: _emailController.text.trim(),
                   password: _passwordController.text,
                   rememberMe: true,
                 );
           },
+        ),
+        const SizedBox(height: 14),
+        AuthPrimaryButton(
+          label: l10n.authRegisterCta,
+          outlined: true,
+          onPressed: () => context.go(RouteNames.registerPath),
         ),
         if (authState.hasError)
           Padding(

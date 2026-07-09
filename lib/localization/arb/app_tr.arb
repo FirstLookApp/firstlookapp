@@ -2,6 +2,7 @@
   "@@locale": "tr",
   "appName": "FirstLook",
   "commonRetry": "Tekrar Dene",
+  "commonBack": "Geri",
   "commonCancel": "İptal",
   "commonConfirm": "Onayla",
   "commonSearch": "Ara",
