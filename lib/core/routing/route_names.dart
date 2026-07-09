@@ -5,6 +5,7 @@ abstract final class RouteNames {
   static const String otp = 'otp';
   static const String forgotPassword = 'forgotPassword';
   static const String discover = 'discover';
+  static const String leaderboard = 'leaderboard';
   static const String detail = 'detail';
   static const String submit = 'submit';
   static const String favorites = 'favorites';
@@ -18,6 +19,7 @@ abstract final class RouteNames {
   static const String otpPath = '/otp';
   static const String forgotPasswordPath = '/forgot-password';
   static const String discoverPath = '/discover';
+  static const String leaderboardPath = '/leaderboard';
   static const String detailPath = '/applications/:id';
   static const String submitPath = '/submit';
   static const String favoritesPath = '/favorites';
@@ -44,6 +46,10 @@ abstract final class RouteNames {
 
     if (path.startsWith(submitPath)) {
       return submitPath;
+    }
+
+    if (path.startsWith(leaderboardPath)) {
+      return leaderboardPath;
     }
 
     if (path.startsWith(favoritesPath)) {

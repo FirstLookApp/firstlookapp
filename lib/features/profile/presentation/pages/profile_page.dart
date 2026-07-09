@@ -13,6 +13,7 @@ import 'package:firstlook/widgets/app_loading_indicator.dart';
 import 'package:firstlook/widgets/app_snackbar.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:firstlook/widgets/firstlook_design_system.dart';
+import 'package:firstlook/widgets/showcase_coming_soon_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,7 +63,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 FirstLookPrimaryButton(
                   label: l10n.profilePromoteApp,
                   icon: Icons.rocket_launch_rounded,
-                  onPressed: () => _showPromoteInfoDialog(context),
+                  onPressed: () => showShowcaseComingSoonDialog(context),
                 ),
                 const SizedBox(height: 20),
                 _ProfileTabs(
@@ -96,71 +97,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const _AvatarPickerSheet(),
-    );
-  }
-
-  Future<void> _showPromoteInfoDialog(BuildContext context) async {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    await showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(22, 18, 18, 24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: const <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.shadow,
-                  blurRadius: 28,
-                  offset: Offset(0, 16),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        l10n.profilePromoteSoonTitle,
-                        style: const TextStyle(
-                          color: AppColors.secondary,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          height: 1.08,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(),
-                      icon: const Icon(Icons.close_rounded),
-                      color: AppColors.secondary,
-                      splashRadius: 22,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  l10n.profilePromoteSoonMessage,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 14,
-                    height: 1.45,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

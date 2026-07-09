@@ -25,7 +25,14 @@ class FirstLookScreenHeader extends ConsumerWidget {
           icon: Icons.grid_view_rounded,
           onTap: () => showFirstLookSettings(context, ref),
         ),
-        const FirstLookLogo(size: 33),
+        InkResponse(
+          onTap: () => context.go(RouteNames.discoverPath),
+          radius: 34,
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: FirstLookLogo(size: 33),
+          ),
+        ),
         FirstLookIconButton(
           icon: Icons.search_rounded,
           size: 27,

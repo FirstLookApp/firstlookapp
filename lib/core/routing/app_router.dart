@@ -151,9 +151,9 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: RouteNames.submitPath,
-                name: RouteNames.submit,
-                builder: (_, __) => const SubmitPage(),
+                path: RouteNames.leaderboardPath,
+                name: RouteNames.leaderboard,
+                builder: (_, __) => const LeaderboardPage(),
                 routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],
@@ -164,6 +164,16 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.favoritesPath,
                 name: RouteNames.favorites,
                 builder: (_, __) => const FavoritesPage(),
+                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RouteNames.submitPath,
+                name: RouteNames.submit,
+                builder: (_, __) => const SubmitPage(),
                 routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
               ),
             ],

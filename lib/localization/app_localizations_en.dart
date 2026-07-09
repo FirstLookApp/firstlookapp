@@ -37,6 +37,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navDiscover => 'Discover';
 
   @override
+  String get navLeaderboard => 'Leaderboard';
+
+  @override
+  String get navShowcase => 'Showcase';
+
+  @override
+  String get showcaseComingSoonTitle => 'Showcase Coming Soon';
+
+  @override
+  String get showcaseComingSoonMessage =>
+      'Very soon, we will help your apps reach more people.';
+
+  @override
+  String get showcaseComingSoonBadge => 'Premium visibility is being prepared';
+
+  @override
   String get navSubmit => 'Submit';
 
   @override

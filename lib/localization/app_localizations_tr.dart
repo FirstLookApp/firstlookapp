@@ -38,6 +38,22 @@ class AppLocalizationsTr extends AppLocalizations {
   String get navDiscover => 'Kesfet';
 
   @override
+  String get navLeaderboard => 'Liderlik';
+
+  @override
+  String get navShowcase => 'Vitrin';
+
+  @override
+  String get showcaseComingSoonTitle => 'Vitrin Çok Yakında';
+
+  @override
+  String get showcaseComingSoonMessage =>
+      'Çok yakında uygulamalarınızın daha fazla kişiye erişmesini sağlayacağız.';
+
+  @override
+  String get showcaseComingSoonBadge => 'Premium görünürlük hazırlanıyor';
+
+  @override
   String get navSubmit => 'Gonder';
 
   @override

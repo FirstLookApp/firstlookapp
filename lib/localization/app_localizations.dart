@@ -152,6 +152,36 @@ abstract class AppLocalizations {
   /// **'Discover'**
   String get navDiscover;
 
+  /// No description provided for @navLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get navLeaderboard;
+
+  /// No description provided for @navShowcase.
+  ///
+  /// In en, this message translates to:
+  /// **'Showcase'**
+  String get navShowcase;
+
+  /// No description provided for @showcaseComingSoonTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Showcase Coming Soon'**
+  String get showcaseComingSoonTitle;
+
+  /// No description provided for @showcaseComingSoonMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Very soon, we will help your apps reach more people.'**
+  String get showcaseComingSoonMessage;
+
+  /// No description provided for @showcaseComingSoonBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium visibility is being prepared'**
+  String get showcaseComingSoonBadge;
+
   /// No description provided for @navSubmit.
   ///
   /// In en, this message translates to:

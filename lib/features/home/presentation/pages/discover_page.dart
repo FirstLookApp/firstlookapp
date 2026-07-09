@@ -98,7 +98,7 @@ class DiscoverPage extends ConsumerWidget {
               const SizedBox(height: 22),
               _SectionTitle(
                 title: destination == SubmitDestination.drop
-                    ? l10n.leaderboardTitle
+                    ? l10n.discoverSubtitle
                     : l10n.testStageTitle,
               ),
               const SizedBox(height: 12),
@@ -124,15 +124,24 @@ class DiscoverPage extends ConsumerWidget {
                       );
                     }
 
-                    return _DropLeaderboard(
-                      items: items,
-                      buttonLabel: l10n.discoverReviewButton,
-                      onTap: (ApplicationListItem item) => context.push(
-                        RouteNames.applicationDetailLocation(
-                          id: item.id,
-                          platform: item.platform,
-                        ),
-                      ),
+                    return Column(
+                      children: items.asMap().entries.map<Widget>(
+                        (MapEntry<int, ApplicationListItem> entry) {
+                          final ApplicationListItem item = entry.value;
+
+                          return _DropAppCard(
+                            rank: entry.key + 1,
+                            item: item,
+                            buttonLabel: l10n.discoverReviewButton,
+                            onTap: () => context.push(
+                              RouteNames.applicationDetailLocation(
+                                id: item.id,
+                                platform: item.platform,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
                     );
                   },
                   error: (Object error, StackTrace stackTrace) => AppErrorState(
@@ -208,6 +217,78 @@ class DiscoverPage extends ConsumerWidget {
                 ),
               ],
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LeaderboardPage extends ConsumerWidget {
+  const LeaderboardPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final AsyncValue<ActiveDropBatch?> activeDrop =
+        ref.watch(activeDropProvider);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async => ref.invalidate(activeDropProvider),
+          child: activeDrop.when(
+            data: (ActiveDropBatch? drop) {
+              final List<ApplicationListItem> items =
+                  drop?.items ?? <ApplicationListItem>[];
+
+              return ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenHorizontal,
+                  12,
+                  AppSpacing.screenHorizontal,
+                  24,
+                ),
+                children: <Widget>[
+                  const FirstLookAppHeader(),
+                  const SizedBox(height: 28),
+                  _SectionTitle(title: l10n.leaderboardTitle),
+                  const SizedBox(height: 16),
+                  if (items.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: Text(
+                          l10n.commonNoData,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    _DropLeaderboard(
+                      items: items,
+                      buttonLabel: l10n.discoverReviewButton,
+                      onTap: (ApplicationListItem item) => context.push(
+                        RouteNames.applicationDetailLocation(
+                          id: item.id,
+                          platform: item.platform,
+                          currentPath: RouteNames.leaderboardPath,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+            error: (Object error, StackTrace stackTrace) => AppErrorState(
+              message: error.toString(),
+              onRetry: () => ref.invalidate(activeDropProvider),
+            ),
+            loading: () => const AppLoadingIndicator(),
           ),
         ),
       ),
@@ -418,9 +499,9 @@ class _LeaderboardPodium extends StatelessWidget {
     final ApplicationListItem? third = _itemForRank(3);
 
     return SizedBox(
-      height: 184,
+      height: 126,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Expanded(
             child: second == null
@@ -431,7 +512,6 @@ class _LeaderboardPodium extends StatelessWidget {
                     badgeColor: const Color(0xFFD7DCE4),
                     badgeTextColor: AppColors.secondary,
                     imageSize: 58,
-                    barHeight: 58,
                     onTap: () => onTap(second),
                   ),
           ),
@@ -445,7 +525,6 @@ class _LeaderboardPodium extends StatelessWidget {
                     badgeColor: const Color(0xFFFFD65A),
                     badgeTextColor: AppColors.secondary,
                     imageSize: 72,
-                    barHeight: 78,
                     isWinner: true,
                     onTap: () => onTap(first),
                   ),
@@ -460,7 +539,6 @@ class _LeaderboardPodium extends StatelessWidget {
                     badgeColor: const Color(0xFFC8844E),
                     badgeTextColor: Colors.white,
                     imageSize: 58,
-                    barHeight: 48,
                     onTap: () => onTap(third),
                   ),
           ),
@@ -482,7 +560,6 @@ class _PodiumEntry extends StatelessWidget {
     required this.badgeColor,
     required this.badgeTextColor,
     required this.imageSize,
-    required this.barHeight,
     required this.onTap,
     this.isWinner = false,
   });
@@ -492,7 +569,6 @@ class _PodiumEntry extends StatelessWidget {
   final Color badgeColor;
   final Color badgeTextColor;
   final double imageSize;
-  final double barHeight;
   final VoidCallback onTap;
   final bool isWinner;
 
@@ -542,30 +618,120 @@ class _PodiumEntry extends StatelessWidget {
               letterSpacing: 0,
             ),
           ),
-          const SizedBox(height: 8),
-          Container(
-            height: barHeight,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isWinner
-                  ? AppColors.primary.withValues(alpha: 0.1)
-                  : const Color(0xFFF7F7F9),
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
-              ),
-            ),
-            child: Text(
-              rank.toString(),
-              style: TextStyle(
-                color: badgeColor,
-                fontSize: isWinner ? 28 : 23,
-                fontWeight: FontWeight.w900,
-                height: 1,
-                letterSpacing: 0,
-              ),
-            ),
-          ),
         ],
+      ),
+    );
+  }
+}
+
+class _DropAppCard extends StatelessWidget {
+  const _DropAppCard({
+    required this.rank,
+    required this.item,
+    required this.buttonLabel,
+    required this.onTap,
+  });
+
+  final int rank;
+  final ApplicationListItem item;
+  final String buttonLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: AppColors.shadow,
+              blurRadius: 20,
+              offset: Offset(0, 9),
+            ),
+          ],
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: 28,
+              child: Text(
+                rank.toString(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: AppColors.secondary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            _LeaderboardImage(
+              imagePath: item.mainScreenshot,
+              size: 64,
+              radius: 14,
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    item.shortDescription,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.secondary,
+                      fontSize: 12,
+                      height: 1.3,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            FilledButton(
+              onPressed: onTap,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(74, 36),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0,
+                ),
+              ),
+              child: Text(buttonLabel),
+            ),
+          ],
+        ),
       ),
     );
   }
