@@ -6,6 +6,7 @@ import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
+import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
@@ -19,6 +20,9 @@ class FirstLookScreenHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final int unreadNotificationCount =
+        ref.watch(unreadNotificationCountProvider).valueOrNull ?? 0;
+
     return Row(
       children: <Widget>[
         SizedBox(
@@ -48,13 +52,29 @@ class FirstLookScreenHeader extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              FirstLookIconButton(
-                icon: Icons.notifications_none_rounded,
-                size: 19,
-                onTap: () => context.push(
-                  RouteNames.notificationsLocation(
-                    currentPath: GoRouterState.of(context).uri.path,
-                  ),
+              SizedBox.square(
+                dimension: 36,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: <Widget>[
+                    FirstLookIconButton(
+                      icon: Icons.notifications_none_rounded,
+                      size: 19,
+                      onTap: () => context.push(
+                        RouteNames.notificationsLocation(
+                          currentPath: GoRouterState.of(context).uri.path,
+                        ),
+                      ),
+                    ),
+                    if (unreadNotificationCount > 0)
+                      Positioned(
+                        left: -2,
+                        top: -2,
+                        child: _UnreadNotificationBadge(
+                          count: unreadNotificationCount,
+                        ),
+                      ),
+                  ],
                 ),
               ),
               FirstLookIconButton(
@@ -66,6 +86,44 @@ class FirstLookScreenHeader extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _UnreadNotificationBadge extends StatelessWidget {
+  const _UnreadNotificationBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final String label = count > 99 ? '99+' : '$count';
+
+    return Container(
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        border: Border.all(color: Colors.white, width: 1.5),
+        borderRadius: BorderRadius.circular(99),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.28),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 8,
+          fontWeight: FontWeight.w900,
+          height: 1,
+        ),
+      ),
     );
   }
 }

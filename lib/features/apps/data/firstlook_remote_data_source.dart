@@ -118,7 +118,8 @@ class FirstLookRemoteDataSource {
         }
       }
 
-      if (error.response?.statusCode == 404 || error.response?.statusCode == 500) {
+      if (error.response?.statusCode == 404 ||
+          error.response?.statusCode == 500) {
         final ApplicationDetail? fallback =
             await _fallbackDetailFromMyApplications(id);
         if (fallback != null) {
@@ -150,16 +151,18 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
-  Future<ApplicationDetail?> _fallbackDetailFromMyApplications(String id) async {
+  Future<ApplicationDetail?> _fallbackDetailFromMyApplications(
+      String id) async {
     try {
       final PagedResult<ApplicationListItem> mine = await myApplications(
         pageNumber: 1,
         pageSize: 100,
       );
-      final ApplicationListItem? item = mine.items.cast<ApplicationListItem?>().firstWhere(
-            (ApplicationListItem? entry) => entry?.id == id,
-            orElse: () => null,
-          );
+      final ApplicationListItem? item =
+          mine.items.cast<ApplicationListItem?>().firstWhere(
+                (ApplicationListItem? entry) => entry?.id == id,
+                orElse: () => null,
+              );
 
       if (item == null) {
         return null;
@@ -368,6 +371,24 @@ class FirstLookRemoteDataSource {
     );
 
     return envelope.data;
+  }
+
+  Future<int> unreadNotificationCount() async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.profileUnreadNotificationCount,
+    );
+
+    return ApiEnvelope<int>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => json as int? ?? 0,
+    ).data;
+  }
+
+  Future<void> markNotificationRead(String notificationId) async {
+    await _dio.post<Map<String, dynamic>>(
+      ApiPaths.markNotificationRead(notificationId),
+    );
   }
 
   Future<PagedResult<ProfileCommentItem>> profileComments({

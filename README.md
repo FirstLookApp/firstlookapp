@@ -106,6 +106,8 @@ Connected endpoints:
 - `GET /api/profile/me`
 - `GET /api/profile/favorites`
 - `GET /api/profile/notifications`
+- `GET /api/profile/notifications/unread-count`
+- `POST /api/profile/notifications/{notificationId}/read`
 - `GET /api/discovery/{destination}`
 - `GET /api/discovery/{destination}/list`
 - `GET /api/discovery/{applicationId}/detail`

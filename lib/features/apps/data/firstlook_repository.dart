@@ -102,6 +102,14 @@ class FirstLookRepository {
     );
   }
 
+  Future<int> unreadNotificationCount() {
+    return _remoteDataSource.unreadNotificationCount();
+  }
+
+  Future<void> markNotificationRead(String notificationId) {
+    return _remoteDataSource.markNotificationRead(notificationId);
+  }
+
   Future<PagedResult<ProfileCommentItem>> profileComments({
     int pageNumber = 1,
     int pageSize = 20,

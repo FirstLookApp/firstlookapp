@@ -13,6 +13,8 @@ abstract final class ApiPaths {
   static const String selectAvatar = '/api/profile/select-avatar';
   static const String profileFavorites = '/api/profile/favorites';
   static const String profileNotifications = '/api/profile/notifications';
+  static const String profileUnreadNotificationCount =
+      '/api/profile/notifications/unread-count';
   static const String profileComments = '/api/profile/comments';
   static const String applications = '/api/applications';
   static const String myApplications = '/api/applications/mine';
@@ -23,4 +25,7 @@ abstract final class ApiPaths {
   static const String interactions = '/api/interactions';
 
   static String userProfile(String userId) => '/api/users/$userId/profile';
+
+  static String markNotificationRead(String notificationId) =>
+      '/api/profile/notifications/$notificationId/read';
 }

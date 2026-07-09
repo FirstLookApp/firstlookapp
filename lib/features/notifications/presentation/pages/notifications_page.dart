@@ -1,4 +1,5 @@
 import 'package:firstlook/core/network/api_envelope.dart';
+import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
 import 'package:firstlook/localization/app_localizations.dart';
@@ -36,7 +37,11 @@ class NotificationsPage extends ConsumerWidget {
       ),
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async => ref.invalidate(notificationsProvider),
+          onRefresh: () async {
+            ref
+              ..invalidate(notificationsProvider)
+              ..invalidate(unreadNotificationCountProvider);
+          },
           child: notifications.when(
             data: (PagedResult<NotificationItem> result) {
               return ListView(
@@ -48,7 +53,10 @@ class NotificationsPage extends ConsumerWidget {
                     _EmptyNotifications(message: l10n.notificationsEmptyMessage)
                   else
                     ...result.items.map(
-                      (NotificationItem item) => _NotificationTile(item: item),
+                      (NotificationItem item) => _NotificationTile(
+                        item: item,
+                        onTap: () => _openNotification(context, ref, item),
+                      ),
                     ),
                 ],
               );
@@ -60,6 +68,32 @@ class NotificationsPage extends ConsumerWidget {
             loading: () => const AppLoadingIndicator(),
           ),
         ),
+      ),
+    );
+  }
+
+  Future<void> _openNotification(
+    BuildContext context,
+    WidgetRef ref,
+    NotificationItem item,
+  ) async {
+    if (!item.isRead) {
+      await ref.read(firstLookRepositoryProvider).markNotificationRead(item.id);
+      ref
+        ..invalidate(notificationsProvider)
+        ..invalidate(unreadNotificationCountProvider);
+    }
+
+    if (!context.mounted) {
+      return;
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) => _NotificationDetailSheet(
+        item: item,
       ),
     );
   }
@@ -86,74 +120,197 @@ class _NotificationsTitle extends StatelessWidget {
 }
 
 class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.item});
+  const _NotificationTile({
+    required this.item,
+    required this.onTap,
+  });
+
+  final NotificationItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 76),
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: item.isRead
+                    ? const Color(0xFFFCFCFD)
+                    : AppColors.primarySoft.withValues(alpha: 0.55),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: item.isRead
+                      ? const Color(0xFFF0F0F3)
+                      : AppColors.primary.withValues(alpha: 0.18),
+                ),
+              ),
+              child: Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 10,
+                    child: item.isRead
+                        ? null
+                        : Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                              boxShadow: <BoxShadow>[
+                                BoxShadow(
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                  const _NotificationIcon(),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          item.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13,
+                            fontWeight:
+                                item.isRead ? FontWeight.w800 : FontWeight.w900,
+                            height: 1.05,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          item.message,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 11,
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: AppColors.textSoft,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationDetailSheet extends StatelessWidget {
+  const _NotificationDetailSheet({required this.item});
 
   final NotificationItem item;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      constraints: const BoxConstraints(minHeight: 60),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFCFCFD),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF4F4F6)),
-      ),
-      child: Row(
-        children: <Widget>[
-          const _NotificationIcon(),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  item.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                    height: 1.05,
-                    letterSpacing: 0,
-                  ),
+    final MaterialLocalizations localizations =
+        MaterialLocalizations.of(context);
+    final DateTime localCreatedAt = item.createdAt.toLocal();
+    final String createdAt =
+        '${localizations.formatFullDate(localCreatedAt)} · ${localizations.formatTimeOfDay(TimeOfDay.fromDateTime(localCreatedAt))}';
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 12, 22, 28),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Center(
+              child: Container(
+                width: 38,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.border,
+                  borderRadius: BorderRadius.circular(99),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  item.message,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 10,
-                    height: 1.2,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            const _NotificationIcon(size: 34),
+            const SizedBox(height: 16),
+            Text(
+              item.title,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                height: 1.15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              createdAt,
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              item.message,
+              style: const TextStyle(
+                color: AppColors.secondary,
+                fontSize: 15,
+                height: 1.55,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _NotificationIcon extends StatelessWidget {
-  const _NotificationIcon();
+  const _NotificationIcon({this.size = 18});
+
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox.square(
-      dimension: 28,
+    return SizedBox.square(
+      dimension: size + 10,
       child: Icon(
         Icons.notifications_none_rounded,
         color: AppColors.primary,
-        size: 18,
+        size: size,
       ),
     );
   }

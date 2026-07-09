@@ -2,6 +2,7 @@ import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/network/parsers/api_error_parser.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
+import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 
@@ -61,6 +62,16 @@ final favoritesProvider =
 final notificationsProvider =
     FutureProvider<PagedResult<NotificationItem>>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).notifications();
+});
+
+final unreadNotificationCountProvider = FutureProvider<int>((Ref ref) {
+  final AuthStatus? status =
+      ref.watch(authControllerProvider).valueOrNull?.status;
+  if (status != AuthStatus.authenticated) {
+    return 0;
+  }
+
+  return ref.watch(firstLookRepositoryProvider).unreadNotificationCount();
 });
 
 final profileCommentsProvider =
