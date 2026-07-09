@@ -210,6 +210,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get discoverSubtitle => 'Kesfet';
 
   @override
+  String get leaderboardTitle => 'Liderlik Tablosu';
+
+  @override
   String get discoverBannerTimer => 'Bitişe 3 gün';
 
   @override
@@ -264,7 +267,8 @@ class AppLocalizationsTr extends AppLocalizations {
   String get notificationsTitle => 'Bildirimler';
 
   @override
-  String get notificationsEmptyMessage => 'Henüz bildiriminiz yok.';
+  String get notificationsEmptyMessage =>
+      'Henüz hiçbir bildiriminiz bulunmuyor.';
 
   @override
   String get notificationUnread => 'Yeni';

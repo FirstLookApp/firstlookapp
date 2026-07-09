@@ -3,18 +3,16 @@ import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_header.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
-import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_spacing.dart';
+import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class OtpPage extends ConsumerStatefulWidget {
-  const OtpPage({
-    required this.email,
-    super.key,
-  });
+  const OtpPage({required this.email, super.key});
 
   final String email;
 
@@ -24,10 +22,12 @@ class OtpPage extends ConsumerStatefulWidget {
 
 class _OtpPageState extends ConsumerState<OtpPage> {
   final TextEditingController _otp = TextEditingController();
+  final FocusNode _otpFocusNode = FocusNode();
 
   @override
   void dispose() {
     _otp.dispose();
+    _otpFocusNode.dispose();
     super.dispose();
   }
 
@@ -36,8 +36,10 @@ class _OtpPageState extends ConsumerState<OtpPage> {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
 
-    ref.listen<AsyncValue<AuthState>>(authControllerProvider,
-        (_, AsyncValue<AuthState> next) {
+    ref.listen<AsyncValue<AuthState>>(authControllerProvider, (
+      _,
+      AsyncValue<AuthState> next,
+    ) {
       if (next.valueOrNull?.status == AuthStatus.authenticated) {
         context.go(RouteNames.discoverPath);
       }
@@ -61,14 +63,16 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   const AuthHeader(),
-                  const SizedBox(height: 46),
+                  const SizedBox(height: 28),
+                  const Center(child: FirstLookAppIcon(size: 96)),
+                  const SizedBox(height: 28),
                   Text(
                     l10n.otpTitle,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0,
-                        ),
+                      color: Colors.black,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -81,18 +85,15 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                     ),
                   ),
                   const SizedBox(height: 34),
-                  AuthTextField(
-                    controller: _otp,
-                    label: l10n.authOtpLabel,
-                    hint: l10n.authOtpHint,
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 42),
+                  _OtpCodeField(controller: _otp, focusNode: _otpFocusNode),
+                  const SizedBox(height: 24),
                   AuthPrimaryButton(
                     label: l10n.otpButton,
                     isLoading: authState.isLoading,
                     onPressed: () {
-                      ref.read(authControllerProvider.notifier).verifyEmail(
+                      ref
+                          .read(authControllerProvider.notifier)
+                          .verifyEmail(
                             email: widget.email,
                             otp: _otp.text.trim(),
                           );
@@ -103,6 +104,86 @@ class _OtpPageState extends ConsumerState<OtpPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _OtpCodeField extends StatelessWidget {
+  const _OtpCodeField({required this.controller, required this.focusNode});
+
+  final TextEditingController controller;
+  final FocusNode focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => focusNode.requestFocus(),
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Row(
+            children: List<Widget>.generate(
+              6,
+              (int index) => Expanded(
+                child: AnimatedBuilder(
+                  animation: controller,
+                  builder: (BuildContext context, _) {
+                    final String value = controller.text;
+                    final String digit = index < value.length
+                        ? value[index]
+                        : '';
+
+                    return Container(
+                      height: 50,
+                      margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFAFAFB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: digit.isEmpty
+                              ? const Color(0xFFF0F0F3)
+                              : const Color(0xFFFF1F2D),
+                        ),
+                      ),
+                      child: Text(
+                        digit,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 1,
+            height: 1,
+            child: TextField(
+              controller: controller,
+              focusNode: focusNode,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(6),
+              ],
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                counterText: '',
+              ),
+              maxLength: 6,
+              showCursor: false,
+              style: const TextStyle(color: Colors.transparent),
+            ),
+          ),
+        ],
       ),
     );
   }

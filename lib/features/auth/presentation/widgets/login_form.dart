@@ -36,8 +36,10 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     final Object? error = authState.asError?.error;
     final String? errorMessage = error is AppException ? error.message : null;
 
-    ref.listen<AsyncValue<AuthState>>(authControllerProvider,
-        (_, AsyncValue<AuthState> next) {
+    ref.listen<AsyncValue<AuthState>>(authControllerProvider, (
+      _,
+      AsyncValue<AuthState> next,
+    ) {
       if (next.valueOrNull?.status == AuthStatus.authenticated) {
         context.go(RouteNames.discoverPath);
       }
@@ -53,12 +55,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         Text(
           l10n.authDiscoverTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.secondary,
-                fontSize: 26,
-                height: 1,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0,
-              ),
+            color: AppColors.secondary,
+            fontSize: 26,
+            height: 1,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
         ),
         const SizedBox(height: 8),
         Text(
@@ -84,7 +86,26 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           hint: l10n.loginPasswordHint,
           obscureText: true,
         ),
-        const SizedBox(height: 42),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: () => context.go(RouteNames.forgotPasswordPath),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              textStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0,
+              ),
+            ),
+            child: Text(l10n.forgotPasswordTitle),
+          ),
+        ),
+        const SizedBox(height: 24),
         AuthPrimaryButton(
           label: l10n.authRegisterCta,
           outlined: true,
@@ -95,7 +116,9 @@ class _LoginFormState extends ConsumerState<LoginForm> {
           label: l10n.authLoginCta,
           isLoading: authState.isLoading,
           onPressed: () {
-            ref.read(authControllerProvider.notifier).login(
+            ref
+                .read(authControllerProvider.notifier)
+                .login(
                   login: _emailController.text.trim(),
                   password: _passwordController.text,
                   rememberMe: true,
@@ -107,9 +130,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             padding: const EdgeInsets.only(top: 12),
             child: Text(
               errorMessage ?? l10n.commonUnexpectedError,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
       ],

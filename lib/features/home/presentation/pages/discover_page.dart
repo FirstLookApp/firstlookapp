@@ -98,7 +98,7 @@ class DiscoverPage extends ConsumerWidget {
               const SizedBox(height: 22),
               _SectionTitle(
                 title: destination == SubmitDestination.drop
-                    ? l10n.discoverSubtitle
+                    ? l10n.leaderboardTitle
                     : l10n.testStageTitle,
               ),
               const SizedBox(height: 12),
@@ -124,23 +124,15 @@ class DiscoverPage extends ConsumerWidget {
                       );
                     }
 
-                    return Column(
-                      children: items.asMap().entries.map<Widget>(
-                        (MapEntry<int, ApplicationListItem> entry) {
-                          final ApplicationListItem item = entry.value;
-                          return _DropAppCard(
-                            rank: entry.key + 1,
-                            item: item,
-                            buttonLabel: l10n.discoverReviewButton,
-                            onTap: () => context.push(
-                              RouteNames.applicationDetailLocation(
-                                id: item.id,
-                                platform: item.platform,
-                              ),
-                            ),
-                          );
-                        },
-                      ).toList(),
+                    return _DropLeaderboard(
+                      items: items,
+                      buttonLabel: l10n.discoverReviewButton,
+                      onTap: (ApplicationListItem item) => context.push(
+                        RouteNames.applicationDetailLocation(
+                          id: item.id,
+                          platform: item.platform,
+                        ),
+                      ),
                     );
                   },
                   error: (Object error, StackTrace stackTrace) => AppErrorState(
@@ -370,8 +362,217 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-class _DropAppCard extends StatelessWidget {
-  const _DropAppCard({
+class _DropLeaderboard extends StatelessWidget {
+  const _DropLeaderboard({
+    required this.items,
+    required this.buttonLabel,
+    required this.onTap,
+  });
+
+  final List<ApplicationListItem> items;
+  final String buttonLabel;
+  final ValueChanged<ApplicationListItem> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<ApplicationListItem> podiumItems = items.take(3).toList();
+    final List<ApplicationListItem> rankedItems = items.skip(3).toList();
+
+    return Column(
+      children: <Widget>[
+        if (podiumItems.isNotEmpty) ...<Widget>[
+          _LeaderboardPodium(
+            items: podiumItems,
+            onTap: onTap,
+          ),
+          const SizedBox(height: 18),
+        ],
+        ...rankedItems.asMap().entries.map(
+          (MapEntry<int, ApplicationListItem> entry) {
+            return _RankedDropRow(
+              rank: entry.key + 4,
+              item: entry.value,
+              buttonLabel: buttonLabel,
+              onTap: () => onTap(entry.value),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _LeaderboardPodium extends StatelessWidget {
+  const _LeaderboardPodium({
+    required this.items,
+    required this.onTap,
+  });
+
+  final List<ApplicationListItem> items;
+  final ValueChanged<ApplicationListItem> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ApplicationListItem? first = _itemForRank(1);
+    final ApplicationListItem? second = _itemForRank(2);
+    final ApplicationListItem? third = _itemForRank(3);
+
+    return SizedBox(
+      height: 184,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Expanded(
+            child: second == null
+                ? const SizedBox.shrink()
+                : _PodiumEntry(
+                    rank: 2,
+                    item: second,
+                    badgeColor: const Color(0xFFD7DCE4),
+                    badgeTextColor: AppColors.secondary,
+                    imageSize: 58,
+                    barHeight: 58,
+                    onTap: () => onTap(second),
+                  ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: first == null
+                ? const SizedBox.shrink()
+                : _PodiumEntry(
+                    rank: 1,
+                    item: first,
+                    badgeColor: const Color(0xFFFFD65A),
+                    badgeTextColor: AppColors.secondary,
+                    imageSize: 72,
+                    barHeight: 78,
+                    isWinner: true,
+                    onTap: () => onTap(first),
+                  ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: third == null
+                ? const SizedBox.shrink()
+                : _PodiumEntry(
+                    rank: 3,
+                    item: third,
+                    badgeColor: const Color(0xFFC8844E),
+                    badgeTextColor: Colors.white,
+                    imageSize: 58,
+                    barHeight: 48,
+                    onTap: () => onTap(third),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ApplicationListItem? _itemForRank(int rank) {
+    final int index = rank - 1;
+    return index < items.length ? items[index] : null;
+  }
+}
+
+class _PodiumEntry extends StatelessWidget {
+  const _PodiumEntry({
+    required this.rank,
+    required this.item,
+    required this.badgeColor,
+    required this.badgeTextColor,
+    required this.imageSize,
+    required this.barHeight,
+    required this.onTap,
+    this.isWinner = false,
+  });
+
+  final int rank;
+  final ApplicationListItem item;
+  final Color badgeColor;
+  final Color badgeTextColor;
+  final double imageSize;
+  final double barHeight;
+  final VoidCallback onTap;
+  final bool isWinner;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          SizedBox(
+            width: imageSize + 18,
+            height: imageSize + 18,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: <Widget>[
+                _LeaderboardImage(
+                  imagePath: item.mainScreenshot,
+                  size: imageSize,
+                  radius: imageSize * 0.28,
+                ),
+                Positioned(
+                  top: -2,
+                  child: _RankBadge(
+                    rank: rank,
+                    backgroundColor: badgeColor,
+                    textColor: badgeTextColor,
+                    size: isWinner ? 30 : 26,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            item.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: AppColors.secondary,
+              fontSize: isWinner ? 13 : 12,
+              fontWeight: FontWeight.w900,
+              height: 1,
+              letterSpacing: 0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: barHeight,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isWinner
+                  ? AppColors.primary.withValues(alpha: 0.1)
+                  : const Color(0xFFF7F7F9),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+            ),
+            child: Text(
+              rank.toString(),
+              style: TextStyle(
+                color: badgeColor,
+                fontSize: isWinner ? 28 : 23,
+                fontWeight: FontWeight.w900,
+                height: 1,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RankedDropRow extends StatelessWidget {
+  const _RankedDropRow({
     required this.rank,
     required this.item,
     required this.buttonLabel,
@@ -387,59 +588,44 @@ class _DropAppCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const <BoxShadow>[
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 20,
-              offset: Offset(0, 9),
+              color: Colors.black.withValues(alpha: 0.035),
+              blurRadius: 14,
+              offset: const Offset(0, 7),
             ),
           ],
         ),
         child: Row(
           children: <Widget>[
             SizedBox(
-              width: 28,
+              width: 24,
               child: Text(
                 rank.toString(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: AppColors.secondary,
-                  fontSize: 18,
+                  color: AppColors.textMuted,
+                  fontSize: 13,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,
                 ),
               ),
             ),
             const SizedBox(width: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                width: 64,
-                height: 64,
-                child: item.mainScreenshot.isEmpty
-                    ? const ColoredBox(
-                        color: AppColors.primarySoft,
-                        child: Icon(
-                          Icons.apps_rounded,
-                          color: AppColors.primary,
-                        ),
-                      )
-                    : Image.network(
-                        UrlResolver.media(item.mainScreenshot),
-                        fit: BoxFit.cover,
-                      ),
-              ),
+            _LeaderboardImage(
+              imagePath: item.mainScreenshot,
+              size: 46,
+              radius: 12,
             ),
-            const SizedBox(width: 13),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,40 +636,40 @@ class _DropAppCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: AppColors.secondary,
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 0,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 4),
                   Text(
                     item.shortDescription,
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: AppColors.secondary,
-                      fontSize: 12,
-                      height: 1.3,
-                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMuted,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 8),
             FilledButton(
               onPressed: onTap,
               style: FilledButton.styleFrom(
-                minimumSize: const Size(74, 36),
-                padding: const EdgeInsets.symmetric(horizontal: 15),
+                minimumSize: const Size(66, 34),
+                padding: const EdgeInsets.symmetric(horizontal: 13),
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 textStyle: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0,
                 ),
@@ -492,6 +678,78 @@ class _DropAppCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _RankBadge extends StatelessWidget {
+  const _RankBadge({
+    required this.rank,
+    required this.backgroundColor,
+    required this.textColor,
+    required this.size,
+  });
+
+  final int rank;
+  final Color backgroundColor;
+  final Color textColor;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      child: Text(
+        rank.toString(),
+        style: TextStyle(
+          color: textColor,
+          fontSize: size * 0.48,
+          fontWeight: FontWeight.w900,
+          height: 1,
+          letterSpacing: 0,
+        ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardImage extends StatelessWidget {
+  const _LeaderboardImage({
+    required this.imagePath,
+    required this.size,
+    required this.radius,
+  });
+
+  final String imagePath;
+  final double size;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: SizedBox.square(
+        dimension: size,
+        child: imagePath.isEmpty
+            ? const ColoredBox(
+                color: AppColors.primarySoft,
+                child: Icon(
+                  Icons.apps_rounded,
+                  color: AppColors.primary,
+                ),
+              )
+            : Image.network(
+                UrlResolver.media(imagePath),
+                fit: BoxFit.cover,
+              ),
       ),
     );
   }

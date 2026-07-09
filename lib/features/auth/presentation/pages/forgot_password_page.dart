@@ -6,6 +6,7 @@ import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_spacing.dart';
+import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -21,13 +22,16 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _otp = TextEditingController();
   final TextEditingController _password = TextEditingController();
+  final TextEditingController _passwordConfirmation = TextEditingController();
   bool _codeSent = false;
+  String? _passwordError;
 
   @override
   void dispose() {
     _email.dispose();
     _otp.dispose();
     _password.dispose();
+    _passwordConfirmation.dispose();
     super.dispose();
   }
 
@@ -36,8 +40,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
 
-    ref.listen<AsyncValue<AuthState>>(authControllerProvider,
-        (_, AsyncValue<AuthState> next) {
+    ref.listen<AsyncValue<AuthState>>(authControllerProvider, (
+      _,
+      AsyncValue<AuthState> next,
+    ) {
       if (next.valueOrNull?.status == AuthStatus.passwordResetOtpSent) {
         setState(() => _codeSent = true);
       }
@@ -58,14 +64,16 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               ),
               children: <Widget>[
                 const AuthHeader(),
-                const SizedBox(height: 46),
+                const SizedBox(height: 28),
+                const Center(child: FirstLookAppIcon(size: 96)),
+                const SizedBox(height: 28),
                 Text(
                   l10n.forgotPasswordTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0,
-                      ),
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -78,14 +86,14 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                   ),
                 ),
                 const SizedBox(height: 34),
-                AuthTextField(
-                  controller: _email,
-                  label: l10n.authEmailAddressLabel,
-                  hint: l10n.loginEmailHint,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                if (_codeSent) ...<Widget>[
-                  const SizedBox(height: 14),
+                if (!_codeSent)
+                  AuthTextField(
+                    controller: _email,
+                    label: l10n.authEmailAddressLabel,
+                    hint: l10n.loginEmailHint,
+                    keyboardType: TextInputType.emailAddress,
+                  )
+                else ...<Widget>[
                   AuthTextField(
                     controller: _otp,
                     label: l10n.authOtpLabel,
@@ -98,25 +106,54 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                     label: l10n.authNewPasswordLabel,
                     hint: l10n.loginPasswordHint,
                     obscureText: true,
+                    onChanged: (_) => _clearPasswordError(),
+                  ),
+                  const SizedBox(height: 14),
+                  AuthTextField(
+                    controller: _passwordConfirmation,
+                    label: l10n.authPasswordConfirmationLabel,
+                    hint: l10n.registerConfirmPasswordHint,
+                    obscureText: true,
+                    errorText: _passwordError,
+                    onChanged: (_) => _clearPasswordError(),
                   ),
                 ],
-                const SizedBox(height: 42),
+                const SizedBox(height: 24),
                 AuthPrimaryButton(
                   label: _codeSent
                       ? l10n.resetPasswordButton
                       : l10n.forgotPasswordButton,
                   isLoading: authState.isLoading,
-                  onPressed: () {
+                  onPressed: () async {
                     if (_codeSent) {
-                      ref.read(authControllerProvider.notifier).resetPassword(
+                      if (_password.text != _passwordConfirmation.text) {
+                        setState(
+                          () => _passwordError = l10n.authPasswordMismatch,
+                        );
+                        return;
+                      }
+
+                      await ref
+                          .read(authControllerProvider.notifier)
+                          .resetPassword(
                             email: _email.text.trim(),
                             otp: _otp.text.trim(),
                             newPassword: _password.text,
                           );
-                      context.go(RouteNames.loginPath);
+                      if (!context.mounted) {
+                        return;
+                      }
+
+                      final AuthStatus? status = ref
+                          .read(authControllerProvider)
+                          .valueOrNull
+                          ?.status;
+                      if (status == AuthStatus.unauthenticated) {
+                        context.go(RouteNames.loginPath);
+                      }
                       return;
                     }
-                    ref
+                    await ref
                         .read(authControllerProvider.notifier)
                         .forgotPassword(_email.text.trim());
                   },
@@ -127,5 +164,13 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         ),
       ),
     );
+  }
+
+  void _clearPasswordError() {
+    if (_passwordError == null) {
+      return;
+    }
+
+    setState(() => _passwordError = null);
   }
 }

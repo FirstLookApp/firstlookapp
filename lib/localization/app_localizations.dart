@@ -494,6 +494,12 @@ abstract class AppLocalizations {
   /// **'Discover'**
   String get discoverSubtitle;
 
+  /// No description provided for @leaderboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard'**
+  String get leaderboardTitle;
+
   /// No description provided for @discoverBannerTimer.
   ///
   /// In en, this message translates to:

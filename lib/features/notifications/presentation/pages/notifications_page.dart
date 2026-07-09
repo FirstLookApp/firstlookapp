@@ -25,29 +25,18 @@ class NotificationsPage extends ConsumerWidget {
           onRefresh: () async => ref.invalidate(notificationsProvider),
           child: notifications.when(
             data: (PagedResult<NotificationItem> result) {
-              final int unreadCount = result.items
-                  .where((NotificationItem item) => !item.isRead)
-                  .length;
-
               return ListView(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),
                 children: <Widget>[
                   const FirstLookAppHeader(),
-                  const SizedBox(height: 26),
-                  _NotificationsTitle(
-                    title: l10n.notificationsTitle,
-                    unreadCount: unreadCount,
-                    unreadLabel: l10n.notificationUnread,
-                  ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 24),
+                  _NotificationsTitle(title: l10n.notificationsTitle),
+                  const SizedBox(height: 14),
                   if (result.items.isEmpty)
                     _EmptyNotifications(message: l10n.notificationsEmptyMessage)
                   else
                     ...result.items.map(
-                      (NotificationItem item) => _NotificationCard(
-                        item: item,
-                        unreadLabel: l10n.notificationUnread,
-                      ),
+                      (NotificationItem item) => _NotificationTile(item: item),
                     ),
                 ],
               );
@@ -65,142 +54,71 @@ class NotificationsPage extends ConsumerWidget {
 }
 
 class _NotificationsTitle extends StatelessWidget {
-  const _NotificationsTitle({
-    required this.title,
-    required this.unreadCount,
-    required this.unreadLabel,
-  });
+  const _NotificationsTitle({required this.title});
 
   final String title;
-  final int unreadCount;
-  final String unreadLabel;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              height: 1.05,
-            ),
-          ),
-        ),
-        if (unreadCount > 0)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            decoration: BoxDecoration(
-              color: AppColors.primarySoft,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Text(
-              '$unreadCount $unreadLabel',
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-      ],
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 21,
+        fontWeight: FontWeight.w900,
+        height: 1,
+        letterSpacing: 0,
+      ),
     );
   }
 }
 
-class _NotificationCard extends StatelessWidget {
-  const _NotificationCard({
-    required this.item,
-    required this.unreadLabel,
-  });
+class _NotificationTile extends StatelessWidget {
+  const _NotificationTile({required this.item});
 
   final NotificationItem item;
-  final String unreadLabel;
 
   @override
   Widget build(BuildContext context) {
-    final DateTime localCreatedAt = item.createdAt.toLocal();
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: const BoxConstraints(minHeight: 60),
       decoration: BoxDecoration(
-        color: item.isRead ? Colors.white : const Color(0xFFF7F4FF),
-        border: Border.all(
-          color: item.isRead ? AppColors.border : AppColors.primarySoft,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.035),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: const Color(0xFFFCFCFD),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFF4F4F6)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _NotificationIcon(isRead: item.isRead),
+          const _NotificationIcon(),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                    if (!item.isRead)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          unreadLabel,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 7),
                 Text(
-                  item.message,
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 12,
-                    height: 1.35,
+                    color: Colors.black,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    height: 1.05,
+                    letterSpacing: 0,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 3),
                 Text(
-                  _formatDate(localCreatedAt),
+                  item.message,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: AppColors.textMuted,
-                    fontSize: 11,
+                    fontSize: 10,
+                    height: 1.2,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -214,27 +132,16 @@ class _NotificationCard extends StatelessWidget {
 }
 
 class _NotificationIcon extends StatelessWidget {
-  const _NotificationIcon({
-    required this.isRead,
-  });
-
-  final bool isRead;
+  const _NotificationIcon();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: isRead ? const Color(0xFFF4F4F6) : AppColors.primary,
-        borderRadius: BorderRadius.circular(14),
-      ),
+    return const SizedBox.square(
+      dimension: 28,
       child: Icon(
-        isRead
-            ? Icons.notifications_none_rounded
-            : Icons.notifications_active_rounded,
-        color: isRead ? AppColors.textMuted : Colors.white,
-        size: 21,
+        Icons.notifications_none_rounded,
+        color: AppColors.primary,
+        size: 18,
       ),
     );
   }
@@ -249,21 +156,18 @@ class _EmptyNotifications extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 72),
+    return Container(
+      margin: const EdgeInsets.only(top: 70),
+      padding: const EdgeInsets.only(top: 30),
+      decoration: const BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.border)),
+      ),
       child: Column(
         children: <Widget>[
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF4F4F6),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              color: AppColors.textMuted,
-            ),
+          const Icon(
+            Icons.notifications_off_outlined,
+            color: Color(0xFFD6D6DC),
+            size: 54,
           ),
           const SizedBox(height: 14),
           Text(
@@ -271,19 +175,13 @@ class _EmptyNotifications extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.textMuted,
-              fontSize: 13,
-              height: 1.4,
+              fontSize: 12,
+              height: 1.35,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
       ),
     );
   }
-}
-
-String _formatDate(DateTime value) {
-  String twoDigits(int number) => number.toString().padLeft(2, '0');
-
-  return '${twoDigits(value.day)}.${twoDigits(value.month)}.${value.year} '
-      '${twoDigits(value.hour)}:${twoDigits(value.minute)}';
 }

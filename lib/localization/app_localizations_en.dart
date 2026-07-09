@@ -211,6 +211,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverSubtitle => 'Discover';
 
   @override
+  String get leaderboardTitle => 'Leaderboard';
+
+  @override
   String get discoverBannerTimer => 'Ends in 3 days';
 
   @override
