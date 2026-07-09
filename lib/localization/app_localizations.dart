@@ -971,7 +971,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsNotifications.
   ///
   /// In en, this message translates to:
-  /// **'Notifications'**
+  /// **'Sound'**
   String get settingsNotifications;
 
   /// No description provided for @settingsVibration.
