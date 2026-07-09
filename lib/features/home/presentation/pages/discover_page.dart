@@ -235,9 +235,9 @@ class _WeeklyBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
-        height: 132,
+        height: 176,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[Color(0xFFFFF1F2), Color(0xFFFFD9DD)],
@@ -257,124 +257,132 @@ class _WeeklyBanner extends StatelessWidget {
                       const SizedBox.shrink(),
                 ),
               ),
-            if (backgroundImagePath.isNotEmpty)
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFE9EC).withValues(alpha: 0.42),
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Color(0xBF09121E),
+                      Color(0x3309121E),
+                      Color(0xE60B1018),
+                    ],
+                    stops: <double>[0, 0.42, 1],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
                 ),
               ),
-            Positioned(
-              left: -24,
-              top: 18,
-              child: Transform.rotate(
-                angle: -0.28,
-                child: const _BannerPill(width: 92, height: 28),
-              ),
             ),
-            Positioned(
-              right: -18,
-              bottom: 22,
-              child: Transform.rotate(
-                angle: -0.42,
-                child: const _BannerPill(width: 96, height: 32),
-              ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 25,
-                      height: 1.05,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  StreamBuilder<int>(
-                    stream: Stream<int>.periodic(
-                      const Duration(minutes: 1),
-                      (int tick) => tick,
-                    ),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<int> snapshot) {
-                      final AppLocalizations l10n =
-                          AppLocalizations.of(context)!;
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          const Icon(
-                            Icons.schedule_rounded,
-                            color: AppColors.primary,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            _formatDropCountdown(context, endsAt, l10n),
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 7),
-                  Container(
-                    constraints: const BoxConstraints(maxWidth: 220),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.35),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      badge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.24),
+                        ),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: const Text(
+                        'DROP',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    const Spacer(),
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 27,
+                        height: 1,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.4,
+                        shadows: <Shadow>[
+                          Shadow(
+                            color: Color(0x99000000),
+                            blurRadius: 10,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    StreamBuilder<int>(
+                      stream: Stream<int>.periodic(
+                        const Duration(minutes: 1),
+                        (int tick) => tick,
+                      ),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<int> snapshot) {
+                        final AppLocalizations l10n =
+                            AppLocalizations.of(context)!;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 11,
+                            vertical: 7,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.38),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.18),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              const Icon(
+                                Icons.schedule_rounded,
+                                color: Colors.white,
+                                size: 15,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatDropCountdown(context, endsAt, l10n),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      badge,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 12,
+                        height: 1.25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _BannerPill extends StatelessWidget {
-  const _BannerPill({
-    required this.width,
-    required this.height,
-  });
-
-  final double width;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(height / 2),
       ),
     );
   }
