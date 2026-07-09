@@ -151,6 +151,15 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                   onPick: _pickScreenshots,
                   onRemove: _removeScreenshot,
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.submitScreenshotSizeError,
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _videoUrl,

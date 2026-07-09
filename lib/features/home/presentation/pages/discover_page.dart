@@ -19,14 +19,24 @@ class DiscoverPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final AsyncValue<ActiveDropBatch?> activeDrop = ref.watch(activeDropProvider);
+    final AsyncValue<ActiveDropBatch?> activeDrop =
+        ref.watch(activeDropProvider);
     final String bannerTitle = activeDrop.maybeWhen(
-              data: (ActiveDropBatch? drop) =>
-                  drop != null && drop.name.isNotEmpty
-                      ? drop.name
-                      : l10n.discoverTitle,
-              orElse: () => l10n.discoverTitle,
-            );
+      data: (ActiveDropBatch? drop) =>
+          drop != null && drop.name.isNotEmpty ? drop.name : l10n.discoverTitle,
+      orElse: () => l10n.discoverTitle,
+    );
+    final DateTime? bannerEndsAt = activeDrop.maybeWhen(
+      data: (ActiveDropBatch? drop) => drop?.endsAt,
+      orElse: () => null,
+    );
+    final String bannerDescription = activeDrop.maybeWhen(
+      data: (ActiveDropBatch? drop) =>
+          drop?.description.trim().isNotEmpty == true
+              ? drop!.description.trim()
+              : l10n.discoverSubtitle,
+      orElse: () => l10n.discoverWeekBadge,
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -47,8 +57,8 @@ class DiscoverPage extends ConsumerWidget {
               const SizedBox(height: 24),
               _WeeklyBanner(
                 title: bannerTitle,
-                timer: l10n.discoverBannerTimer,
-                badge: l10n.discoverWeekBadge,
+                endsAt: bannerEndsAt,
+                badge: bannerDescription,
               ),
               const SizedBox(height: 22),
               _SectionTitle(
@@ -56,60 +66,81 @@ class DiscoverPage extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               activeDrop.when(
-                  data: (ActiveDropBatch? drop) {
-                    final List<ApplicationListItem> items =
-                        drop?.items ?? <ApplicationListItem>[];
+                data: (ActiveDropBatch? drop) {
+                  final List<ApplicationListItem> items =
+                      drop?.items ?? <ApplicationListItem>[];
 
-                    if (items.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 32),
-                        child: Center(
-                          child: Text(
-                            l10n.commonNoData,
-                            style: const TextStyle(
-                              color: AppColors.textMuted,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
+                  if (items.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: Text(
+                          l10n.commonNoData,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                      );
-                    }
-
-                    return Column(
-                      children: items.asMap().entries.map<Widget>(
-                        (MapEntry<int, ApplicationListItem> entry) {
-                          final ApplicationListItem item = entry.value;
-
-                          return _DropAppCard(
-                            item: item,
-                            buttonLabel: l10n.discoverReviewButton,
-                            onTap: () => context.push(
-                              RouteNames.applicationDetailLocation(
-                                id: item.id,
-                                platform: item.platform,
-                              ),
-                            ),
-                          );
-                        },
-                      ).toList(),
+                      ),
                     );
-                  },
-                  error: (Object error, StackTrace stackTrace) => AppErrorState(
-                    message: error.toString(),
-                    onRetry: () => ref.invalidate(activeDropProvider),
-                  ),
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(40),
-                    child: AppLoadingIndicator(),
-                  ),
+                  }
+
+                  return Column(
+                    children: items.asMap().entries.map<Widget>(
+                      (MapEntry<int, ApplicationListItem> entry) {
+                        final ApplicationListItem item = entry.value;
+
+                        return _DropAppCard(
+                          item: item,
+                          buttonLabel: l10n.discoverReviewButton,
+                          onTap: () => context.push(
+                            RouteNames.applicationDetailLocation(
+                              id: item.id,
+                              platform: item.platform,
+                            ),
+                          ),
+                        );
+                      },
+                    ).toList(),
+                  );
+                },
+                error: (Object error, StackTrace stackTrace) => AppErrorState(
+                  message: error.toString(),
+                  onRetry: () => ref.invalidate(activeDropProvider),
                 ),
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: AppLoadingIndicator(),
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+String _formatDropCountdown(
+  BuildContext context,
+  DateTime? endsAt,
+  AppLocalizations l10n,
+) {
+  if (endsAt == null) {
+    return l10n.discoverBannerTimer;
+  }
+
+  final Duration remaining = endsAt.toLocal().difference(DateTime.now());
+  final bool isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+  if (remaining <= Duration.zero) {
+    return isTurkish ? 'Drop sona erdi' : 'Drop ended';
+  }
+
+  final String duration = isTurkish
+      ? '${remaining.inDays} gün ${remaining.inHours.remainder(24)} saat ${remaining.inMinutes.remainder(60)} dakika'
+      : '${remaining.inDays}d ${remaining.inHours.remainder(24)}h ${remaining.inMinutes.remainder(60)}m';
+  return isTurkish ? 'Bitişe $duration' : 'Ends in $duration';
 }
 
 class LeaderboardPage extends ConsumerWidget {
@@ -186,12 +217,12 @@ class LeaderboardPage extends ConsumerWidget {
 class _WeeklyBanner extends StatelessWidget {
   const _WeeklyBanner({
     required this.title,
-    required this.timer,
+    required this.endsAt,
     required this.badge,
   });
 
   final String title;
-  final String timer;
+  final DateTime? endsAt;
   final String badge;
 
   @override
@@ -241,27 +272,39 @@ class _WeeklyBanner extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Icon(
-                        Icons.schedule_rounded,
-                        color: AppColors.primary,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        timer,
-                        style: const TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                  StreamBuilder<int>(
+                    stream: Stream<int>.periodic(
+                      const Duration(minutes: 1),
+                      (int tick) => tick,
+                    ),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<int> snapshot) {
+                      final AppLocalizations l10n =
+                          AppLocalizations.of(context)!;
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(
+                            Icons.schedule_rounded,
+                            color: AppColors.primary,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            _formatDropCountdown(context, endsAt, l10n),
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                   const SizedBox(height: 7),
                   Container(
+                    constraints: const BoxConstraints(maxWidth: 220),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
@@ -270,6 +313,9 @@ class _WeeklyBanner extends StatelessWidget {
                     ),
                     child: Text(
                       badge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,

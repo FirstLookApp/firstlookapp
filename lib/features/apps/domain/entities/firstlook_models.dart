@@ -93,7 +93,9 @@ class ActiveDropBatch {
     required this.name,
     required this.platform,
     required this.plannedStartAt,
+    required this.endsAt,
     required this.publishedAt,
+    required this.description,
     required this.items,
   });
 
@@ -109,7 +111,9 @@ class ActiveDropBatch {
       plannedStartAt: DateTime.tryParse(
         json['plannedStartAt'] as String? ?? '',
       ),
+      endsAt: DateTime.tryParse(json['endsAt'] as String? ?? ''),
       publishedAt: DateTime.tryParse(json['publishedAt'] as String? ?? ''),
+      description: json['description'] as String? ?? '',
       items: rawItems
           .whereType<Map<String, dynamic>>()
           .map<ApplicationListItem>(ApplicationListItem.fromJson)
@@ -121,7 +125,9 @@ class ActiveDropBatch {
   final String name;
   final int platform;
   final DateTime? plannedStartAt;
+  final DateTime? endsAt;
   final DateTime? publishedAt;
+  final String description;
   final List<ApplicationListItem> items;
 }
 
