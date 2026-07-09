@@ -457,7 +457,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguage => 'Language';
 
   @override
-  String get settingsNotifications => 'Notifications';
+  String get settingsNotifications => 'Sound';
 
   @override
   String get settingsVibration => 'Vibration';

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firstlook/core/network/api_envelope.dart';
+import 'package:firstlook/core/feedback/app_feedback_service.dart';
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
@@ -84,7 +85,10 @@ class FirstLookIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkResponse(
-      onTap: onTap,
+      onTap: () {
+        AppFeedbackService.selection();
+        onTap();
+      },
       radius: 24,
       child: SizedBox.square(
         dimension: 36,
@@ -174,7 +178,12 @@ class FirstLookPrimaryButton extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: FilledButton.icon(
-        onPressed: onPressed,
+        onPressed: onPressed == null
+            ? null
+            : () {
+                AppFeedbackService.selection();
+                onPressed!();
+              },
         icon: icon == null ? const SizedBox.shrink() : Icon(icon, size: 17),
         label: Text(label),
         style: FilledButton.styleFrom(
@@ -236,58 +245,76 @@ Future<void> showFirstLookSettings(
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 46),
-        child: FirstLookSoftCard(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const FirstLookLogo(size: 36),
-              const SizedBox(height: 12),
-              _SettingsRow(
-                label: l10n.settingsLanguage,
-                left: 'TR',
-                right: 'EN',
-                selectedLeft: true,
-              ),
-              _SettingsRow(
-                label: l10n.settingsNotifications,
-                left: l10n.settingsOn,
-                right: l10n.settingsOff,
-                selectedLeft: true,
-              ),
-              _SettingsRow(
-                label: l10n.settingsVibration,
-                left: l10n.settingsOn,
-                right: l10n.settingsOff,
-                selectedLeft: true,
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 38,
-                width: 136,
-                child: FilledButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    ref.read(authControllerProvider.notifier).logout();
-                  },
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1,
+      return Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          final AppFeedbackSettings settings =
+              ref.watch(appFeedbackSettingsProvider);
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 46),
+            child: FirstLookSoftCard(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const FirstLookLogo(size: 36),
+                  const SizedBox(height: 12),
+                  _SettingsRow(
+                    label: l10n.settingsLanguage,
+                    left: 'TR',
+                    right: 'EN',
+                    selectedLeft: true,
+                  ),
+                  _SettingsRow(
+                    label: l10n.settingsNotifications,
+                    left: l10n.settingsOn,
+                    right: l10n.settingsOff,
+                    selectedLeft: settings.soundEnabled,
+                    onLeft: () => ref
+                        .read(appFeedbackSettingsProvider.notifier)
+                        .setSoundEnabled(true),
+                    onRight: () => ref
+                        .read(appFeedbackSettingsProvider.notifier)
+                        .setSoundEnabled(false),
+                  ),
+                  _SettingsRow(
+                    label: l10n.settingsVibration,
+                    left: l10n.settingsOn,
+                    right: l10n.settingsOff,
+                    selectedLeft: settings.vibrationEnabled,
+                    onLeft: () => ref
+                        .read(appFeedbackSettingsProvider.notifier)
+                        .setVibrationEnabled(true),
+                    onRight: () => ref
+                        .read(appFeedbackSettingsProvider.notifier)
+                        .setVibrationEnabled(false),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 38,
+                    width: 136,
+                    child: FilledButton(
+                      onPressed: () {
+                        Navigator.of(dialogContext).pop();
+                        ref.read(authControllerProvider.notifier).logout();
+                      },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        textStyle: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      child: Text(l10n.logoutButton.toUpperCase()),
                     ),
                   ),
-                  child: Text(l10n.logoutButton.toUpperCase()),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
     },
   );
@@ -299,12 +326,16 @@ class _SettingsRow extends StatelessWidget {
     required this.left,
     required this.right,
     required this.selectedLeft,
+    this.onLeft,
+    this.onRight,
   });
 
   final String label;
   final String left;
   final String right;
   final bool selectedLeft;
+  final VoidCallback? onLeft;
+  final VoidCallback? onRight;
 
   @override
   Widget build(BuildContext context) {
@@ -331,8 +362,16 @@ class _SettingsRow extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                _SettingsPill(label: left, selected: selectedLeft),
-                _SettingsPill(label: right, selected: !selectedLeft),
+                _SettingsPill(
+                  label: left,
+                  selected: selectedLeft,
+                  onTap: onLeft,
+                ),
+                _SettingsPill(
+                  label: right,
+                  selected: !selectedLeft,
+                  onTap: onRight,
+                ),
               ],
             ),
           ),
@@ -346,27 +385,33 @@ class _SettingsPill extends StatelessWidget {
   const _SettingsPill({
     required this.label,
     required this.selected,
+    required this.onTap,
   });
 
   final String label;
   final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 46,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: selected ? AppColors.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected ? Colors.white : AppColors.secondary,
-          fontSize: 9,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 46,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : AppColors.secondary,
+            fontSize: 9,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );

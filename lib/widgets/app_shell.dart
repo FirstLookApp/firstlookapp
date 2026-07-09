@@ -1,4 +1,5 @@
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/core/feedback/app_feedback_service.dart';
 import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/widgets/showcase_coming_soon_dialog.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +45,7 @@ class AppShell extends StatelessWidget {
           ),
         ],
         onTap: (int index) {
+          AppFeedbackService.selection();
           if (index == 2) {
             showShowcaseComingSoonDialog(context);
             return;
@@ -91,7 +93,8 @@ class _FirstLookBottomNav extends StatelessWidget {
                 AnimatedPositioned(
                   duration: const Duration(milliseconds: 420),
                   curve: Curves.easeOutCubic,
-                  left: (slotWidth * currentIndex) + ((slotWidth - indicatorWidth) / 2),
+                  left: (slotWidth * currentIndex) +
+                      ((slotWidth - indicatorWidth) / 2),
                   top: 8,
                   child: IgnorePointer(
                     child: _BottomNavGlow(

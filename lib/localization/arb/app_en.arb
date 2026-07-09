@@ -146,7 +146,7 @@
   "profileAvatarEmpty": "There are no selectable avatars yet.",
   "profileAvatarLoadError": "Waiting for the mobile avatar list endpoint.",
   "settingsLanguage": "Language",
-  "settingsNotifications": "Notifications",
+  "settingsNotifications": "Sound",
   "settingsVibration": "Vibration",
   "settingsOn": "On",
   "settingsOff": "Off",

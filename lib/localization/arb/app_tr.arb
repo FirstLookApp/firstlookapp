@@ -146,7 +146,7 @@
   "profileAvatarEmpty": "Henüz seçilebilir avatar yok.",
   "profileAvatarLoadError": "Avatar listesi için mobil endpoint bekleniyor.",
   "settingsLanguage": "Dil Seçeneği",
-  "settingsNotifications": "Bildirimler",
+  "settingsNotifications": "Ses",
   "settingsVibration": "Titreşim",
   "settingsOn": "Açık",
   "settingsOff": "Kapalı",

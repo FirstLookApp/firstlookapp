@@ -456,7 +456,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get settingsLanguage => 'Dil Seçeneği';
 
   @override
-  String get settingsNotifications => 'Bildirimler';
+  String get settingsNotifications => 'Ses';
 
   @override
   String get settingsVibration => 'Titreşim';
