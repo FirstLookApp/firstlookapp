@@ -15,7 +15,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonRetry => 'Tekrar Dene';
 
   @override
-  String get commonCancel => 'Iptal';
+  String get commonCancel => 'İptal';
 
   @override
   String get commonConfirm => 'Onayla';
@@ -24,18 +24,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get commonSearch => 'Ara';
 
   @override
-  String get commonNoData => 'Veri bulunamadi';
+  String get commonNoData => 'Veri bulunamadı';
 
   @override
   String get commonUnexpectedError =>
-      'Bir sorun olustu. Lutfen tekrar deneyin.';
+      'Bir sorun oluştu. Lütfen tekrar deneyin.';
 
   @override
   String get commonSessionExpired =>
-      'Oturumunuz sona erdi. Lutfen yeniden giris yapin.';
+      'Oturumunuz sona erdi. Lütfen yeniden giriş yapın.';
 
   @override
-  String get navDiscover => 'Kesfet';
+  String get navDiscover => 'Keşfet';
 
   @override
   String get navLeaderboard => 'Liderlik';
@@ -54,31 +54,31 @@ class AppLocalizationsTr extends AppLocalizations {
   String get showcaseComingSoonBadge => 'Premium görünürlük hazırlanıyor';
 
   @override
-  String get navSubmit => 'Gonder';
+  String get navSubmit => 'Gönder';
 
   @override
-  String get navFavorites => 'Begeniler';
+  String get navFavorites => 'Beğeniler';
 
   @override
   String get navProfile => 'Profil';
 
   @override
-  String get loginTitle => 'Tekrar hos geldiniz';
+  String get loginTitle => 'Tekrar hoş geldiniz';
 
   @override
-  String get loginSubtitle => 'Devam etmek icin giris yapin';
+  String get loginSubtitle => 'Devam etmek için giriş yapın';
 
   @override
   String get loginEmail => 'E-posta';
 
   @override
-  String get loginPassword => 'Sifre';
+  String get loginPassword => 'Şifre';
 
   @override
-  String get loginRememberMe => 'Beni hatirla';
+  String get loginRememberMe => 'Beni hatırla';
 
   @override
-  String get loginButton => 'Giris Yap';
+  String get loginButton => 'Giriş Yap';
 
   @override
   String get authDiscoverTitle => 'Uygulamalarını Keşfet';
@@ -142,16 +142,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get homeTitle => 'Ana Sayfa';
 
   @override
-  String get logoutButton => 'Cikis Yap';
+  String get logoutButton => 'Çıkış Yap';
 
   @override
-  String get screenArchitectureReady => 'Mimari, ozellik gelistirmeye hazir.';
+  String get screenArchitectureReady => 'Mimari, özellik geliştirmeye hazır.';
 
   @override
-  String get submitTitle => 'Uygulama Gonder';
+  String get submitTitle => 'Uygulama Gönder';
 
   @override
-  String get favoritesTitle => 'Begeniler';
+  String get favoritesTitle => 'Beğeniler';
 
   @override
   String get favoritesEmptyMessage => 'Henüz hiçbir uygulamayı beğenmediniz.';
@@ -160,13 +160,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileTitle => 'Profil';
 
   @override
-  String get splashTagline => 'Mobil urunleri ilk kesfeden ol';
+  String get splashTagline => 'Mobil ürünleri ilk keşfeden sen ol';
 
   @override
-  String get registerTitle => 'Hesap olustur';
+  String get registerTitle => 'Hesap oluştur';
 
   @override
-  String get registerSubtitle => 'FirstLook\'a katil ve kesfetmeye basla.';
+  String get registerSubtitle => 'FirstLook\'a katıl ve keşfetmeye başla.';
 
   @override
   String get authFirstName => 'Ad';
@@ -175,7 +175,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authLastName => 'Soyad';
 
   @override
-  String get authUsername => 'Kullanici adi';
+  String get authUsername => 'Kullanıcı adı';
 
   @override
   String get authBiography => 'Biyografi';
@@ -184,61 +184,66 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authEmail => 'E-posta';
 
   @override
-  String get authPassword => 'Sifre';
+  String get authPassword => 'Şifre';
 
   @override
-  String get authNewPassword => 'Yeni sifre';
+  String get authNewPassword => 'Yeni şifre';
 
   @override
-  String get authOtp => 'Dogrulama kodu';
+  String get authOtp => 'Doğrulama kodu';
 
   @override
-  String get registerButton => 'Hesap olustur';
+  String get registerButton => 'Hesap oluştur';
 
   @override
-  String get otpTitle => 'E-postani dogrula';
+  String get otpTitle => 'E-postanı doğrula';
 
   @override
   String get otpSubtitle => 'E-postana gelen 6 haneli kodu gir.';
 
   @override
-  String get otpButton => 'Dogrula';
+  String get otpButton => 'Doğrula';
 
   @override
-  String get forgotPasswordTitle => 'Sifremi unuttum';
+  String get forgotPasswordTitle => 'Şifremi unuttum';
 
   @override
-  String get forgotPasswordSubtitle => 'E-postana sifirlama kodu gonderecegiz.';
+  String get forgotPasswordSubtitle => 'E-postana sıfırlama kodu göndereceğiz.';
 
   @override
-  String get forgotPasswordButton => 'Kod gonder';
+  String get forgotPasswordButton => 'Kod gönder';
 
   @override
-  String get resetPasswordButton => 'Sifreyi sifirla';
+  String get resetPasswordButton => 'Şifreyi sıfırla';
 
   @override
-  String get goToRegister => 'Hesap olustur';
+  String get goToRegister => 'Hesap oluştur';
 
   @override
   String get goToLogin => 'Zaten hesabınız var mı?';
 
   @override
-  String get discoverTitle => 'Bu Hafta: Mobil Oyunlar';
+  String get discoverTitle => 'Bu Hafta: Mobil Uygulamalar';
 
   @override
-  String get testDiscoverTitle => 'Test Ürünlerini Keşfet';
-
-  @override
-  String get discoverSubtitle => 'Kesfet';
+  String get discoverSubtitle => 'Keşfet';
 
   @override
   String get leaderboardTitle => 'Liderlik Tablosu';
 
   @override
-  String get discoverBannerTimer => 'Bitişe 3 gün';
+  String get discoverBannerTimer => 'Bitiş tarihi yakında';
 
   @override
-  String get discoverWeekBadge => '23. HAFTA';
+  String get dropFallbackDescription => 'Bu Drop için açıklama yakında.';
+
+  @override
+  String get dropEnded => 'Drop sona erdi';
+
+  @override
+  String dropCountdown(String duration) {
+    return 'Bitişe $duration';
+  }
 
   @override
   String get discoverReviewButton => 'İncele';
@@ -247,25 +252,16 @@ class AppLocalizationsTr extends AppLocalizations {
   String get dropTab => 'Drop';
 
   @override
-  String get testTab => 'Test';
-
-  @override
-  String get testStageTitle => 'Test Aşamasındakiler';
-
-  @override
-  String get testJoinButton => 'Teste Katıl';
-
-  @override
   String get iosTab => 'iOS';
 
   @override
   String get androidTab => 'Android';
 
   @override
-  String get allPlatformsTab => 'Tumu';
+  String get allPlatformsTab => 'Tümü';
 
   @override
-  String get detailAbout => 'Hakkinda';
+  String get detailAbout => 'Hakkında';
 
   @override
   String get detailComments => 'Yorumlar';
@@ -274,16 +270,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get detailOpenStore => 'Uygulama Mağazasında Aç';
 
   @override
-  String get detailJoinBeta => 'Betaya katil';
-
-  @override
-  String get betaAccessRequestButton => 'Erişim İste';
-
-  @override
   String get commentHint => 'Yorum yaz';
 
   @override
-  String get commentSend => 'Gonder';
+  String get commentSend => 'Gönder';
 
   @override
   String get notificationsTitle => 'Bildirimler';
@@ -300,7 +290,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Dünyaya yeni bir dijital deneyim sunmaya hazır mısın? Detayları doldur ve keşfedilmeye başla.';
 
   @override
-  String get submitName => 'Uygulama adi';
+  String get submitName => 'Uygulama adı';
 
   @override
   String get submitNameLabel => 'UYGULAMA ADI';
@@ -321,7 +311,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitCategoryEducation => 'Eğitim';
 
   @override
-  String get submitDescription => 'Aciklama';
+  String get submitDescription => 'Açıklama';
 
   @override
   String get submitDescriptionHint =>
@@ -368,9 +358,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitApplyDrop => 'Drop\'a Başvur';
 
   @override
-  String get submitAddTest => 'Test\'e Ekle';
-
-  @override
   String get submitRequiredFields =>
       'Uygulama adı ve açıklama alanlarını doldurun.';
 
@@ -384,13 +371,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitSuccess => 'Uygulama incelemeye gönderildi.';
 
   @override
-  String get submitButton => 'Incelemeye gonder';
+  String get submitButton => 'İncelemeye gönder';
 
   @override
-  String get profileMyApps => 'Uygulamalarim';
+  String get profileMyApps => 'Uygulamalarım';
 
   @override
-  String get profileMyComments => 'Yorumlarim';
+  String get profileMyComments => 'Yorumlarım';
 
   @override
   String get profilePromoteApp => 'Uygulamanı Öne Çıkar';
@@ -403,14 +390,13 @@ class AppLocalizationsTr extends AppLocalizations {
       'Çok yakında uygulamalarınızın daha fazla kişiye ulaşmasını sağlayacak yeni öne çıkarma seçeneklerini açacağız. Hazırlıklar tamamlandığında profilinizden kolayca başlatabileceksiniz.';
 
   @override
-  String get profileCommentsTodo =>
-      'Yorumlarım için mobil profil endpoint\'i bekleniyor.';
+  String get profileCommentsTodo => 'Yorumlar şu anda yüklenemiyor.';
 
   @override
   String get profileStatsApps => 'Uygulama';
 
   @override
-  String get profileStatsLikes => 'Begeni';
+  String get profileStatsLikes => 'Beğeni';
 
   @override
   String get profileStatsComments => 'Yorum';
@@ -425,7 +411,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileCommentOwnApp => 'Kendi uygulamana yorumun';
 
   @override
-  String get userProfilePublishedApps => 'Yayınlanan Uygulamaları';
+  String get userProfilePublishedApps => 'Yayınlanan Uygulamalar';
 
   @override
   String get userProfileNoApps => 'Henüz yayınlanan uygulama yok.';
@@ -449,8 +435,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileAvatarEmpty => 'Henüz seçilebilir avatar yok.';
 
   @override
-  String get profileAvatarLoadError =>
-      'Avatar listesi için mobil endpoint bekleniyor.';
+  String get profileAvatarLoadError => 'Avatarlar şu anda yüklenemiyor.';
 
   @override
   String get settingsLanguage => 'Dil Seçeneği';
@@ -481,5 +466,5 @@ class AppLocalizationsTr extends AppLocalizations {
   String get searchUsers => 'Kullanıcılar';
 
   @override
-  String get searchUsersTodo => 'Kullanıcı arama endpoint\'i bekleniyor.';
+  String get searchUsersTodo => 'Kullanıcı araması şu anda kullanılamıyor.';
 }

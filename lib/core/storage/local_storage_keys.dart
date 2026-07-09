@@ -8,4 +8,5 @@ abstract final class LocalStorageKeys {
   static const String refreshToken = 'refresh_token';
   static const String soundEnabled = 'sound_enabled';
   static const String vibrationEnabled = 'vibration_enabled';
+  static const String languageCode = 'language_code';
 }

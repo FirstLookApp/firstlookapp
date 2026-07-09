@@ -72,24 +72,27 @@
   "goToRegister": "Create account",
   "goToLogin": "Already have an account?",
   "discoverTitle": "This Week: Mobile Apps",
-  "testDiscoverTitle": "Discover Test Products",
   "discoverSubtitle": "Discover",
   "leaderboardTitle": "Leaderboard",
-  "discoverBannerTimer": "Ends in 3 days",
-  "discoverWeekBadge": "WEEK 23",
+  "discoverBannerTimer": "End time coming soon",
+  "dropFallbackDescription": "A description for this Drop is coming soon.",
+  "dropEnded": "Drop ended",
+  "dropCountdown": "Ends in {duration}",
+  "@dropCountdown": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "discoverReviewButton": "Review",
   "dropTab": "Drop",
-  "testTab": "Test",
-  "testStageTitle": "In testing",
-  "testJoinButton": "Join Test",
   "iosTab": "iOS",
   "androidTab": "Android",
   "allPlatformsTab": "All",
   "detailAbout": "About",
   "detailComments": "Comments",
   "detailOpenStore": "Open in App Store",
-  "detailJoinBeta": "Join beta",
-  "betaAccessRequestButton": "Request Access",
   "commentHint": "Write a comment",
   "commentSend": "Send",
   "notificationsTitle": "Notifications",
@@ -118,7 +121,6 @@
   "submitStoreLinks": "STORE LINKS",
   "submitBothPlatforms": "Both",
   "submitApplyDrop": "Apply to Drop",
-  "submitAddTest": "Add to Test",
   "submitRequiredFields": "Fill in the application name and description.",
   "submitFieldIsRequiredSuffix": "is required.",
   "submitInvalidUrlSuffix": "must be a valid URL.",
@@ -129,7 +131,7 @@
   "profilePromoteApp": "Promote My App",
   "profilePromoteSoonTitle": "Coming soon",
   "profilePromoteSoonMessage": "Very soon, we will open new promotion options that help your applications reach more people. Once everything is ready, you will be able to start directly from your profile.",
-  "profileCommentsTodo": "Waiting for the mobile profile comments endpoint.",
+  "profileCommentsTodo": "Comments cannot be loaded right now.",
   "profileStatsApps": "Applications",
   "profileStatsLikes": "Likes",
   "profileStatsComments": "Comments",
@@ -144,7 +146,7 @@
   "profileAvatarSaving": "Saving",
   "profileAvatarSaved": "Avatar updated.",
   "profileAvatarEmpty": "There are no selectable avatars yet.",
-  "profileAvatarLoadError": "Waiting for the mobile avatar list endpoint.",
+  "profileAvatarLoadError": "Avatars cannot be loaded right now.",
   "settingsLanguage": "Language",
   "settingsNotifications": "Sound",
   "settingsVibration": "Vibration",
@@ -154,5 +156,5 @@
   "searchMinCharacters": "Enter at least 3 characters to see results.",
   "searchApplications": "Applications",
   "searchUsers": "Users",
-  "searchUsersTodo": "Waiting for the user search endpoint."
+  "searchUsersTodo": "User search is not available right now."
 }

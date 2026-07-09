@@ -1,4 +1,6 @@
 import 'package:firstlook/core/network/services/dio_client.dart';
+import 'package:firstlook/core/storage/hive_service.dart';
+import 'package:firstlook/core/storage/local_storage_keys.dart';
 import 'package:firstlook/core/storage/secure_token_storage.dart';
 import 'package:firstlook/features/apps/data/firstlook_remote_data_source.dart';
 import 'package:firstlook/features/apps/data/firstlook_repository.dart';
@@ -70,6 +72,34 @@ final authControllerProvider = AsyncNotifierProvider<AuthController, AuthState>(
 
 final themeModeProvider = StateProvider<ThemeMode>(
   (Ref ref) => ThemeMode.system,
+);
+
+class AppLocaleController extends StateNotifier<Locale> {
+  AppLocaleController()
+      : super(
+          Locale(
+            HiveService.preferencesBox.get(
+              LocalStorageKeys.languageCode,
+              defaultValue: 'tr',
+            ) as String,
+          ),
+        );
+
+  Future<void> setLocale(Locale locale) async {
+    if (locale.languageCode != 'tr' && locale.languageCode != 'en') {
+      return;
+    }
+
+    state = locale;
+    await HiveService.preferencesBox.put(
+      LocalStorageKeys.languageCode,
+      locale.languageCode,
+    );
+  }
+}
+
+final appLocaleProvider = StateNotifierProvider<AppLocaleController, Locale>(
+  (Ref ref) => AppLocaleController(),
 );
 
 class AppProviderObserver extends ProviderObserver {

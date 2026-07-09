@@ -240,15 +240,15 @@ Future<void> showFirstLookSettings(
   BuildContext context,
   WidgetRef ref,
 ) {
-  final AppLocalizations l10n = AppLocalizations.of(context)!;
-
   return showDialog<void>(
     context: context,
     builder: (BuildContext dialogContext) {
       return Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          final AppLocalizations l10n = AppLocalizations.of(context)!;
           final AppFeedbackSettings settings =
               ref.watch(appFeedbackSettingsProvider);
+          final Locale locale = ref.watch(appLocaleProvider);
           return Dialog(
             backgroundColor: Colors.transparent,
             insetPadding: const EdgeInsets.symmetric(horizontal: 46),
@@ -263,7 +263,13 @@ Future<void> showFirstLookSettings(
                     label: l10n.settingsLanguage,
                     left: 'TR',
                     right: 'EN',
-                    selectedLeft: true,
+                    selectedLeft: locale.languageCode == 'tr',
+                    onLeft: () => ref
+                        .read(appLocaleProvider.notifier)
+                        .setLocale(const Locale('tr')),
+                    onRight: () => ref
+                        .read(appLocaleProvider.notifier)
+                        .setLocale(const Locale('en')),
                   ),
                   _SettingsRow(
                     label: l10n.settingsNotifications,

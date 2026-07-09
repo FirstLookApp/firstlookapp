@@ -34,8 +34,8 @@ class DiscoverPage extends ConsumerWidget {
       data: (ActiveDropBatch? drop) =>
           drop?.description.trim().isNotEmpty == true
               ? drop!.description.trim()
-              : l10n.discoverSubtitle,
-      orElse: () => l10n.discoverWeekBadge,
+              : l10n.dropFallbackDescription,
+      orElse: () => l10n.dropFallbackDescription,
     );
     final String bannerBackgroundImagePath = activeDrop.maybeWhen(
       data: (ActiveDropBatch? drop) => drop?.backgroundImagePath ?? '',
@@ -139,13 +139,13 @@ String _formatDropCountdown(
   final Duration remaining = endsAt.toLocal().difference(DateTime.now());
   final bool isTurkish = Localizations.localeOf(context).languageCode == 'tr';
   if (remaining <= Duration.zero) {
-    return isTurkish ? 'Drop sona erdi' : 'Drop ended';
+    return l10n.dropEnded;
   }
 
   final String duration = isTurkish
       ? '${remaining.inDays} gün ${remaining.inHours.remainder(24)} saat ${remaining.inMinutes.remainder(60)} dakika'
       : '${remaining.inDays}d ${remaining.inHours.remainder(24)}h ${remaining.inMinutes.remainder(60)}m';
-  return isTurkish ? 'Bitişe $duration' : 'Ends in $duration';
+  return l10n.dropCountdown(duration);
 }
 
 class LeaderboardPage extends ConsumerWidget {

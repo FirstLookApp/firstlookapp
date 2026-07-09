@@ -524,12 +524,6 @@ abstract class AppLocalizations {
   /// **'This Week: Mobile Apps'**
   String get discoverTitle;
 
-  /// No description provided for @testDiscoverTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Discover Test Products'**
-  String get testDiscoverTitle;
-
   /// No description provided for @discoverSubtitle.
   ///
   /// In en, this message translates to:
@@ -545,14 +539,26 @@ abstract class AppLocalizations {
   /// No description provided for @discoverBannerTimer.
   ///
   /// In en, this message translates to:
-  /// **'Ends in 3 days'**
+  /// **'End time coming soon'**
   String get discoverBannerTimer;
 
-  /// No description provided for @discoverWeekBadge.
+  /// No description provided for @dropFallbackDescription.
   ///
   /// In en, this message translates to:
-  /// **'WEEK 23'**
-  String get discoverWeekBadge;
+  /// **'A description for this Drop is coming soon.'**
+  String get dropFallbackDescription;
+
+  /// No description provided for @dropEnded.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop ended'**
+  String get dropEnded;
+
+  /// No description provided for @dropCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Ends in {duration}'**
+  String dropCountdown(String duration);
 
   /// No description provided for @discoverReviewButton.
   ///
@@ -565,24 +571,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Drop'**
   String get dropTab;
-
-  /// No description provided for @testTab.
-  ///
-  /// In en, this message translates to:
-  /// **'Test'**
-  String get testTab;
-
-  /// No description provided for @testStageTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'In testing'**
-  String get testStageTitle;
-
-  /// No description provided for @testJoinButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Join Test'**
-  String get testJoinButton;
 
   /// No description provided for @iosTab.
   ///
@@ -619,18 +607,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open in App Store'**
   String get detailOpenStore;
-
-  /// No description provided for @detailJoinBeta.
-  ///
-  /// In en, this message translates to:
-  /// **'Join beta'**
-  String get detailJoinBeta;
-
-  /// No description provided for @betaAccessRequestButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Request Access'**
-  String get betaAccessRequestButton;
 
   /// No description provided for @commentHint.
   ///
@@ -800,12 +776,6 @@ abstract class AppLocalizations {
   /// **'Apply to Drop'**
   String get submitApplyDrop;
 
-  /// No description provided for @submitAddTest.
-  ///
-  /// In en, this message translates to:
-  /// **'Add to Test'**
-  String get submitAddTest;
-
   /// No description provided for @submitRequiredFields.
   ///
   /// In en, this message translates to:
@@ -869,7 +839,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileCommentsTodo.
   ///
   /// In en, this message translates to:
-  /// **'Waiting for the mobile profile comments endpoint.'**
+  /// **'Comments cannot be loaded right now.'**
   String get profileCommentsTodo;
 
   /// No description provided for @profileStatsApps.
@@ -959,7 +929,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileAvatarLoadError.
   ///
   /// In en, this message translates to:
-  /// **'Waiting for the mobile avatar list endpoint.'**
+  /// **'Avatars cannot be loaded right now.'**
   String get profileAvatarLoadError;
 
   /// No description provided for @settingsLanguage.
@@ -1019,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchUsersTodo.
   ///
   /// In en, this message translates to:
-  /// **'Waiting for the user search endpoint.'**
+  /// **'User search is not available right now.'**
   String get searchUsersTodo;
 }
 

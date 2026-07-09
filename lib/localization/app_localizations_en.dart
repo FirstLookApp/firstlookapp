@@ -227,34 +227,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverTitle => 'This Week: Mobile Apps';
 
   @override
-  String get testDiscoverTitle => 'Discover Test Products';
-
-  @override
   String get discoverSubtitle => 'Discover';
 
   @override
   String get leaderboardTitle => 'Leaderboard';
 
   @override
-  String get discoverBannerTimer => 'Ends in 3 days';
+  String get discoverBannerTimer => 'End time coming soon';
 
   @override
-  String get discoverWeekBadge => 'WEEK 23';
+  String get dropFallbackDescription =>
+      'A description for this Drop is coming soon.';
+
+  @override
+  String get dropEnded => 'Drop ended';
+
+  @override
+  String dropCountdown(String duration) {
+    return 'Ends in $duration';
+  }
 
   @override
   String get discoverReviewButton => 'Review';
 
   @override
   String get dropTab => 'Drop';
-
-  @override
-  String get testTab => 'Test';
-
-  @override
-  String get testStageTitle => 'In testing';
-
-  @override
-  String get testJoinButton => 'Join Test';
 
   @override
   String get iosTab => 'iOS';
@@ -273,12 +270,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailOpenStore => 'Open in App Store';
-
-  @override
-  String get detailJoinBeta => 'Join beta';
-
-  @override
-  String get betaAccessRequestButton => 'Request Access';
 
   @override
   String get commentHint => 'Write a comment';
@@ -368,9 +359,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitApplyDrop => 'Apply to Drop';
 
   @override
-  String get submitAddTest => 'Add to Test';
-
-  @override
   String get submitRequiredFields =>
       'Fill in the application name and description.';
 
@@ -403,8 +391,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Very soon, we will open new promotion options that help your applications reach more people. Once everything is ready, you will be able to start directly from your profile.';
 
   @override
-  String get profileCommentsTodo =>
-      'Waiting for the mobile profile comments endpoint.';
+  String get profileCommentsTodo => 'Comments cannot be loaded right now.';
 
   @override
   String get profileStatsApps => 'Applications';
@@ -450,8 +437,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAvatarEmpty => 'There are no selectable avatars yet.';
 
   @override
-  String get profileAvatarLoadError =>
-      'Waiting for the mobile avatar list endpoint.';
+  String get profileAvatarLoadError => 'Avatars cannot be loaded right now.';
 
   @override
   String get settingsLanguage => 'Language';
@@ -482,5 +468,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchUsers => 'Users';
 
   @override
-  String get searchUsersTodo => 'Waiting for the user search endpoint.';
+  String get searchUsersTodo => 'User search is not available right now.';
 }

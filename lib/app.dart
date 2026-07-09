@@ -13,6 +13,7 @@ class FirstLookApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
+    final Locale locale = ref.watch(appLocaleProvider);
     final GoRouter router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
@@ -22,7 +23,7 @@ class FirstLookApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      locale: const Locale('tr'),
+      locale: locale,
       routerConfig: router,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
