@@ -15,13 +15,16 @@ class RetryInterceptor extends Interceptor {
     final bool shouldRetry = err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.receiveTimeout;
+    final bool alreadyRetriedNetwork =
+        err.requestOptions.extra['hasRetriedNetwork'] as bool? ?? false;
 
-    if (!shouldRetry) {
+    if (!shouldRetry || alreadyRetriedNetwork) {
       handler.next(err);
       return;
     }
 
     try {
+      err.requestOptions.extra['hasRetriedNetwork'] = true;
       final Response<dynamic> response = await retry(
         () => _dio.fetch<dynamic>(err.requestOptions),
         maxAttempts: AppConstants.maxRetryAttempts,
