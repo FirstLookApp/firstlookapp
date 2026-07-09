@@ -98,17 +98,30 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (BuildContext sheetContext) => Padding(
+      builder: (BuildContext sheetContext) => SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const Text('Profili düzenle', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             TextField(controller: firstName, decoration: const InputDecoration(labelText: 'Ad')),
+            const SizedBox(height: 18),
             TextField(controller: lastName, decoration: const InputDecoration(labelText: 'Soyad')),
-            TextField(controller: biography, maxLength: 140, decoration: const InputDecoration(labelText: 'Biyografi')),
+            const SizedBox(height: 18),
+            TextField(
+              controller: biography,
+              maxLength: 140,
+              minLines: 3,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
+              decoration: const InputDecoration(
+                alignLabelWithHint: true,
+                labelText: 'Biyografi',
+              ),
+            ),
+            const SizedBox(height: 8),
             OutlinedButton(
               onPressed: () => _showAvatarPicker(sheetContext),
               child: const Text('Avatarı değiştir'),
