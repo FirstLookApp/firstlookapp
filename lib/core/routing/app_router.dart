@@ -21,7 +21,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 final appRouterProvider = Provider<GoRouter>((Ref ref) {
-  final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
   final RouterRefreshNotifier refreshNotifier = RouterRefreshNotifier();
 
   ref.listen<AsyncValue<AuthState>>(
@@ -48,6 +47,8 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
     debugLogDiagnostics: false,
     refreshListenable: refreshNotifier,
     redirect: (BuildContext context, GoRouterState state) {
+      final AsyncValue<AuthState> authState = ref.read(authControllerProvider);
+
       if (authState.isLoading) {
         return null;
       }
