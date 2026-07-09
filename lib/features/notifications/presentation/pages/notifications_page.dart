@@ -5,9 +5,9 @@ import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
-import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
@@ -20,6 +20,20 @@ class NotificationsPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: IconButton(
+          onPressed: () => context.pop(),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: Colors.black,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => ref.invalidate(notificationsProvider),
@@ -28,8 +42,6 @@ class NotificationsPage extends ConsumerWidget {
               return ListView(
                 padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),
                 children: <Widget>[
-                  const FirstLookAppHeader(),
-                  const SizedBox(height: 24),
                   _NotificationsTitle(title: l10n.notificationsTitle),
                   const SizedBox(height: 14),
                   if (result.items.isEmpty)

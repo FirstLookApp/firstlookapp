@@ -55,7 +55,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 const SizedBox(height: 28),
                 _ProfileIdentity(
                   user: user,
-                  onAvatarTap: () => _showAvatarPicker(context),
+                  onAvatarTap: () => _showProfileEditor(context, user),
                 ),
                 const SizedBox(height: 20),
                 _StatsCard(user: user),
@@ -89,6 +89,50 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showProfileEditor(BuildContext context, UserProfile user) async {
+    final TextEditingController firstName = TextEditingController(text: user.firstName);
+    final TextEditingController lastName = TextEditingController(text: user.lastName);
+    final TextEditingController biography = TextEditingController(text: user.biography);
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            const Text('Profili düzenle', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 16),
+            TextField(controller: firstName, decoration: const InputDecoration(labelText: 'Ad')),
+            TextField(controller: lastName, decoration: const InputDecoration(labelText: 'Soyad')),
+            TextField(controller: biography, maxLength: 140, decoration: const InputDecoration(labelText: 'Biyografi')),
+            OutlinedButton(
+              onPressed: () => _showAvatarPicker(sheetContext),
+              child: const Text('Avatarı değiştir'),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              onPressed: () async {
+                await ref.read(firstLookRepositoryProvider).updateProfile(
+                  firstName: firstName.text.trim(),
+                  lastName: lastName.text.trim(),
+                  biography: biography.text.trim(),
+                );
+                ref.invalidate(profileProvider);
+                if (sheetContext.mounted) Navigator.of(sheetContext).pop();
+              },
+              child: const Text('Kaydet'),
+            ),
+          ],
+        ),
+      ),
+    );
+    firstName.dispose();
+    lastName.dispose();
+    biography.dispose();
   }
 
   Future<void> _showAvatarPicker(BuildContext context) async {

@@ -34,7 +34,6 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
 
   int _selectedCategoryIndex = 1;
   PlatformType _selectedPlatform = PlatformType.android;
-  SubmitDestination _selectedDestination = SubmitDestination.drop;
   List<PlatformFile> _screenshots = <PlatformFile>[];
 
   bool get _showsAndroidField {
@@ -205,21 +204,6 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                   ),
                 ],
                 const SizedBox(height: 16),
-                FirstLookSegmentedControl<SubmitDestination>(
-                  values: const <SubmitDestination>[
-                    SubmitDestination.drop,
-                    SubmitDestination.test,
-                  ],
-                  selected: _selectedDestination,
-                  labelBuilder: (SubmitDestination destination) =>
-                      switch (destination) {
-                    SubmitDestination.drop => l10n.submitApplyDrop,
-                    SubmitDestination.test => l10n.submitAddTest,
-                  },
-                  onChanged: (SubmitDestination value) =>
-                      setState(() => _selectedDestination = value),
-                ),
-                const SizedBox(height: 16),
                 AuthPrimaryButton(
                   label: l10n.submitButton,
                   isLoading: submitState.isLoading,
@@ -301,11 +285,28 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   void _submit(AppLocalizations l10n, List<String> categories) {
     final String name = _name.text.trim();
     final String description = _description.text.trim();
+    final String videoUrl = _videoUrl.text.trim();
     final String googlePlayUrl = _googlePlayUrl.text.trim();
     final String appStoreUrl = _appStoreUrl.text.trim();
 
     if (name.isEmpty || description.isEmpty) {
       AppSnackbar.show(context, message: l10n.submitRequiredFields);
+      return;
+    }
+
+    if (videoUrl.isEmpty) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitVideoUrl} ${l10n.submitFieldIsRequiredSuffix}',
+      );
+      return;
+    }
+
+    if (!_isValidStoreUrl(videoUrl)) {
+      AppSnackbar.show(
+        context,
+        message: '${l10n.submitVideoUrl} ${l10n.submitInvalidUrlSuffix}',
+      );
       return;
     }
 
@@ -348,11 +349,11 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
             name: name,
             category: categories[_selectedCategoryIndex],
             description: description,
-            videoUrl: _videoUrl.text.trim(),
+            videoUrl: videoUrl,
             platform: _selectedPlatform,
             appStoreUrl: _showsIosField ? appStoreUrl : '',
             googlePlayUrl: _showsAndroidField ? googlePlayUrl : '',
-            destination: _selectedDestination,
+            destination: SubmitDestination.drop,
             screenshotPaths: _screenshots
                 .map((PlatformFile file) => file.path)
                 .whereType<String>()
@@ -382,7 +383,6 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     setState(() {
       _selectedCategoryIndex = 1;
       _selectedPlatform = PlatformType.android;
-      _selectedDestination = SubmitDestination.drop;
       _screenshots = <PlatformFile>[];
     });
   }

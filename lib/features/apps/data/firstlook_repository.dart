@@ -9,36 +9,16 @@ class FirstLookRepository {
 
   final FirstLookRemoteDataSource _remoteDataSource;
 
-  Future<List<DiscoveryItem>> discover({
-    required SubmitDestination destination,
-    required PlatformType platform,
-  }) {
-    return _remoteDataSource.discover(
-      destination: destination,
-      platform: platform,
-    );
-  }
-
-  Future<PagedResult<ApplicationListItem>> listApplications({
-    required SubmitDestination destination,
-    required PlatformType platform,
-    int pageNumber = 1,
-    int pageSize = 20,
-    String? search,
-  }) {
-    return _remoteDataSource.listApplications(
-      destination: destination,
-      platform: platform,
-      pageNumber: pageNumber,
-      pageSize: pageSize,
-      search: search,
-    );
-  }
-
   Future<ActiveDropBatch?> activeDrop({
     required PlatformType platform,
   }) {
     return _remoteDataSource.activeDrop(platform: platform);
+  }
+
+  Future<PagedResult<ApplicationListItem>> leaderboard({
+    required PlatformType platform,
+  }) {
+    return _remoteDataSource.leaderboard(platform: platform);
   }
 
   Future<String> submitApplication(SubmitApplicationPayload payload) {
@@ -74,15 +54,22 @@ class FirstLookRepository {
     return _remoteDataSource.trackStoreClick(id: id, platform: platform);
   }
 
-  Future<void> requestBetaAccess({
-    required String id,
-    required String email,
-  }) {
-    return _remoteDataSource.requestBetaAccess(id: id, email: email);
-  }
-
   Future<UserProfile> profile() {
     return _remoteDataSource.profile();
+  }
+
+  Future<UserProfile> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String biography,
+    String? avatarId,
+  }) {
+    return _remoteDataSource.updateProfile(
+      firstName: firstName,
+      lastName: lastName,
+      biography: biography,
+      avatarId: avatarId,
+    );
   }
 
   Future<List<AvatarOption>> avatars() {

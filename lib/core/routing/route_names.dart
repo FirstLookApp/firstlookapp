@@ -39,6 +39,10 @@ abstract final class RouteNames {
     return '${_shellRootFor(currentPath)}/users/$id';
   }
 
+  static String notificationsLocation({String? currentPath}) {
+    return '${_shellRootFor(currentPath)}/notifications';
+  }
+
   static String _shellRootFor(String? path) {
     if (path == null || path.isEmpty) {
       return discoverPath;

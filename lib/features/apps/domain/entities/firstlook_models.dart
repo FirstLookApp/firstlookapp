@@ -17,8 +17,7 @@ enum PlatformType {
 }
 
 enum SubmitDestination {
-  drop(1, 'Drop'),
-  test(2, 'Test');
+  drop(1, 'Drop');
 
   const SubmitDestination(this.apiValue, this.label);
 

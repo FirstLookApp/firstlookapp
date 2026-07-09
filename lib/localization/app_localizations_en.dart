@@ -114,6 +114,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authLoginCta => 'SIGN IN';
 
   @override
+  String get loginIdentifierLabel => 'EMAIL OR USERNAME';
+
+  @override
+  String get loginIdentifierHint => 'Email or username';
+
+  @override
   String get loginEmailHint => 'johndoe@mail.com';
 
   @override
@@ -266,7 +272,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailComments => 'Comments';
 
   @override
-  String get detailOpenStore => 'Open store';
+  String get detailOpenStore => 'Open in App Store';
 
   @override
   String get detailJoinBeta => 'Join beta';

@@ -8,7 +8,6 @@ import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
-import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,50 +19,21 @@ class DiscoverPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final SubmitDestination destination =
-        ref.watch(selectedDestinationProvider);
-    final AsyncValue<ActiveDropBatch?>? activeDrop =
-        destination == SubmitDestination.drop
-            ? ref.watch(activeDropProvider)
-            : null;
-    final AsyncValue<List<DiscoveryItem>>? discovery =
-        destination == SubmitDestination.test
-            ? ref.watch(discoveryProvider)
-            : null;
-    final AsyncValue<PagedResult<ApplicationListItem>>? list =
-        destination == SubmitDestination.test
-            ? ref.watch(applicationListProvider)
-            : null;
-    final String bannerTitle = destination == SubmitDestination.drop
-        ? activeDrop?.maybeWhen(
+    final AsyncValue<ActiveDropBatch?> activeDrop = ref.watch(activeDropProvider);
+    final String bannerTitle = activeDrop.maybeWhen(
               data: (ActiveDropBatch? drop) =>
                   drop != null && drop.name.isNotEmpty
                       ? drop.name
                       : l10n.discoverTitle,
               orElse: () => l10n.discoverTitle,
-            ) ??
-            l10n.discoverTitle
-        : l10n.testDiscoverTitle;
-    final Set<String> featuredTestIds = destination == SubmitDestination.test
-        ? discovery?.maybeWhen(
-              data: (List<DiscoveryItem> items) =>
-                  items.take(3).map((DiscoveryItem item) => item.id).toSet(),
-              orElse: () => const <String>{},
-            ) ??
-            const <String>{}
-        : const <String>{};
+            );
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            if (destination == SubmitDestination.drop) {
-              ref.invalidate(activeDropProvider);
-            } else {
-              ref.invalidate(discoveryProvider);
-              ref.invalidate(applicationListProvider);
-            }
+            ref.invalidate(activeDropProvider);
           },
           child: ListView(
             padding: const EdgeInsets.fromLTRB(
@@ -75,21 +45,6 @@ class DiscoverPage extends ConsumerWidget {
             children: <Widget>[
               const FirstLookAppHeader(),
               const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 34),
-                child: FirstLookSegmentedControl<SubmitDestination>(
-                  values: SubmitDestination.values,
-                  selected: destination,
-                  labelBuilder: (SubmitDestination value) =>
-                      value == SubmitDestination.drop
-                          ? l10n.dropTab
-                          : l10n.testTab,
-                  onChanged: (SubmitDestination value) => ref
-                      .read(selectedDestinationProvider.notifier)
-                      .state = value,
-                ),
-              ),
-              const SizedBox(height: 24),
               _WeeklyBanner(
                 title: bannerTitle,
                 timer: l10n.discoverBannerTimer,
@@ -97,13 +52,10 @@ class DiscoverPage extends ConsumerWidget {
               ),
               const SizedBox(height: 22),
               _SectionTitle(
-                title: destination == SubmitDestination.drop
-                    ? l10n.discoverSubtitle
-                    : l10n.testStageTitle,
+                title: l10n.discoverSubtitle,
               ),
               const SizedBox(height: 12),
-              if (destination == SubmitDestination.drop)
-                activeDrop!.when(
+              activeDrop.when(
                   data: (ActiveDropBatch? drop) {
                     final List<ApplicationListItem> items =
                         drop?.items ?? <ApplicationListItem>[];
@@ -151,70 +103,7 @@ class DiscoverPage extends ConsumerWidget {
                     padding: EdgeInsets.all(40),
                     child: AppLoadingIndicator(),
                   ),
-                )
-              else ...<Widget>[
-                discovery!.when(
-                  data: (List<DiscoveryItem> items) => items.isEmpty
-                      ? const SizedBox.shrink()
-                      : Column(
-                          children: items.take(3).map(
-                            (DiscoveryItem item) {
-                              return _ApplicationRow(
-                                title: item.name,
-                                subtitle: item.shortDescription,
-                                imagePath: item.mainScreenshot,
-                                buttonLabel: l10n.testJoinButton,
-                                isPrimaryAction: true,
-                                onTap: () => context.push(
-                                  RouteNames.applicationDetailLocation(
-                                    id: item.id,
-                                    platform: PlatformType.both.apiValue,
-                                  ),
-                                ),
-                              );
-                            },
-                          ).toList(),
-                        ),
-                  error: (Object error, StackTrace stackTrace) => AppErrorState(
-                    message: error.toString(),
-                    onRetry: () => ref.invalidate(discoveryProvider),
-                  ),
-                  loading: () => const Padding(
-                    padding: EdgeInsets.all(40),
-                    child: AppLoadingIndicator(),
-                  ),
                 ),
-                list!.when(
-                  data: (PagedResult<ApplicationListItem> result) {
-                    final Iterable<ApplicationListItem> remainingItems =
-                        result.items.where(
-                      (ApplicationListItem item) =>
-                          !featuredTestIds.contains(item.id),
-                    );
-
-                    return Column(
-                      children: remainingItems
-                          .map<Widget>(
-                            (ApplicationListItem item) => _CompactAppRow(
-                              item: item,
-                              buttonLabel: l10n.testJoinButton,
-                              isPrimaryAction: true,
-                              onTap: () => context.push(
-                                RouteNames.applicationDetailLocation(
-                                  id: item.id,
-                                  platform: item.platform,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    );
-                  },
-                  error: (Object error, StackTrace stackTrace) =>
-                      const SizedBox.shrink(),
-                  loading: () => const SizedBox.shrink(),
-                ),
-              ],
             ],
           ),
         ),
@@ -229,18 +118,17 @@ class LeaderboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final AsyncValue<ActiveDropBatch?> activeDrop =
-        ref.watch(activeDropProvider);
+    final AsyncValue<PagedResult<ApplicationListItem>> leaderboard =
+        ref.watch(leaderboardProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () async => ref.invalidate(activeDropProvider),
-          child: activeDrop.when(
-            data: (ActiveDropBatch? drop) {
-              final List<ApplicationListItem> items =
-                  drop?.items ?? <ApplicationListItem>[];
+          onRefresh: () async => ref.invalidate(leaderboardProvider),
+          child: leaderboard.when(
+            data: (PagedResult<ApplicationListItem> result) {
+              final List<ApplicationListItem> items = result.items;
 
               return ListView(
                 padding: const EdgeInsets.fromLTRB(
@@ -285,7 +173,7 @@ class LeaderboardPage extends ConsumerWidget {
             },
             error: (Object error, StackTrace stackTrace) => AppErrorState(
               message: error.toString(),
-              onRetry: () => ref.invalidate(activeDropProvider),
+              onRetry: () => ref.invalidate(leaderboardProvider),
             ),
             loading: () => const AppLoadingIndicator(),
           ),
@@ -900,140 +788,6 @@ class _LeaderboardImage extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
       ),
-    );
-  }
-}
-
-class _ApplicationRow extends StatelessWidget {
-  const _ApplicationRow({
-    required this.title,
-    required this.subtitle,
-    required this.imagePath,
-    required this.buttonLabel,
-    required this.onTap,
-    required this.isPrimaryAction,
-  });
-
-  final String title;
-  final String subtitle;
-  final String imagePath;
-  final String buttonLabel;
-  final VoidCallback onTap;
-  final bool isPrimaryAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                width: 48,
-                height: 48,
-                child: imagePath.isEmpty
-                    ? const ColoredBox(
-                        color: AppColors.primarySoft,
-                        child: Icon(
-                          Icons.apps_rounded,
-                          color: AppColors.primary,
-                        ),
-                      )
-                    : Image.network(
-                        UrlResolver.media(imagePath),
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 11,
-                      height: 1.25,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: onTap,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(60, 34),
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                backgroundColor:
-                    isPrimaryAction ? AppColors.primary : AppColors.chipFill,
-                foregroundColor:
-                    isPrimaryAction ? Colors.white : AppColors.secondary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              child: Text(buttonLabel),
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.star_rounded,
-              color: AppColors.primary,
-              size: 22,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CompactAppRow extends StatelessWidget {
-  const _CompactAppRow({
-    required this.item,
-    required this.buttonLabel,
-    required this.onTap,
-    required this.isPrimaryAction,
-  });
-
-  final ApplicationListItem item;
-  final String buttonLabel;
-  final VoidCallback onTap;
-  final bool isPrimaryAction;
-
-  @override
-  Widget build(BuildContext context) {
-    return _ApplicationRow(
-      title: item.name,
-      subtitle: item.shortDescription,
-      imagePath: item.mainScreenshot,
-      buttonLabel: buttonLabel,
-      onTap: onTap,
-      isPrimaryAction: isPrimaryAction,
     );
   }
 }

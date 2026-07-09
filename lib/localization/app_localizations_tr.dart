@@ -115,6 +115,12 @@ class AppLocalizationsTr extends AppLocalizations {
   String get authLoginCta => 'GİRİŞ YAP';
 
   @override
+  String get loginIdentifierLabel => 'E-POSTA VEYA KULLANICI ADI';
+
+  @override
+  String get loginIdentifierHint => 'E-posta veya kullanıcı adı';
+
+  @override
   String get loginEmailHint => 'johndoe@mail.com';
 
   @override
@@ -265,7 +271,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get detailComments => 'Yorumlar';
 
   @override
-  String get detailOpenStore => 'Magazada ac';
+  String get detailOpenStore => 'Uygulama Mağazasında Aç';
 
   @override
   String get detailJoinBeta => 'Betaya katil';

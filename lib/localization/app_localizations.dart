@@ -302,6 +302,18 @@ abstract class AppLocalizations {
   /// **'SIGN IN'**
   String get authLoginCta;
 
+  /// No description provided for @loginIdentifierLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'EMAIL OR USERNAME'**
+  String get loginIdentifierLabel;
+
+  /// No description provided for @loginIdentifierHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or username'**
+  String get loginIdentifierHint;
+
   /// No description provided for @loginEmailHint.
   ///
   /// In en, this message translates to:
@@ -605,7 +617,7 @@ abstract class AppLocalizations {
   /// No description provided for @detailOpenStore.
   ///
   /// In en, this message translates to:
-  /// **'Open store'**
+  /// **'Open in App Store'**
   String get detailOpenStore;
 
   /// No description provided for @detailJoinBeta.

@@ -22,8 +22,6 @@ class FavoritesPage extends ConsumerStatefulWidget {
 }
 
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
-  SubmitDestination _selectedDestination = SubmitDestination.drop;
-
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
@@ -37,10 +35,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           onRefresh: () async => ref.invalidate(favoritesProvider),
           child: favorites.when(
             data: (PagedResult<ApplicationListItem> result) {
-              final List<ApplicationListItem> filtered = result.items
-                  .where((ApplicationListItem item) =>
-                      item.destination == _selectedDestination.apiValue)
-                  .toList(growable: false);
+              final List<ApplicationListItem> filtered = result.items;
 
               return ListView(
                 padding: const EdgeInsets.fromLTRB(
@@ -61,12 +56,6 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _DestinationFilter(
-                    selected: _selectedDestination,
-                    onChanged: (SubmitDestination value) =>
-                        setState(() => _selectedDestination = value),
-                  ),
-                  const SizedBox(height: 22),
                   if (filtered.isEmpty)
                     _EmptyFavorites(message: l10n.favoritesEmptyMessage)
                   else
@@ -95,51 +84,6 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _DestinationFilter extends StatelessWidget {
-  const _DestinationFilter({
-    required this.selected,
-    required this.onChanged,
-  });
-
-  final SubmitDestination selected;
-  final ValueChanged<SubmitDestination> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    return Row(
-      children: SubmitDestination.values.map((SubmitDestination value) {
-        final bool isSelected = selected == value;
-        final String label =
-            value == SubmitDestination.drop ? l10n.dropTab : l10n.testTab;
-
-        return Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: ChoiceChip(
-            selected: isSelected,
-            label: Text(label),
-            selectedColor: Colors.black,
-            backgroundColor: Colors.white,
-            labelStyle: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
-            side: BorderSide(
-              color: isSelected ? Colors.black : AppColors.border,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            onSelected: (_) => onChanged(value),
-          ),
-        );
-      }).toList(),
     );
   }
 }

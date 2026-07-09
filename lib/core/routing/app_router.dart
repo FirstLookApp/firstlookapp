@@ -110,8 +110,7 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
       ),
       GoRoute(
         path: RouteNames.notificationsPath,
-        name: RouteNames.notifications,
-        builder: (_, __) => const NotificationsPage(),
+        redirect: (_, __) => RouteNames.notificationsLocation(),
       ),
       GoRoute(
         path: RouteNames.detailPath,
@@ -144,7 +143,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.discoverPath,
                 name: RouteNames.discover,
                 builder: (_, __) => const DiscoverPage(),
-                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+                routes: <RouteBase>[
+                  _detailRoute(),
+                  _userProfileRoute(),
+                  _notificationsRoute(),
+                ],
               ),
             ],
           ),
@@ -154,7 +157,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.leaderboardPath,
                 name: RouteNames.leaderboard,
                 builder: (_, __) => const LeaderboardPage(),
-                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+                routes: <RouteBase>[
+                  _detailRoute(),
+                  _userProfileRoute(),
+                  _notificationsRoute(),
+                ],
               ),
             ],
           ),
@@ -164,7 +171,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.favoritesPath,
                 name: RouteNames.favorites,
                 builder: (_, __) => const FavoritesPage(),
-                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+                routes: <RouteBase>[
+                  _detailRoute(),
+                  _userProfileRoute(),
+                  _notificationsRoute(),
+                ],
               ),
             ],
           ),
@@ -174,7 +185,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.submitPath,
                 name: RouteNames.submit,
                 builder: (_, __) => const SubmitPage(),
-                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+                routes: <RouteBase>[
+                  _detailRoute(),
+                  _userProfileRoute(),
+                  _notificationsRoute(),
+                ],
               ),
             ],
           ),
@@ -184,7 +199,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
                 path: RouteNames.profilePath,
                 name: RouteNames.profile,
                 builder: (_, __) => const ProfilePage(),
-                routes: <RouteBase>[_detailRoute(), _userProfileRoute()],
+                routes: <RouteBase>[
+                  _detailRoute(),
+                  _userProfileRoute(),
+                  _notificationsRoute(),
+                ],
               ),
             ],
           ),
@@ -215,6 +234,13 @@ GoRoute _userProfileRoute() {
     builder: (_, GoRouterState state) => UserProfilePreviewPage(
       userId: state.pathParameters['id'] ?? '',
     ),
+  );
+}
+
+GoRoute _notificationsRoute() {
+  return GoRoute(
+    path: 'notifications',
+    builder: (_, __) => const NotificationsPage(),
   );
 }
 

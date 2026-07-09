@@ -35,6 +35,7 @@ class _OtpPageState extends ConsumerState<OtpPage> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
+    final EdgeInsets viewInsets = MediaQuery.viewInsetsOf(context);
 
     ref.listen<AsyncValue<AuthState>>(authControllerProvider, (
       _,
@@ -48,61 +49,75 @@ class _OtpPageState extends ConsumerState<OtpPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 390),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.large,
-                18,
-                AppSpacing.large,
-                AppSpacing.large,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  const AuthHeader(),
-                  const SizedBox(height: 28),
-                  const Center(child: FirstLookAppIcon(size: 96)),
-                  const SizedBox(height: 28),
-                  Text(
-                    l10n.otpTitle,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.only(bottom: viewInsets.bottom),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 390,
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.large,
+                      18,
+                      AppSpacing.large,
+                      AppSpacing.large,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        const AuthHeader(),
+                        const SizedBox(height: 28),
+                        const Center(child: FirstLookAppIcon(size: 96)),
+                        const SizedBox(height: 28),
+                        Text(
+                          l10n.otpTitle,
+                          style:
+                              Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.otpSubtitle,
+                          style: const TextStyle(
+                            color: Color(0xFF7C7C84),
+                            fontSize: 12,
+                            height: 1.45,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 34),
+                        _OtpCodeField(
+                          controller: _otp,
+                          focusNode: _otpFocusNode,
+                        ),
+                        const SizedBox(height: 24),
+                        AuthPrimaryButton(
+                          label: l10n.otpButton,
+                          isLoading: authState.isLoading,
+                          onPressed: () {
+                            ref
+                                .read(authControllerProvider.notifier)
+                                .verifyEmail(
+                                  email: widget.email,
+                                  otp: _otp.text.trim(),
+                                );
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    l10n.otpSubtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF7C7C84),
-                      fontSize: 12,
-                      height: 1.45,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 34),
-                  _OtpCodeField(controller: _otp, focusNode: _otpFocusNode),
-                  const SizedBox(height: 24),
-                  AuthPrimaryButton(
-                    label: l10n.otpButton,
-                    isLoading: authState.isLoading,
-                    onPressed: () {
-                      ref
-                          .read(authControllerProvider.notifier)
-                          .verifyEmail(
-                            email: widget.email,
-                            otp: _otp.text.trim(),
-                          );
-                    },
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

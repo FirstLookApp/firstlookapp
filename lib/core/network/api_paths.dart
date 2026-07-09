@@ -16,10 +16,10 @@ abstract final class ApiPaths {
   static const String profileComments = '/api/profile/comments';
   static const String applications = '/api/applications';
   static const String myApplications = '/api/applications/mine';
-  static const String myBetaRequests = '/api/applications/my-beta-requests';
   static const String userSearch = '/api/users/search';
   static const String discovery = '/api/discovery';
   static const String activeDrop = '/api/discovery/drop/active';
+  static const String leaderboard = '/api/discovery/leaderboard';
   static const String interactions = '/api/interactions';
 
   static String userProfile(String userId) => '/api/users/$userId/profile';

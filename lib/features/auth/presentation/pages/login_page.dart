@@ -7,23 +7,35 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final EdgeInsets viewInsets = MediaQuery.viewInsetsOf(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 390),
-            child: const Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.large,
-                18,
-                AppSpacing.large,
-                AppSpacing.large,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.only(bottom: viewInsets.bottom),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 390,
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      AppSpacing.large,
+                      18,
+                      AppSpacing.large,
+                      AppSpacing.large,
+                    ),
+                    child: LoginForm(),
+                  ),
+                ),
               ),
-              child: LoginForm(),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

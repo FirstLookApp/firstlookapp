@@ -3,32 +3,23 @@ import 'package:firstlook/core/network/parsers/api_error_parser.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-final selectedDestinationProvider = StateProvider<SubmitDestination>(
-  (Ref ref) => SubmitDestination.drop,
-);
+import 'package:flutter/foundation.dart';
 
 final selectedPlatformProvider = StateProvider<PlatformType>(
-  (Ref ref) => PlatformType.ios,
+  (Ref ref) => defaultTargetPlatform == TargetPlatform.android
+      ? PlatformType.android
+      : PlatformType.ios,
 );
-
-final discoveryProvider = FutureProvider<List<DiscoveryItem>>((Ref ref) {
-  return ref.watch(firstLookRepositoryProvider).discover(
-        destination: ref.watch(selectedDestinationProvider),
-        platform: ref.watch(selectedPlatformProvider),
-      );
-});
-
-final applicationListProvider =
-    FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
-  return ref.watch(firstLookRepositoryProvider).listApplications(
-        destination: ref.watch(selectedDestinationProvider),
-        platform: ref.watch(selectedPlatformProvider),
-      );
-});
 
 final activeDropProvider = FutureProvider<ActiveDropBatch?>((Ref ref) {
   return ref.watch(firstLookRepositoryProvider).activeDrop(
+        platform: ref.watch(selectedPlatformProvider),
+      );
+});
+
+final leaderboardProvider =
+    FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).leaderboard(
         platform: ref.watch(selectedPlatformProvider),
       );
 });

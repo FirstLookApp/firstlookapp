@@ -10,63 +10,6 @@ class FirstLookRemoteDataSource {
 
   final Dio _dio;
 
-  Future<List<DiscoveryItem>> discover({
-    required SubmitDestination destination,
-    required PlatformType platform,
-  }) async {
-    final Response<Map<String, dynamic>> response =
-        await _dio.get<Map<String, dynamic>>(
-      '${ApiPaths.discovery}/${destination.label}',
-      queryParameters: <String, dynamic>{'platform': platform.label},
-      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
-    );
-
-    final ApiEnvelope<List<DiscoveryItem>> envelope =
-        ApiEnvelope<List<DiscoveryItem>>.fromJson(
-      response.data ?? <String, dynamic>{},
-      (Object? json) {
-        final List<Object?> items = json is List<Object?> ? json : <Object?>[];
-        return items
-            .whereType<Map<String, dynamic>>()
-            .map<DiscoveryItem>(DiscoveryItem.fromJson)
-            .toList(growable: false);
-      },
-    );
-
-    return envelope.data;
-  }
-
-  Future<PagedResult<ApplicationListItem>> listApplications({
-    required SubmitDestination destination,
-    required PlatformType platform,
-    int pageNumber = 1,
-    int pageSize = 20,
-    String? search,
-  }) async {
-    final Response<Map<String, dynamic>> response =
-        await _dio.get<Map<String, dynamic>>(
-      '${ApiPaths.discovery}/${destination.label}/list',
-      queryParameters: <String, dynamic>{
-        'platform': platform.label,
-        'pageNumber': pageNumber,
-        'pageSize': pageSize,
-        if (search != null && search.isNotEmpty) 'search': search,
-      },
-      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
-    );
-
-    final ApiEnvelope<PagedResult<ApplicationListItem>> envelope =
-        ApiEnvelope<PagedResult<ApplicationListItem>>.fromJson(
-      response.data ?? <String, dynamic>{},
-      (Object? json) => PagedResult<ApplicationListItem>.fromJson(
-        json,
-        ApplicationListItem.fromJson,
-      ),
-    );
-
-    return envelope.data;
-  }
-
   Future<ActiveDropBatch?> activeDrop({
     required PlatformType platform,
   }) async {
@@ -89,28 +32,35 @@ class FirstLookRemoteDataSource {
       return envelope.data;
     } on DioException catch (error) {
       if (error.response?.statusCode == 404) {
-        final PagedResult<ApplicationListItem> fallback =
-            await listApplications(
-          destination: SubmitDestination.drop,
-          platform: platform,
-        );
-
-        if (fallback.items.isEmpty) {
-          return null;
-        }
-
-        return ActiveDropBatch(
-          id: '',
-          name: '',
-          platform: platform.apiValue,
-          plannedStartAt: null,
-          publishedAt: null,
-          items: fallback.items,
-        );
+        return null;
       }
 
       rethrow;
     }
+  }
+
+  Future<PagedResult<ApplicationListItem>> leaderboard({
+    required PlatformType platform,
+    int pageNumber = 1,
+    int pageSize = 50,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.leaderboard,
+      queryParameters: <String, dynamic>{
+        'platform': platform.label,
+        'pageNumber': pageNumber,
+        'pageSize': pageSize,
+      },
+      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
+    );
+    return ApiEnvelope<PagedResult<ApplicationListItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<ApplicationListItem>.fromJson(
+        json,
+        ApplicationListItem.fromJson,
+      ),
+    ).data;
   }
 
   Future<String> submitApplication(SubmitApplicationPayload payload) async {
@@ -156,7 +106,23 @@ class FirstLookRemoteDataSource {
         try {
           return await _detail(id: id, platform: PlatformType.ios);
         } on DioException {
-          return _detail(id: id, platform: PlatformType.android);
+          try {
+            return await _detail(id: id, platform: PlatformType.android);
+          } on DioException {
+            final ApplicationDetail? fallback =
+                await _fallbackDetailFromMyApplications(id);
+            if (fallback != null) {
+              return fallback;
+            }
+          }
+        }
+      }
+
+      if (error.response?.statusCode == 404 || error.response?.statusCode == 500) {
+        final ApplicationDetail? fallback =
+            await _fallbackDetailFromMyApplications(id);
+        if (fallback != null) {
+          return fallback;
         }
       }
 
@@ -182,6 +148,43 @@ class FirstLookRemoteDataSource {
     );
 
     return envelope.data;
+  }
+
+  Future<ApplicationDetail?> _fallbackDetailFromMyApplications(String id) async {
+    try {
+      final PagedResult<ApplicationListItem> mine = await myApplications(
+        pageNumber: 1,
+        pageSize: 100,
+      );
+      final ApplicationListItem? item = mine.items.cast<ApplicationListItem?>().firstWhere(
+            (ApplicationListItem? entry) => entry?.id == id,
+            orElse: () => null,
+          );
+
+      if (item == null) {
+        return null;
+      }
+
+      return ApplicationDetail(
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        description: item.shortDescription,
+        videoUrl: '',
+        platform: item.platform,
+        appStoreUrl: null,
+        googlePlayUrl: null,
+        destination: item.destination,
+        screenshots: item.mainScreenshot.isEmpty
+            ? const <String>[]
+            : <String>[item.mainScreenshot],
+        isLiked: false,
+        likeCount: 0,
+        commentCount: 0,
+      );
+    } on DioException {
+      return null;
+    }
   }
 
   Future<PagedResult<CommentItem>> comments(String id) async {
@@ -253,17 +256,6 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
-  Future<void> requestBetaAccess({
-    required String id,
-    required String email,
-  }) async {
-    await _dio.post<Map<String, dynamic>>(
-      '${ApiPaths.interactions}/$id/beta-request',
-      data: <String, dynamic>{'email': email},
-      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
-    );
-  }
-
   Future<UserProfile> profile() async {
     final Response<Map<String, dynamic>> response =
         await _dio.get<Map<String, dynamic>>(ApiPaths.profileMe);
@@ -275,6 +267,30 @@ class FirstLookRemoteDataSource {
     );
 
     return envelope.data;
+  }
+
+  Future<UserProfile> updateProfile({
+    required String firstName,
+    required String lastName,
+    required String biography,
+    String? avatarId,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.put<Map<String, dynamic>>(
+      ApiPaths.profileMe,
+      data: <String, dynamic>{
+        'firstName': firstName,
+        'lastName': lastName,
+        'biography': biography,
+        'avatarId': avatarId,
+      },
+    );
+    return ApiEnvelope<UserProfile>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => UserProfile.fromJson(
+        json is Map<String, dynamic> ? json : <String, dynamic>{},
+      ),
+    ).data;
   }
 
   Future<List<AvatarOption>> avatars() async {

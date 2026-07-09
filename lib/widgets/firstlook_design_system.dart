@@ -50,7 +50,11 @@ class FirstLookScreenHeader extends ConsumerWidget {
               FirstLookIconButton(
                 icon: Icons.notifications_none_rounded,
                 size: 19,
-                onTap: () => context.push(RouteNames.notificationsPath),
+                onTap: () => context.push(
+                  RouteNames.notificationsLocation(
+                    currentPath: GoRouterState.of(context).uri.path,
+                  ),
+                ),
               ),
               FirstLookIconButton(
                 icon: Icons.search_rounded,
@@ -595,26 +599,6 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
         final repository = ref.read(firstLookRepositoryProvider);
         final List<PagedResult<ApplicationListItem>> pages = await Future.wait(
           <Future<PagedResult<ApplicationListItem>>>[
-            repository.listApplications(
-              destination: SubmitDestination.drop,
-              platform: PlatformType.ios,
-              search: query,
-            ),
-            repository.listApplications(
-              destination: SubmitDestination.test,
-              platform: PlatformType.ios,
-              search: query,
-            ),
-            repository.listApplications(
-              destination: SubmitDestination.drop,
-              platform: PlatformType.android,
-              search: query,
-            ),
-            repository.listApplications(
-              destination: SubmitDestination.test,
-              platform: PlatformType.android,
-              search: query,
-            ),
             repository.myApplications(
               search: query,
             ),

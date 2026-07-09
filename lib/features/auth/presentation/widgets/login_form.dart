@@ -75,8 +75,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         const SizedBox(height: 30),
         AuthTextField(
           controller: _emailController,
-          label: l10n.authEmailAddressLabel,
-          hint: l10n.loginEmailHint,
+          label: l10n.loginIdentifierLabel,
+          hint: l10n.loginIdentifierHint,
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 16),

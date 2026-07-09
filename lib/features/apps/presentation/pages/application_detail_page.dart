@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
@@ -10,7 +12,6 @@ import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/app_error_state.dart';
 import 'package:firstlook/widgets/app_loading_indicator.dart';
-import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,12 +33,10 @@ class ApplicationDetailPage extends ConsumerStatefulWidget {
 
 class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
   final TextEditingController _comment = TextEditingController();
-  final TextEditingController _betaEmail = TextEditingController();
 
   @override
   void dispose() {
     _comment.dispose();
-    _betaEmail.dispose();
     super.dispose();
   }
 
@@ -68,41 +67,30 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
         ),
       ),
       body: detail.when(
-        data: (ApplicationDetail app) => SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.screenHorizontal,
-              8,
-              AppSpacing.screenHorizontal,
-              24,
-            ),
-            children: <Widget>[
-              _DetailHeader(
-                app: app,
-                onLike: () async {
-                  await ref
-                      .read(firstLookRepositoryProvider)
-                      .toggleLike(app.id);
-                  ref.invalidate(applicationDetailProvider(request));
-                },
+        data: (ApplicationDetail app) {
+          final bool canOpenStore = _resolveStoreUrl(app) != null;
+
+          return SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenHorizontal,
+                8,
+                AppSpacing.screenHorizontal,
+                24,
               ),
-              const SizedBox(height: 18),
-              if (app.destination ==
-                  SubmitDestination.test.apiValue) ...<Widget>[
-                _BetaAccessCard(
-                  controller: _betaEmail,
-                  onSubmit: () async {
+              children: <Widget>[
+                _DetailHeader(
+                  app: app,
+                  openStoreLabel: l10n.detailOpenStore,
+                  onOpenStore: canOpenStore ? () => _handleOpenStore(app, l10n) : null,
+                  onLike: () async {
                     await ref
                         .read(firstLookRepositoryProvider)
-                        .requestBetaAccess(
-                          id: app.id,
-                          email: _betaEmail.text.trim(),
-                        );
-                    _betaEmail.clear();
+                        .toggleLike(app.id);
+                    ref.invalidate(applicationDetailProvider(request));
                   },
                 ),
-                const SizedBox(height: 18),
-              ],
+              const SizedBox(height: 18),
               _ScreenshotRail(screenshots: app.screenshots),
               const SizedBox(height: 22),
               Text(
@@ -166,31 +154,10 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                   ref.invalidate(commentsProvider(app.id));
                 },
               ),
-              if (app.destination !=
-                  SubmitDestination.test.apiValue) ...<Widget>[
-                const SizedBox(height: 22),
-                FirstLookPrimaryButton(
-                  label: l10n.detailOpenStore,
-                  icon: Icons.file_download_outlined,
-                  onPressed: () async {
-                    final String url = await ref
-                        .read(firstLookRepositoryProvider)
-                        .trackStoreClick(
-                          id: app.id,
-                          platform: widget.initialPlatform,
-                        );
-                    if (url.isNotEmpty) {
-                      await launchUrl(
-                        Uri.parse(url),
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                  },
-                ),
               ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
         error: (Object error, StackTrace stackTrace) => AppErrorState(
           message: error is AppException
               ? error.message
@@ -201,15 +168,75 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
       ),
     );
   }
+
+  Future<void> _handleOpenStore(
+    ApplicationDetail app,
+    AppLocalizations l10n,
+  ) async {
+    final String? directUrl = _resolveStoreUrl(app);
+
+    if (directUrl == null || directUrl.isEmpty) {
+      _showMessage(l10n.commonUnexpectedError);
+      return;
+    }
+
+    final Uri? uri = Uri.tryParse(directUrl);
+    if (uri == null) {
+      _showMessage(l10n.commonUnexpectedError);
+      return;
+    }
+
+    final bool launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+    if (!launched) {
+      _showMessage(l10n.commonUnexpectedError);
+      return;
+    }
+
+    unawaited(
+      ref.read(firstLookRepositoryProvider).trackStoreClick(
+            id: app.id,
+            platform: widget.initialPlatform,
+          ),
+    );
+  }
+
+  String? _resolveStoreUrl(ApplicationDetail app) {
+    final String? appStoreUrl = _normalizeStoreUrl(app.appStoreUrl);
+    final String? googlePlayUrl = _normalizeStoreUrl(app.googlePlayUrl);
+
+    switch (widget.initialPlatform) {
+      case PlatformType.ios:
+        return appStoreUrl ?? googlePlayUrl;
+      case PlatformType.android:
+        return googlePlayUrl ?? appStoreUrl;
+      case PlatformType.both:
+        return appStoreUrl ?? googlePlayUrl;
+    }
+  }
+
+  String? _normalizeStoreUrl(String? value) {
+    final String trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? null : trimmed;
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 }
 
 class _DetailHeader extends StatelessWidget {
   const _DetailHeader({
     required this.app,
+    required this.openStoreLabel,
+    required this.onOpenStore,
     required this.onLike,
   });
 
   final ApplicationDetail app;
+  final String openStoreLabel;
+  final VoidCallback? onOpenStore;
   final VoidCallback onLike;
 
   @override
@@ -291,17 +318,40 @@ class _DetailHeader extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
+                  if (onOpenStore != null) ...<Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: onOpenStore,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 32),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        icon: const Icon(
+                          Icons.open_in_new_rounded,
+                          size: 16,
+                        ),
+                        label: Text(
+                          openStoreLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     children: <Widget>[
                       _MetaChip(label: app.category),
-                      _MetaChip(
-                        label:
-                            app.destination == SubmitDestination.test.apiValue
-                                ? l10n.detailJoinBeta
-                                : l10n.dropTab,
-                      ),
+                      _MetaChip(label: l10n.dropTab),
                     ],
                   ),
                 ],
@@ -336,60 +386,6 @@ class _MetaChip extends StatelessWidget {
           fontSize: 9,
           fontWeight: FontWeight.w800,
         ),
-      ),
-    );
-  }
-}
-
-class _BetaAccessCard extends StatelessWidget {
-  const _BetaAccessCard({
-    required this.controller,
-    required this.onSubmit,
-  });
-
-  final TextEditingController controller;
-  final VoidCallback onSubmit;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    return FirstLookSoftCard(
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              const Icon(
-                Icons.verified_rounded,
-                color: AppColors.primary,
-                size: 18,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.detailJoinBeta,
-                style: const TextStyle(
-                  color: AppColors.secondary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          AuthTextField(
-            controller: controller,
-            label: l10n.authEmailAddressLabel,
-            hint: l10n.loginEmailHint,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          FirstLookPrimaryButton(
-            label: l10n.betaAccessRequestButton,
-            onPressed: onSubmit,
-          ),
-        ],
       ),
     );
   }

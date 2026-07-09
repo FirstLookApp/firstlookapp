@@ -49,12 +49,14 @@ class AuthInterceptor extends Interceptor {
     ErrorInterceptorHandler handler,
   ) async {
     final bool isUnauthorized = err.response?.statusCode == 401;
+    final bool requiresAuth =
+        err.requestOptions.extra['requiresAuth'] as bool? ?? true;
     final bool isRefreshCall =
         err.requestOptions.extra['isRefreshCall'] as bool? ?? false;
     final bool alreadyRetried =
         err.requestOptions.extra['hasRetried'] as bool? ?? false;
 
-    if (!isUnauthorized || isRefreshCall || alreadyRetried) {
+    if (!isUnauthorized || !requiresAuth || isRefreshCall || alreadyRetried) {
       handler.next(err);
       return;
     }

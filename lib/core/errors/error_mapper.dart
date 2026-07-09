@@ -7,8 +7,10 @@ abstract final class ErrorMapper {
   static AppException mapDioError(DioException error) {
     final Object? data = error.response?.data;
     final int? statusCode = error.response?.statusCode;
+    final bool requiresAuth =
+        error.requestOptions.extra['requiresAuth'] as bool? ?? true;
 
-    if (statusCode == 401) {
+    if (statusCode == 401 && requiresAuth) {
       return const AppException(
         message: 'Your session expired. Please sign in again.',
         code: 401,
