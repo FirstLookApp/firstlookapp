@@ -130,7 +130,6 @@ class DiscoverPage extends ConsumerWidget {
                           final ApplicationListItem item = entry.value;
 
                           return _DropAppCard(
-                            rank: entry.key + 1,
                             item: item,
                             buttonLabel: l10n.discoverReviewButton,
                             onTap: () => context.push(
@@ -626,13 +625,11 @@ class _PodiumEntry extends StatelessWidget {
 
 class _DropAppCard extends StatelessWidget {
   const _DropAppCard({
-    required this.rank,
     required this.item,
     required this.buttonLabel,
     required this.onTap,
   });
 
-  final int rank;
   final ApplicationListItem item;
   final String buttonLabel;
   final VoidCallback onTap;
@@ -660,20 +657,6 @@ class _DropAppCard extends StatelessWidget {
         ),
         child: Row(
           children: <Widget>[
-            SizedBox(
-              width: 28,
-              child: Text(
-                rank.toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: AppColors.secondary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
             _LeaderboardImage(
               imagePath: item.mainScreenshot,
               size: 64,

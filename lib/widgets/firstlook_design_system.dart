@@ -19,24 +19,46 @@ class FirstLookScreenHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        FirstLookIconButton(
-          icon: Icons.grid_view_rounded,
-          onTap: () => showFirstLookSettings(context, ref),
-        ),
-        InkResponse(
-          onTap: () => context.go(RouteNames.discoverPath),
-          radius: 34,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-            child: FirstLookLogo(size: 33),
+        SizedBox(
+          width: 76,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: FirstLookIconButton(
+              icon: Icons.grid_view_rounded,
+              onTap: () => showFirstLookSettings(context, ref),
+            ),
           ),
         ),
-        FirstLookIconButton(
-          icon: Icons.search_rounded,
-          size: 27,
-          onTap: () => showFirstLookSearch(context, ref),
+        Expanded(
+          child: Center(
+            child: InkResponse(
+              onTap: () => context.go(RouteNames.discoverPath),
+              radius: 34,
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: FirstLookLogo(size: 33),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 76,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              FirstLookIconButton(
+                icon: Icons.notifications_none_rounded,
+                size: 19,
+                onTap: () => context.push(RouteNames.notificationsPath),
+              ),
+              FirstLookIconButton(
+                icon: Icons.search_rounded,
+                size: 22,
+                onTap: () => showFirstLookSearch(context, ref),
+              ),
+            ],
+          ),
         ),
       ],
     );
