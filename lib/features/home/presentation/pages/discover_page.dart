@@ -37,6 +37,10 @@ class DiscoverPage extends ConsumerWidget {
               : l10n.discoverSubtitle,
       orElse: () => l10n.discoverWeekBadge,
     );
+    final String bannerBackgroundImagePath = activeDrop.maybeWhen(
+      data: (ActiveDropBatch? drop) => drop?.backgroundImagePath ?? '',
+      orElse: () => '',
+    );
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,6 +63,7 @@ class DiscoverPage extends ConsumerWidget {
                 title: bannerTitle,
                 endsAt: bannerEndsAt,
                 badge: bannerDescription,
+                backgroundImagePath: bannerBackgroundImagePath,
               ),
               const SizedBox(height: 22),
               _SectionTitle(
@@ -219,11 +224,13 @@ class _WeeklyBanner extends StatelessWidget {
     required this.title,
     required this.endsAt,
     required this.badge,
+    required this.backgroundImagePath,
   });
 
   final String title;
   final DateTime? endsAt;
   final String badge;
+  final String backgroundImagePath;
 
   @override
   Widget build(BuildContext context) {
@@ -240,6 +247,24 @@ class _WeeklyBanner extends StatelessWidget {
         ),
         child: Stack(
           children: <Widget>[
+            if (backgroundImagePath.isNotEmpty)
+              Positioned.fill(
+                child: Image.network(
+                  UrlResolver.media(backgroundImagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object error,
+                          StackTrace? stackTrace) =>
+                      const SizedBox.shrink(),
+                ),
+              ),
+            if (backgroundImagePath.isNotEmpty)
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFE9EC).withValues(alpha: 0.42),
+                  ),
+                ),
+              ),
             Positioned(
               left: -24,
               top: 18,
