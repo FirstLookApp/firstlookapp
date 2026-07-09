@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firstlook/core/errors/app_exception.dart';
+import 'package:firstlook/core/providers/app_providers.dart';
+import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
+import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
@@ -14,6 +17,7 @@ import 'package:firstlook/widgets/firstlook_app_header.dart';
 import 'package:firstlook/widgets/firstlook_design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SubmitPage extends ConsumerStatefulWidget {
   const SubmitPage({super.key});
@@ -292,6 +296,14 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   }
 
   void _submit(AppLocalizations l10n, List<String> categories) {
+    final bool isAuthenticated =
+        ref.read(authControllerProvider).valueOrNull?.status ==
+            AuthStatus.authenticated;
+    if (!isAuthenticated) {
+      context.push(RouteNames.loginPath);
+      return;
+    }
+
     final String name = _name.text.trim();
     final String description = _description.text.trim();
     final String videoUrl = _videoUrl.text.trim();

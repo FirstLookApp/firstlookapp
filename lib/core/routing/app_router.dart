@@ -69,7 +69,11 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         return '${RouteNames.otpPath}?email=${Uri.encodeComponent(email)}';
       }
 
-      if (!isAuthenticated && !isAuthRoute) {
+      if (!isAuthenticated && state.matchedLocation == RouteNames.splashPath) {
+        return RouteNames.discoverPath;
+      }
+
+      if (!isAuthenticated && _requiresAuthentication(state.uri.path)) {
         return RouteNames.loginPath;
       }
 
@@ -212,6 +216,15 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
     ],
   );
 });
+
+bool _requiresAuthentication(String path) {
+  return path == RouteNames.favoritesPath ||
+      path.startsWith('${RouteNames.favoritesPath}/') ||
+      path == RouteNames.profilePath ||
+      path.startsWith('${RouteNames.profilePath}/') ||
+      path == RouteNames.notificationsPath ||
+      path.endsWith('/notifications');
+}
 
 void _invalidateUserScopedData(Ref ref) {
   ref
