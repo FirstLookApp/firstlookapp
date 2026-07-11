@@ -1220,117 +1220,123 @@ class _RankedDiscoverCard extends StatelessWidget {
     final bool topThree = rank <= 3;
     return Stack(
       children: <Widget>[
-        Container(
-          width: double.infinity,
-          constraints: const BoxConstraints(minHeight: 82),
-          padding: const EdgeInsets.fromLTRB(38, 10, 10, 10),
-          decoration: BoxDecoration(
-            color: rank.isEven
-                ? AppColors.surfaceAlt(context)
-                : AppColors.surface(context),
-            border: isLast
-                ? null
-                : Border(
-                    bottom: BorderSide(color: AppColors.outline(context)),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(minHeight: 82),
+              padding: const EdgeInsets.fromLTRB(38, 10, 10, 10),
+              decoration: BoxDecoration(
+                color: rank.isEven
+                    ? AppColors.surfaceAlt(context)
+                    : AppColors.surface(context),
+                border: isLast
+                    ? null
+                    : Border(
+                        bottom: BorderSide(color: AppColors.outline(context)),
+                      ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 48,
+                    height: 48,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceAlt(context),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: _LeaderboardImage(
+                      imagePath: item.mainScreenshot,
+                      size: 40,
+                      radius: 8,
+                    ),
                   ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: 48,
-                height: 48,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceAlt(context),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: _LeaderboardImage(
-                  imagePath: item.mainScreenshot,
-                  size: 40,
-                  radius: 8,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      item.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.textPrimary(context),
-                        fontSize: 13,
-                        height: 1.1,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                    if (item.category.trim().isNotEmpty) ...<Widget>[
-                      const SizedBox(height: 4),
-                      Text(
-                        item.category,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.textSecondary(context),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 5),
-                    Text(
-                      item.shortDescription,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.textSecondary(context),
-                        fontSize: 10,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 7),
-              SizedBox(
-                width: 68,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    _PressScaleButton(label: buttonLabel, onPressed: onTap),
-                    if (item.score > 0) ...<Widget>[
-                      const SizedBox(height: 5),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Icon(
-                            Icons.favorite_rounded,
-                            color: AppColors.textSecondary(context),
-                            size: 11,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          item.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.textPrimary(context),
+                            fontSize: 13,
+                            height: 1.1,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0,
                           ),
-                          const SizedBox(width: 4),
+                        ),
+                        if (item.category.trim().isNotEmpty) ...<Widget>[
+                          const SizedBox(height: 4),
                           Text(
-                            item.score.toStringAsFixed(1),
+                            item.category,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: AppColors.textSecondary(context),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0,
                             ),
                           ),
                         ],
-                      ),
-                    ],
-                  ],
-                ),
+                        const SizedBox(height: 5),
+                        Text(
+                          item.shortDescription,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 10,
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  SizedBox(
+                    width: 68,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        _PressScaleButton(label: buttonLabel, onPressed: onTap),
+                        if (item.score > 0) ...<Widget>[
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(
+                                Icons.favorite_rounded,
+                                color: AppColors.textSecondary(context),
+                                size: 11,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                item.score.toStringAsFixed(1),
+                                style: TextStyle(
+                                  color: AppColors.textSecondary(context),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         Positioned(

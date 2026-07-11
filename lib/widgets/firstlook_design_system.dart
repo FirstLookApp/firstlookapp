@@ -436,6 +436,12 @@ class _FirstLookSettingsSheetState
                           icon: Icons.language_rounded,
                           title: l10n.settingsLanguage,
                           subtitle: l10n.settingsLanguageSubtitle,
+                          onTap: () =>
+                              ref.read(appLocaleProvider.notifier).setLocale(
+                                    Locale(
+                                      locale.languageCode == 'tr' ? 'en' : 'tr',
+                                    ),
+                                  ),
                           trailing: SizedBox(
                             width: 116,
                             child: FirstLookSegmentedControl<String>(
@@ -458,6 +464,9 @@ class _FirstLookSettingsSheetState
                           icon: Icons.volume_up_outlined,
                           title: l10n.settingsNotifications,
                           subtitle: l10n.settingsSoundSubtitle,
+                          onTap: () => ref
+                              .read(appFeedbackSettingsProvider.notifier)
+                              .setSoundEnabled(!settings.soundEnabled),
                           trailing: CupertinoSwitch(
                             value: settings.soundEnabled,
                             activeTrackColor: AppColors.primary,
@@ -474,6 +483,9 @@ class _FirstLookSettingsSheetState
                           icon: Icons.vibration_rounded,
                           title: l10n.settingsVibration,
                           subtitle: l10n.settingsVibrationSubtitle,
+                          onTap: () => ref
+                              .read(appFeedbackSettingsProvider.notifier)
+                              .setVibrationEnabled(!settings.vibrationEnabled),
                           trailing: CupertinoSwitch(
                             value: settings.vibrationEnabled,
                             activeTrackColor: AppColors.primary,
@@ -506,6 +518,9 @@ class _FirstLookSettingsSheetState
                           iconBackground: AppColors.surfaceAlt(context),
                           title: l10n.settingsDarkMode,
                           subtitle: l10n.settingsDarkModeSubtitle,
+                          onTap: () => ref
+                              .read(themeModeProvider.notifier)
+                              .setDarkMode(!darkModeEnabled),
                           trailing: CupertinoSwitch(
                             value: darkModeEnabled,
                             activeTrackColor: AppColors.primary,
