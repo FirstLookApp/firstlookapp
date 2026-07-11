@@ -10,23 +10,15 @@ class FirstLookLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget logo = Image.asset(
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Image.asset(
       'assets/images/firstlook-logo.png',
       height: size * 1.18,
       fit: BoxFit.contain,
       filterQuality: FilterQuality.high,
-    );
-
-    if (Theme.of(context).brightness == Brightness.light) {
-      return logo;
-    }
-
-    return ColorFiltered(
-      colorFilter: const ColorFilter.mode(
-        Color(0x52FFFFFF),
-        BlendMode.screen,
-      ),
-      child: logo,
+      color: isDark ? const Color(0x52FFFFFF) : null,
+      colorBlendMode: isDark ? BlendMode.srcATop : null,
     );
   }
 }

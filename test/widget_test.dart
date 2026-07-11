@@ -2,6 +2,7 @@ import 'package:firstlook/features/onboarding/presentation/pages/onboarding_page
 import 'package:firstlook/features/onboarding/presentation/pages/review_onboarding_page.dart';
 import 'package:firstlook/features/onboarding/presentation/pages/reward_onboarding_page.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/widgets/firstlook_logo.dart';
 import 'package:firstlook/widgets/firstlook_startup_experience.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,6 +10,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('dark logo keeps its blend inside the image paint',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: const Scaffold(body: FirstLookLogo()),
+      ),
+    );
+
+    expect(find.byType(ColorFiltered), findsNothing);
+
+    final Image logo = tester.widget<Image>(find.byType(Image));
+    expect(logo.color, const Color(0x52FFFFFF));
+    expect(logo.colorBlendMode, BlendMode.srcATop);
+  });
+
   testWidgets('startup waits for app readiness before revealing content',
       (WidgetTester tester) async {
     bool isAppReady = false;
