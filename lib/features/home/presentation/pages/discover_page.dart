@@ -1201,23 +1201,8 @@ class _RankedDiscoverCard extends StatelessWidget {
   final String buttonLabel;
   final VoidCallback onTap;
 
-  Color get _badgeFill => switch (rank) {
-        1 => const Color(0xFFFFB20F),
-        2 => const Color(0xFFA9ADB5),
-        3 => const Color(0xFFD96A19),
-        _ => Colors.white,
-      };
-
-  Color get _badgeShadowColor => switch (rank) {
-        1 => const Color(0xFFFFB20F),
-        2 => const Color(0xFFA9ADB5),
-        3 => const Color(0xFFA9ADB5),
-        _ => Colors.transparent,
-      };
-
   @override
   Widget build(BuildContext context) {
-    final bool topThree = rank <= 3;
     return Stack(
       children: <Widget>[
         Material(
@@ -1227,7 +1212,7 @@ class _RankedDiscoverCard extends StatelessWidget {
             child: Container(
               width: double.infinity,
               constraints: const BoxConstraints(minHeight: 82),
-              padding: const EdgeInsets.fromLTRB(38, 10, 10, 10),
+              padding: const EdgeInsets.fromLTRB(64, 10, 10, 10),
               decoration: BoxDecoration(
                 color: rank.isEven
                     ? AppColors.surfaceAlt(context)
@@ -1340,48 +1325,132 @@ class _RankedDiscoverCard extends StatelessWidget {
           ),
         ),
         Positioned(
-          left: 9,
+          left: 6,
           top: 0,
-          bottom: 12,
+          bottom: 0,
           child: Center(
-            child: Container(
-              width: 20,
-              height: 20,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: _badgeFill,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: topThree ? Colors.white : AppColors.outline(context),
-                  width: topThree ? 1.3 : 1,
-                ),
-                boxShadow: topThree
-                    ? <BoxShadow>[
-                        BoxShadow(
-                          color: _badgeShadowColor.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Text(
-                rank.toString(),
-                style: TextStyle(
-                  color:
-                      topThree ? Colors.white : AppColors.textPrimary(context),
-                  fontSize: 9,
-                  height: 1,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0,
-                ),
-              ),
-            ),
+            child: _LaurelRankBadge(rank: rank),
           ),
         ),
       ],
     );
   }
+}
+
+class _LaurelRankBadge extends StatelessWidget {
+  const _LaurelRankBadge({required this.rank});
+
+  final int rank;
+
+  Color get _laurelColor => switch (rank) {
+        1 => const Color(0xFFFFC43D),
+        2 => const Color(0xFFD8DEE8),
+        3 => const Color(0xFFD9984F),
+        _ => const Color(0xFFFFC43D),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: 50,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          CustomPaint(
+            size: const Size.square(50),
+            painter: _LaurelWreathPainter(color: _laurelColor),
+          ),
+          Container(
+            width: 27,
+            height: 27,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF171927),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withValues(alpha: 0.75)),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: _laurelColor.withValues(alpha: 0.35),
+                  blurRadius: 8,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: Text(
+              rank.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LaurelWreathPainter extends CustomPainter {
+  const _LaurelWreathPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint branchPaint = Paint()
+      ..color = color.withValues(alpha: 0.86)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+    final Paint leafPaint = Paint()..color = color;
+    final Offset center = Offset(size.width / 2, size.height / 2);
+
+    for (final double side in <double>[-1, 1]) {
+      final Path branch = Path()
+        ..moveTo(center.dx + (side * 7), size.height * 0.86)
+        ..quadraticBezierTo(
+          center.dx + (side * 22),
+          size.height * 0.72,
+          center.dx + (side * 17),
+          size.height * 0.28,
+        );
+      canvas.drawPath(branch, branchPaint);
+
+      for (int index = 0; index < 6; index++) {
+        final double progress = index / 5;
+        final double x = center.dx + (side * (10 + (12 * (1 - progress))));
+        final double y = size.height * (0.78 - (progress * 0.5));
+        final double rotation =
+            side < 0 ? -0.65 + (progress * 0.3) : 0.65 - (progress * 0.3);
+
+        canvas.save();
+        canvas.translate(x, y);
+        canvas.rotate(rotation);
+        canvas.drawOval(
+          Rect.fromCenter(center: Offset.zero, width: 4.8, height: 10),
+          leafPaint,
+        );
+        canvas.restore();
+      }
+    }
+
+    final Paint stemPaint = Paint()
+      ..color = color
+      ..strokeWidth = 1.8
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(
+      Offset(center.dx - 4, size.height * 0.85),
+      Offset(center.dx + 4, size.height * 0.85),
+      stemPaint,
+    );
+    canvas.drawCircle(Offset(center.dx, size.height * 0.85), 2.2, leafPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _LaurelWreathPainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _PressScaleButton extends StatefulWidget {
