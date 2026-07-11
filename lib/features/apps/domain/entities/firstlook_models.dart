@@ -197,6 +197,8 @@ class ApplicationDetail {
     required this.isLiked,
     required this.likeCount,
     required this.commentCount,
+    required this.ownerId,
+    required this.ownerUsername,
   });
 
   factory ApplicationDetail.fromJson(Map<String, dynamic> json) {
@@ -219,6 +221,8 @@ class ApplicationDetail {
       isLiked: json['isLiked'] as bool? ?? false,
       likeCount: json['likeCount'] as int? ?? 0,
       commentCount: json['commentCount'] as int? ?? 0,
+      ownerId: json['ownerId'] as String? ?? '',
+      ownerUsername: json['ownerUsername'] as String? ?? '',
     );
   }
 
@@ -235,6 +239,8 @@ class ApplicationDetail {
   final bool isLiked;
   final int likeCount;
   final int commentCount;
+  final String ownerId;
+  final String ownerUsername;
 }
 
 class CommentItem {

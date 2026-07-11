@@ -360,6 +360,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get detailOpenStore => 'Open in App Store';
 
   @override
+  String get detailCreatedBy => 'Created by';
+
+  @override
   String get commentHint => 'Write a comment';
 
   @override

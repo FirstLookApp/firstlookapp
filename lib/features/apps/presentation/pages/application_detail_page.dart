@@ -88,8 +88,17 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                 _DetailHeader(
                   app: app,
                   openStoreLabel: l10n.detailOpenStore,
+                  createdByLabel: l10n.detailCreatedBy,
                   onOpenStore:
                       canOpenStore ? () => _handleOpenStore(app, l10n) : null,
+                  onOwnerTap: app.ownerId.isEmpty || app.ownerUsername.isEmpty
+                      ? null
+                      : () => context.push(
+                            RouteNames.userProfileLocation(
+                              app.ownerId,
+                              currentPath: GoRouterState.of(context).uri.path,
+                            ),
+                          ),
                   onLike: () async {
                     if (!isAuthenticated) {
                       context.push(RouteNames.loginPath);
@@ -249,13 +258,17 @@ class _DetailHeader extends StatelessWidget {
   const _DetailHeader({
     required this.app,
     required this.openStoreLabel,
+    required this.createdByLabel,
     required this.onOpenStore,
+    required this.onOwnerTap,
     required this.onLike,
   });
 
   final ApplicationDetail app;
   final String openStoreLabel;
+  final String createdByLabel;
   final VoidCallback? onOpenStore;
+  final VoidCallback? onOwnerTap;
   final VoidCallback onLike;
 
   @override
@@ -359,6 +372,34 @@ class _DetailHeader extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                  if (onOwnerTap != null) ...<Widget>[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: onOwnerTap,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.secondary,
+                          padding: EdgeInsets.zero,
+                          minimumSize: const Size(0, 28),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        icon: const Icon(
+                          Icons.person_outline_rounded,
+                          size: 16,
+                        ),
+                        label: Text(
+                          '$createdByLabel @${app.ownerUsername}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
                       ),

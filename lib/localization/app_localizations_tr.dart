@@ -358,6 +358,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get detailOpenStore => 'Uygulama Mağazasında Aç';
 
   @override
+  String get detailCreatedBy => 'Yapan:';
+
+  @override
   String get commentHint => 'Yorum yaz';
 
   @override

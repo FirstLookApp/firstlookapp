@@ -770,6 +770,12 @@ abstract class AppLocalizations {
   /// **'Open in App Store'**
   String get detailOpenStore;
 
+  /// No description provided for @detailCreatedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Created by'**
+  String get detailCreatedBy;
+
   /// No description provided for @commentHint.
   ///
   /// In en, this message translates to:

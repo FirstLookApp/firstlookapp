@@ -184,6 +184,8 @@ class FirstLookRemoteDataSource {
         isLiked: false,
         likeCount: 0,
         commentCount: 0,
+        ownerId: '',
+        ownerUsername: '',
       );
     } on DioException {
       return null;
