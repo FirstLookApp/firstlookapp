@@ -1423,7 +1423,7 @@ class _LaurelWreathPainter extends CustomPainter {
         final double x = center.dx + (side * (11 + (17 * (1 - progress))));
         final double y = size.height * (0.8 - (progress * 0.62));
         final double rotation =
-            side < 0 ? -0.95 + (progress * 0.4) : 0.95 - (progress * 0.4);
+            side < 0 ? 0.95 - (progress * 0.4) : -0.95 + (progress * 0.4);
 
         canvas.save();
         canvas.translate(x, y);
