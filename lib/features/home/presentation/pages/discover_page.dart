@@ -1418,18 +1418,18 @@ class _LaurelWreathPainter extends CustomPainter {
         );
       canvas.drawPath(branch, branchPaint);
 
-      for (int index = 0; index < 10; index++) {
-        final double progress = index / 9;
+      for (int index = 0; index < 8; index++) {
+        final double progress = index / 7;
         final double curve = 4 * progress * (1 - progress);
         final double x =
-            center.dx + (side * (8 + (8 * progress) + (13 * curve)));
-        final double y = size.height * (0.79 - (progress * 0.63));
+            center.dx + (side * (9 + (7 * progress) + (11 * curve)));
+        final double y = size.height * (0.76 - (progress * 0.55));
         final bool outerLeaf = index.isEven;
         final double rotation = switch ((side < 0, outerLeaf)) {
-          (true, true) => -2.15 - (0.42 * curve) + (0.2 * progress),
-          (true, false) => -0.96 + (0.16 * curve) - (0.08 * progress),
-          (false, true) => -0.99 + (0.42 * curve) - (0.2 * progress),
-          (false, false) => -2.18 - (0.16 * curve) + (0.08 * progress),
+          (true, true) => -2.05 - (0.25 * curve) + (0.1 * progress),
+          (true, false) => -1.04 + (0.1 * curve) - (0.05 * progress),
+          (false, true) => -1.09 + (0.25 * curve) - (0.1 * progress),
+          (false, false) => -2.1 - (0.1 * curve) + (0.05 * progress),
         };
 
         canvas.save();
@@ -1437,8 +1437,8 @@ class _LaurelWreathPainter extends CustomPainter {
         canvas.rotate(rotation);
         final Path leaf = Path()
           ..moveTo(0, 0)
-          ..quadraticBezierTo(5.1, -3.05, 10.1, 0)
-          ..quadraticBezierTo(5.1, 3.05, 0, 0)
+          ..quadraticBezierTo(4.45, -2.65, 8.9, 0)
+          ..quadraticBezierTo(4.45, 2.65, 0, 0)
           ..close();
         canvas.drawPath(leaf, leafPaint);
         canvas.restore();
