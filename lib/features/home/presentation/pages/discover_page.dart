@@ -1411,24 +1411,33 @@ class _LaurelWreathPainter extends CustomPainter {
       final Path branch = Path()
         ..moveTo(center.dx + (side * 4), size.height * 0.86)
         ..quadraticBezierTo(
-          center.dx + (side * 26),
-          size.height * 0.67,
-          center.dx + (side * 20),
+          center.dx + (side * 31),
+          size.height * 0.56,
+          center.dx + (side * 16),
           size.height * 0.13,
         );
       canvas.drawPath(branch, branchPaint);
 
       for (int index = 0; index < 6; index++) {
         final double progress = index / 5;
-        final double x = center.dx + (side * (8 + (13 * progress)));
+        final double curve = 4 * progress * (1 - progress);
+        final double x =
+            center.dx + (side * (8 + (8 * progress) + (15 * curve)));
         final double y = size.height * (0.79 - (progress * 0.61));
-        final List<double> leafRotations =
-            side < 0 ? <double>[-2.22, -0.92] : <double>[-0.92, -2.22];
+        final List<double> leafRotations = side < 0
+            ? <double>[
+                -2.15 - (0.5 * curve) + (0.25 * progress),
+                -0.92 + (0.25 * curve) - (0.1 * progress),
+              ]
+            : <double>[
+                -0.99 + (0.5 * curve) - (0.25 * progress),
+                -2.22 - (0.25 * curve) + (0.1 * progress),
+              ];
 
         for (final double rotation in leafRotations) {
           canvas.save();
           canvas.translate(x, y);
-          canvas.rotate(rotation + ((progress - 0.5) * side * 0.18));
+          canvas.rotate(rotation);
           final Path leaf = Path()
             ..moveTo(0, 0)
             ..quadraticBezierTo(5.6, -3.25, 10.8, 0)
