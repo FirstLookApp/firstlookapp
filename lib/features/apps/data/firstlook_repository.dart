@@ -17,8 +17,9 @@ class FirstLookRepository {
 
   Future<PagedResult<ApplicationListItem>> leaderboard({
     required PlatformType platform,
+    required LeaderboardPeriod period,
   }) {
-    return _remoteDataSource.leaderboard(platform: platform);
+    return _remoteDataSource.leaderboard(platform: platform, period: period);
   }
 
   Future<String> submitApplication(SubmitApplicationPayload payload) {

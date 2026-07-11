@@ -41,6 +41,7 @@ class FirstLookRemoteDataSource {
 
   Future<PagedResult<ApplicationListItem>> leaderboard({
     required PlatformType platform,
+    required LeaderboardPeriod period,
     int pageNumber = 1,
     int pageSize = 50,
   }) async {
@@ -49,6 +50,7 @@ class FirstLookRemoteDataSource {
       ApiPaths.leaderboard,
       queryParameters: <String, dynamic>{
         'platform': platform.label,
+        'period': period.apiValue,
         'pageNumber': pageNumber,
         'pageSize': pageSize,
       },

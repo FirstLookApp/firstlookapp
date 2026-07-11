@@ -702,8 +702,11 @@ class LeaderboardPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final LeaderboardPeriod selectedPeriod = ref.watch(
+      leaderboardPeriodProvider,
+    );
     final AsyncValue<PagedResult<ApplicationListItem>> leaderboard =
-        ref.watch(leaderboardProvider);
+        ref.watch(leaderboardProvider(selectedPeriod));
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
@@ -711,7 +714,9 @@ class LeaderboardPage extends ConsumerWidget {
         color: AppColors.background(context),
         child: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () async => ref.invalidate(leaderboardProvider),
+            onRefresh: () async => ref.invalidate(
+              leaderboardProvider(selectedPeriod),
+            ),
             child: leaderboard.when(
               data: (PagedResult<ApplicationListItem> result) {
                 final List<ApplicationListItem> items = result.items;
@@ -728,6 +733,14 @@ class LeaderboardPage extends ConsumerWidget {
                     const SizedBox(height: 28),
                     _SectionTitle(title: l10n.leaderboardTitle),
                     const SizedBox(height: 16),
+                    _LeaderboardPeriodTabs(
+                      selected: selectedPeriod,
+                      onChanged: (LeaderboardPeriod period) {
+                        ref.read(leaderboardPeriodProvider.notifier).state =
+                            period;
+                      },
+                    ),
+                    const SizedBox(height: 22),
                     if (items.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 32),
@@ -743,9 +756,8 @@ class LeaderboardPage extends ConsumerWidget {
                         ),
                       )
                     else
-                      _DropLeaderboard(
+                      _OwnerLeaderboard(
                         items: items,
-                        buttonLabel: l10n.discoverReviewButton,
                         onTap: (ApplicationListItem item) => context.push(
                           RouteNames.applicationDetailLocation(
                             id: item.id,
@@ -759,12 +771,431 @@ class LeaderboardPage extends ConsumerWidget {
               },
               error: (Object error, StackTrace stackTrace) => AppErrorState(
                 message: error.toString(),
-                onRetry: () => ref.invalidate(leaderboardProvider),
+                onRetry: () =>
+                    ref.invalidate(leaderboardProvider(selectedPeriod)),
               ),
               loading: () => const AppLoadingIndicator(),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardPeriodTabs extends StatelessWidget {
+  const _LeaderboardPeriodTabs({
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final LeaderboardPeriod selected;
+  final ValueChanged<LeaderboardPeriod> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isTurkish = Localizations.localeOf(context).languageCode == 'tr';
+    const List<LeaderboardPeriod> periods = LeaderboardPeriod.values;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.outline(context)),
+      ),
+      child: Row(
+        children: periods.map((LeaderboardPeriod period) {
+          final bool isSelected = period == selected;
+          return Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onChanged(period),
+                borderRadius: BorderRadius.circular(12),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.surface(context)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: isSelected
+                        ? <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 9,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Text(
+                    _leaderboardPeriodLabel(period, isTurkish),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondary(context),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(growable: false),
+      ),
+    );
+  }
+}
+
+String _leaderboardPeriodLabel(LeaderboardPeriod period, bool isTurkish) {
+  if (isTurkish) {
+    return switch (period) {
+      LeaderboardPeriod.daily => 'GÜNLÜK',
+      LeaderboardPeriod.weekly => 'HAFTALIK',
+      LeaderboardPeriod.monthly => 'AYLIK',
+      LeaderboardPeriod.allTime => 'GENEL',
+    };
+  }
+
+  return switch (period) {
+    LeaderboardPeriod.daily => 'TODAY',
+    LeaderboardPeriod.weekly => 'WEEK',
+    LeaderboardPeriod.monthly => 'MONTH',
+    LeaderboardPeriod.allTime => 'ALL TIME',
+  };
+}
+
+class _OwnerLeaderboard extends StatelessWidget {
+  const _OwnerLeaderboard({required this.items, required this.onTap});
+
+  final List<ApplicationListItem> items;
+  final ValueChanged<ApplicationListItem> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<ApplicationListItem> podiumItems = items.take(3).toList();
+    final List<ApplicationListItem> remainingItems = items.skip(3).toList();
+
+    return Column(
+      children: <Widget>[
+        if (podiumItems.isNotEmpty) ...<Widget>[
+          _OwnerLeaderboardPodium(items: podiumItems, onTap: onTap),
+          const SizedBox(height: 18),
+        ],
+        ...remainingItems.asMap().entries.map(
+              (MapEntry<int, ApplicationListItem> entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _OwnerLeaderboardRow(
+                  rank: entry.key + 4,
+                  item: entry.value,
+                  onTap: () => onTap(entry.value),
+                ),
+              ),
+            ),
+      ],
+    );
+  }
+}
+
+class _OwnerLeaderboardPodium extends StatelessWidget {
+  const _OwnerLeaderboardPodium({required this.items, required this.onTap});
+
+  final List<ApplicationListItem> items;
+  final ValueChanged<ApplicationListItem> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    ApplicationListItem? itemForRank(int rank) {
+      final int index = rank - 1;
+      return index < items.length ? items[index] : null;
+    }
+
+    final ApplicationListItem? second = itemForRank(2);
+    final ApplicationListItem? first = itemForRank(1);
+    final ApplicationListItem? third = itemForRank(3);
+
+    return SizedBox(
+      height: 190,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            child: second == null
+                ? const SizedBox.shrink()
+                : _OwnerPodiumEntry(
+                    rank: 2,
+                    item: second,
+                    avatarSize: 58,
+                    onTap: () => onTap(second),
+                  ),
+          ),
+          Expanded(
+            child: first == null
+                ? const SizedBox.shrink()
+                : _OwnerPodiumEntry(
+                    rank: 1,
+                    item: first,
+                    avatarSize: 74,
+                    isWinner: true,
+                    onTap: () => onTap(first),
+                  ),
+          ),
+          Expanded(
+            child: third == null
+                ? const SizedBox.shrink()
+                : _OwnerPodiumEntry(
+                    rank: 3,
+                    item: third,
+                    avatarSize: 58,
+                    onTap: () => onTap(third),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OwnerPodiumEntry extends StatelessWidget {
+  const _OwnerPodiumEntry({
+    required this.rank,
+    required this.item,
+    required this.avatarSize,
+    required this.onTap,
+    this.isWinner = false,
+  });
+
+  final int rank;
+  final ApplicationListItem item;
+  final double avatarSize;
+  final VoidCallback onTap;
+  final bool isWinner;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color rankColor = switch (rank) {
+      1 => const Color(0xFFFFC23E),
+      2 => const Color(0xFFC9D0DD),
+      _ => const Color(0xFFD9984F),
+    };
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+          child: Column(
+            children: <Widget>[
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: <Widget>[
+                  if (isWinner)
+                    const Positioned(
+                      top: -22,
+                      child: Icon(
+                        Icons.workspace_premium_rounded,
+                        color: Color(0xFFFFC23E),
+                        size: 25,
+                      ),
+                    ),
+                  _LeaderboardOwnerAvatar(item: item, size: avatarSize),
+                  Positioned(
+                    right: -4,
+                    bottom: -4,
+                    child: _RankBadge(
+                      rank: rank,
+                      backgroundColor: rankColor,
+                      textColor: Colors.white,
+                      size: 25,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                item.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: isWinner ? 13 : 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '@${_leaderboardOwnerName(item)}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              _LeaderboardLikeCount(count: item.likeCount),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OwnerLeaderboardRow extends StatelessWidget {
+  const _OwnerLeaderboardRow({
+    required this.rank,
+    required this.item,
+    required this.onTap,
+  });
+
+  final int rank;
+  final ApplicationListItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface(context),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.outline(context)),
+          ),
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: 28,
+                child: Text(
+                  rank.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _LeaderboardOwnerAvatar(item: item, size: 48),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      item.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textPrimary(context),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '@${_leaderboardOwnerName(item)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _LeaderboardLikeCount(count: item.likeCount),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+String _leaderboardOwnerName(ApplicationListItem item) {
+  return item.ownerUsername.trim().isEmpty ? 'firstlook' : item.ownerUsername;
+}
+
+class _LeaderboardLikeCount extends StatelessWidget {
+  const _LeaderboardLikeCount({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const Icon(Icons.favorite_rounded, color: AppColors.primary, size: 14),
+        const SizedBox(width: 4),
+        Text(
+          count.toString(),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 12,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _LeaderboardOwnerAvatar extends StatelessWidget {
+  const _LeaderboardOwnerAvatar({required this.item, required this.size});
+
+  final ApplicationListItem item;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final String initials = _leaderboardOwnerName(item).isEmpty
+        ? '?'
+        : _leaderboardOwnerName(item)[0].toUpperCase();
+    final String? avatarUrl = item.ownerAvatarUrl;
+
+    return Container(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.34)),
+      ),
+      child: CircleAvatar(
+        backgroundColor: AppColors.primarySoft,
+        backgroundImage: avatarUrl == null || avatarUrl.isEmpty
+            ? null
+            : NetworkImage(UrlResolver.media(avatarUrl)),
+        child: avatarUrl == null || avatarUrl.isEmpty
+            ? Text(
+                initials,
+                style: const TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w900,
+                ),
+              )
+            : null,
       ),
     );
   }
@@ -963,6 +1394,7 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _DropLeaderboard extends StatelessWidget {
   const _DropLeaderboard({
     required this.items,

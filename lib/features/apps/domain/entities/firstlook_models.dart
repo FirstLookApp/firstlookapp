@@ -25,6 +25,17 @@ enum SubmitDestination {
   final String label;
 }
 
+enum LeaderboardPeriod {
+  daily('Daily'),
+  weekly('Weekly'),
+  monthly('Monthly'),
+  allTime('AllTime');
+
+  const LeaderboardPeriod(this.apiValue);
+
+  final String apiValue;
+}
+
 class DiscoveryItem {
   const DiscoveryItem({
     required this.id,
@@ -61,6 +72,10 @@ class ApplicationListItem {
     required this.mainScreenshot,
     required this.shortDescription,
     required this.score,
+    required this.ownerId,
+    required this.ownerUsername,
+    required this.ownerAvatarUrl,
+    required this.likeCount,
   });
 
   factory ApplicationListItem.fromJson(Map<String, dynamic> json) {
@@ -74,6 +89,10 @@ class ApplicationListItem {
       mainScreenshot: json['mainScreenshot'] as String? ?? '',
       shortDescription: json['shortDescription'] as String? ?? '',
       score: (json['score'] as num?)?.toDouble() ?? 0,
+      ownerId: json['ownerId'] as String? ?? '',
+      ownerUsername: json['ownerUsername'] as String? ?? '',
+      ownerAvatarUrl: json['ownerAvatarUrl'] as String?,
+      likeCount: json['likeCount'] as int? ?? 0,
     );
   }
 
@@ -85,6 +104,10 @@ class ApplicationListItem {
   final String mainScreenshot;
   final String shortDescription;
   final double score;
+  final String ownerId;
+  final String ownerUsername;
+  final String? ownerAvatarUrl;
+  final int likeCount;
 }
 
 class ActiveDropBatch {

@@ -18,10 +18,15 @@ final activeDropProvider = FutureProvider<ActiveDropBatch?>((Ref ref) {
       );
 });
 
+final leaderboardPeriodProvider =
+    StateProvider<LeaderboardPeriod>((Ref ref) => LeaderboardPeriod.weekly);
+
 final leaderboardProvider =
-    FutureProvider<PagedResult<ApplicationListItem>>((Ref ref) {
+    FutureProvider.family<PagedResult<ApplicationListItem>, LeaderboardPeriod>(
+        (Ref ref, LeaderboardPeriod period) {
   return ref.watch(firstLookRepositoryProvider).leaderboard(
         platform: ref.watch(selectedPlatformProvider),
+        period: period,
       );
 });
 
