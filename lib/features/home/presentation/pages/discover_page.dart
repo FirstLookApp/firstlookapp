@@ -1343,35 +1343,35 @@ class _LaurelRankBadge extends StatelessWidget {
   final int rank;
 
   Color get _laurelColor => switch (rank) {
-        1 => const Color(0xFFFFC43D),
+        1 => const Color(0xFFFFC23E),
         2 => const Color(0xFFD8DEE8),
         3 => const Color(0xFFD9984F),
-        _ => const Color(0xFFFFC43D),
+        _ => const Color(0xFFB89A53),
       };
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: 50,
+      dimension: 56,
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
           CustomPaint(
-            size: const Size.square(50),
+            size: const Size.square(56),
             painter: _LaurelWreathPainter(color: _laurelColor),
           ),
           Container(
-            width: 27,
-            height: 27,
+            width: 30,
+            height: 30,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: const Color(0xFF171927),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.75)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.86)),
               boxShadow: <BoxShadow>[
                 BoxShadow(
                   color: _laurelColor.withValues(alpha: 0.35),
-                  blurRadius: 8,
+                  blurRadius: 10,
                   spreadRadius: 1,
                 ),
               ],
@@ -1380,7 +1380,7 @@ class _LaurelRankBadge extends StatelessWidget {
               rank.toString(),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 15,
                 height: 1,
                 fontWeight: FontWeight.w900,
               ),
@@ -1402,36 +1402,38 @@ class _LaurelWreathPainter extends CustomPainter {
     final Paint branchPaint = Paint()
       ..color = color.withValues(alpha: 0.86)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
+      ..strokeWidth = 1.6
       ..strokeCap = StrokeCap.round;
     final Paint leafPaint = Paint()..color = color;
     final Offset center = Offset(size.width / 2, size.height / 2);
 
     for (final double side in <double>[-1, 1]) {
       final Path branch = Path()
-        ..moveTo(center.dx + (side * 7), size.height * 0.86)
+        ..moveTo(center.dx + (side * 5), size.height * 0.88)
         ..quadraticBezierTo(
-          center.dx + (side * 22),
-          size.height * 0.72,
-          center.dx + (side * 17),
-          size.height * 0.28,
+          center.dx + (side * 29),
+          size.height * 0.69,
+          center.dx + (side * 19),
+          size.height * 0.15,
         );
       canvas.drawPath(branch, branchPaint);
 
-      for (int index = 0; index < 6; index++) {
-        final double progress = index / 5;
-        final double x = center.dx + (side * (10 + (12 * (1 - progress))));
-        final double y = size.height * (0.78 - (progress * 0.5));
+      for (int index = 0; index < 8; index++) {
+        final double progress = index / 7;
+        final double x = center.dx + (side * (11 + (17 * (1 - progress))));
+        final double y = size.height * (0.8 - (progress * 0.62));
         final double rotation =
-            side < 0 ? -0.65 + (progress * 0.3) : 0.65 - (progress * 0.3);
+            side < 0 ? -0.95 + (progress * 0.4) : 0.95 - (progress * 0.4);
 
         canvas.save();
         canvas.translate(x, y);
-        canvas.rotate(rotation);
-        canvas.drawOval(
-          Rect.fromCenter(center: Offset.zero, width: 4.8, height: 10),
-          leafPaint,
-        );
+        canvas.rotate(rotation + (index.isEven ? 0.14 : -0.1));
+        final Path leaf = Path()
+          ..moveTo(Offset.zero.dx, -6.3)
+          ..quadraticBezierTo(3.6, -1.5, 0, 5.7)
+          ..quadraticBezierTo(-3.6, -1.5, 0, -6.3)
+          ..close();
+        canvas.drawPath(leaf, leafPaint);
         canvas.restore();
       }
     }
@@ -1441,11 +1443,11 @@ class _LaurelWreathPainter extends CustomPainter {
       ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(
-      Offset(center.dx - 4, size.height * 0.85),
-      Offset(center.dx + 4, size.height * 0.85),
+      Offset(center.dx - 5, size.height * 0.87),
+      Offset(center.dx + 5, size.height * 0.87),
       stemPaint,
     );
-    canvas.drawCircle(Offset(center.dx, size.height * 0.85), 2.2, leafPaint);
+    canvas.drawCircle(Offset(center.dx, size.height * 0.87), 2.4, leafPaint);
   }
 
   @override
