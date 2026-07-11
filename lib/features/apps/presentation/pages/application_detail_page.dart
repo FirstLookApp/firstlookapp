@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/network/api_envelope.dart';
@@ -469,23 +470,216 @@ class _ScreenshotRail extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemBuilder: (BuildContext context, int index) {
           final String path = visible[index];
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 172,
-              decoration: BoxDecoration(
-                color: AppColors.primarySoft,
-                border: Border.all(color: AppColors.outline(context)),
-                borderRadius: BorderRadius.circular(18),
+          return GestureDetector(
+            onTap: path.isEmpty
+                ? null
+                : () => _openGallery(
+                      context,
+                      screenshots: screenshots,
+                      initialPage: index,
+                    ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: Container(
+                width: 172,
+                decoration: BoxDecoration(
+                  color: AppColors.primarySoft,
+                  border: Border.all(color: AppColors.outline(context)),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    path.isEmpty
+                        ? const Icon(
+                            Icons.phone_iphone,
+                            color: AppColors.primary,
+                          )
+                        : Image.network(
+                            UrlResolver.media(path),
+                            fit: BoxFit.cover,
+                          ),
+                    if (path.isNotEmpty)
+                      Positioned(
+                        right: 8,
+                        bottom: 8,
+                        child: Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.open_in_full_rounded,
+                            color: Colors.white,
+                            size: 15,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-              child: path.isEmpty
-                  ? const Icon(Icons.phone_iphone, color: AppColors.primary)
-                  : Image.network(UrlResolver.media(path), fit: BoxFit.cover),
             ),
           );
         },
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemCount: visible.length,
+      ),
+    );
+  }
+
+  void _openGallery(
+    BuildContext context, {
+    required List<String> screenshots,
+    required int initialPage,
+  }) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withValues(alpha: 0.64),
+      builder: (BuildContext dialogContext) => _ScreenshotGalleryDialog(
+        screenshots: screenshots,
+        initialPage: initialPage,
+      ),
+    );
+  }
+}
+
+class _ScreenshotGalleryDialog extends StatefulWidget {
+  const _ScreenshotGalleryDialog({
+    required this.screenshots,
+    required this.initialPage,
+  });
+
+  final List<String> screenshots;
+  final int initialPage;
+
+  @override
+  State<_ScreenshotGalleryDialog> createState() =>
+      _ScreenshotGalleryDialogState();
+}
+
+class _ScreenshotGalleryDialogState extends State<_ScreenshotGalleryDialog> {
+  late final PageController _pageController;
+  late int _currentPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = widget.initialPage;
+    _pageController = PageController(initialPage: widget.initialPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.sizeOf(context);
+
+    return Dialog(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 72),
+      child: SizedBox(
+        width: math.min(420, screenSize.width - 40),
+        height: math.min(580, screenSize.height * 0.72),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: ColoredBox(
+            color: const Color(0xFF11131A),
+            child: Stack(
+              children: <Widget>[
+                PageView.builder(
+                  controller: _pageController,
+                  itemCount: widget.screenshots.length,
+                  onPageChanged: (int value) {
+                    setState(() => _currentPage = value);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    final String path = widget.screenshots[index];
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 52, 18, 42),
+                      child: Image.network(
+                        UrlResolver.media(path),
+                        fit: BoxFit.contain,
+                        loadingBuilder: (
+                          BuildContext context,
+                          Widget child,
+                          ImageChunkEvent? loadingProgress,
+                        ) {
+                          if (loadingProgress == null) {
+                            return child;
+                          }
+
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          );
+                        },
+                        errorBuilder: (
+                          BuildContext context,
+                          Object error,
+                          StackTrace? stackTrace,
+                        ) =>
+                            const Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            color: Colors.white70,
+                            size: 42,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.white.withValues(alpha: 0.14),
+                      foregroundColor: Colors.white,
+                    ),
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                  ),
+                ),
+                if (widget.screenshots.length > 1)
+                  Positioned(
+                    bottom: 14,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: Text(
+                          '${_currentPage + 1} / ${widget.screenshots.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
