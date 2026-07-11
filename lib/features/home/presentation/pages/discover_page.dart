@@ -1400,38 +1400,37 @@ class _LaurelWreathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint branchPaint = Paint()
-      ..color = color.withValues(alpha: 0.86)
+      ..color = color.withValues(alpha: 0.72)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.6
+      ..strokeWidth = 1.35
       ..strokeCap = StrokeCap.round;
     final Paint leafPaint = Paint()..color = color;
     final Offset center = Offset(size.width / 2, size.height / 2);
 
     for (final double side in <double>[-1, 1]) {
       final Path branch = Path()
-        ..moveTo(center.dx + (side * 5), size.height * 0.88)
+        ..moveTo(center.dx + (side * 4), size.height * 0.86)
         ..quadraticBezierTo(
-          center.dx + (side * 29),
-          size.height * 0.69,
-          center.dx + (side * 19),
-          size.height * 0.15,
+          center.dx + (side * 26),
+          size.height * 0.67,
+          center.dx + (side * 20),
+          size.height * 0.13,
         );
       canvas.drawPath(branch, branchPaint);
 
-      for (int index = 0; index < 8; index++) {
-        final double progress = index / 7;
-        final double x = center.dx + (side * (11 + (17 * (1 - progress))));
-        final double y = size.height * (0.8 - (progress * 0.62));
-        final double rotation =
-            side < 0 ? 0.95 - (progress * 0.4) : -0.95 + (progress * 0.4);
+      for (int index = 0; index < 7; index++) {
+        final double progress = index / 6;
+        final double x = center.dx + (side * (7 + (15 * progress)));
+        final double y = size.height * (0.79 - (progress * 0.61));
+        final double rotation = side < 0 ? -2.25 : -0.89;
 
         canvas.save();
         canvas.translate(x, y);
-        canvas.rotate(rotation + (index.isEven ? 0.14 : -0.1));
+        canvas.rotate(rotation + ((progress - 0.5) * side * 0.22));
         final Path leaf = Path()
-          ..moveTo(Offset.zero.dx, -6.3)
-          ..quadraticBezierTo(3.6, -1.5, 0, 5.7)
-          ..quadraticBezierTo(-3.6, -1.5, 0, -6.3)
+          ..moveTo(0, 0)
+          ..quadraticBezierTo(5.8, -3.7, 11.5, 0)
+          ..quadraticBezierTo(5.8, 3.7, 0, 0)
           ..close();
         canvas.drawPath(leaf, leafPaint);
         canvas.restore();
