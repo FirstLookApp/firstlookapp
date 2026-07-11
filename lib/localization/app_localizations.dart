@@ -104,6 +104,102 @@ abstract class AppLocalizations {
   /// **'FirstLook'**
   String get appName;
 
+  /// No description provided for @onboardingDiscoverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover Apps'**
+  String get onboardingDiscoverTitle;
+
+  /// No description provided for @onboardingDiscoverSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore the newest mobile apps and discover your favorites.'**
+  String get onboardingDiscoverSubtitle;
+
+  /// No description provided for @onboardingFeatureNewApps.
+  ///
+  /// In en, this message translates to:
+  /// **'New applications'**
+  String get onboardingFeatureNewApps;
+
+  /// No description provided for @onboardingFeatureRealReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Real user reviews'**
+  String get onboardingFeatureRealReviews;
+
+  /// No description provided for @onboardingFeatureDailyDiscoveries.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily discoveries'**
+  String get onboardingFeatureDailyDiscoveries;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Your Experience'**
+  String get onboardingReviewTitle;
+
+  /// No description provided for @onboardingReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the apps you use, leave reviews, and help other users make better choices.'**
+  String get onboardingReviewSubtitle;
+
+  /// No description provided for @onboardingFeatureTrustedRatings.
+  ///
+  /// In en, this message translates to:
+  /// **'Trusted ratings'**
+  String get onboardingFeatureTrustedRatings;
+
+  /// No description provided for @onboardingFeatureCommunityExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Community experience'**
+  String get onboardingFeatureCommunityExperience;
+
+  /// No description provided for @onboardingShareExperience.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Your Experience'**
+  String get onboardingShareExperience;
+
+  /// No description provided for @onboardingReviewCommentOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Great design and very useful.'**
+  String get onboardingReviewCommentOne;
+
+  /// No description provided for @onboardingReviewCommentTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'The interface is very successful.'**
+  String get onboardingReviewCommentTwo;
+
+  /// No description provided for @onboardingReviewCommentThree.
+  ///
+  /// In en, this message translates to:
+  /// **'I definitely recommend it.'**
+  String get onboardingReviewCommentThree;
+
+  /// No description provided for @onboardingHelpfulCount.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} people found this helpful'**
+  String onboardingHelpfulCount(int count);
+
   /// No description provided for @commonRetry.
   ///
   /// In en, this message translates to:
@@ -536,6 +632,66 @@ abstract class AppLocalizations {
   /// **'Discover'**
   String get discoverSubtitle;
 
+  /// No description provided for @discoverWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello'**
+  String get discoverWelcomeTitle;
+
+  /// No description provided for @discoverWelcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps selected for you\nto discover today.'**
+  String get discoverWelcomeSubtitle;
+
+  /// No description provided for @discoverNewDrops.
+  ///
+  /// In en, this message translates to:
+  /// **'New Drops'**
+  String get discoverNewDrops;
+
+  /// No description provided for @discoverDailyDiscovery.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Discovery'**
+  String get discoverDailyDiscovery;
+
+  /// No description provided for @discoverNewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'new'**
+  String get discoverNewLabel;
+
+  /// No description provided for @discoverWeeklyDropsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week\'s Drops 👑'**
+  String get discoverWeeklyDropsTitle;
+
+  /// No description provided for @discoverWeeklyDropsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The apps highlighted most by the community.'**
+  String get discoverWeeklyDropsSubtitle;
+
+  /// No description provided for @discoverCommunityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community Recommendations'**
+  String get discoverCommunityTitle;
+
+  /// No description provided for @discoverReviewerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Reviewer'**
+  String get discoverReviewerBadge;
+
+  /// No description provided for @discoverPlaceholderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Community reviews will appear here soon.'**
+  String get discoverPlaceholderReview;
+
   /// No description provided for @leaderboardTitle.
   ///
   /// In en, this message translates to:
@@ -938,11 +1094,29 @@ abstract class AppLocalizations {
   /// **'Avatars cannot be loaded right now.'**
   String get profileAvatarLoadError;
 
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalize your app experience.'**
+  String get settingsSubtitle;
+
   /// No description provided for @settingsLanguage.
   ///
   /// In en, this message translates to:
   /// **'Language'**
   String get settingsLanguage;
+
+  /// No description provided for @settingsLanguageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Application language'**
+  String get settingsLanguageSubtitle;
 
   /// No description provided for @settingsNotifications.
   ///
@@ -950,11 +1124,71 @@ abstract class AppLocalizations {
   /// **'Sound'**
   String get settingsNotifications;
 
+  /// No description provided for @settingsSoundSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification and application sounds'**
+  String get settingsSoundSubtitle;
+
   /// No description provided for @settingsVibration.
   ///
   /// In en, this message translates to:
   /// **'Vibration'**
   String get settingsVibration;
+
+  /// No description provided for @settingsVibrationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Haptic feedback'**
+  String get settingsVibrationSubtitle;
+
+  /// No description provided for @settingsRateApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate the App'**
+  String get settingsRateApp;
+
+  /// No description provided for @settingsRateAppSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate us on the App Store or Google Play.'**
+  String get settingsRateAppSubtitle;
+
+  /// No description provided for @settingsRateError.
+  ///
+  /// In en, this message translates to:
+  /// **'The app store could not be opened.'**
+  String get settingsRateError;
+
+  /// No description provided for @settingsDarkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get settingsDarkMode;
+
+  /// No description provided for @settingsDarkModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark appearance'**
+  String get settingsDarkModeSubtitle;
+
+  /// No description provided for @settingsSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get settingsSoon;
+
+  /// No description provided for @settingsComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'COMING SOON'**
+  String get settingsComingSoon;
+
+  /// No description provided for @settingsDarkModeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark mode is coming soon.'**
+  String get settingsDarkModeMessage;
 
   /// No description provided for @settingsOn.
   ///
@@ -967,6 +1201,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off'**
   String get settingsOff;
+
+  /// No description provided for @onboardingRewardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish Your App, Reach the Top'**
+  String get onboardingRewardsTitle;
+
+  /// No description provided for @onboardingRewardsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your app with the Firstlook community. Rise through the weekly app leaderboard as you earn likes and reach more people.'**
+  String get onboardingRewardsSubtitle;
+
+  /// No description provided for @onboardingFeatureLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish Your App'**
+  String get onboardingFeatureLeaderboard;
+
+  /// No description provided for @onboardingFeatureBadges.
+  ///
+  /// In en, this message translates to:
+  /// **'Earn Likes'**
+  String get onboardingFeatureBadges;
+
+  /// No description provided for @onboardingFeatureDailyTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Climb the Leaderboard'**
+  String get onboardingFeatureDailyTasks;
+
+  /// No description provided for @onboardingStartDiscovering.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Your App'**
+  String get onboardingStartDiscovering;
+
+  /// No description provided for @onboardingAchievementLeader.
+  ///
+  /// In en, this message translates to:
+  /// **'App of the Week'**
+  String get onboardingAchievementLeader;
+
+  /// No description provided for @onboardingAchievementBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Rising Fast'**
+  String get onboardingAchievementBadge;
+
+  /// No description provided for @onboardingAchievementActive.
+  ///
+  /// In en, this message translates to:
+  /// **'New App'**
+  String get onboardingAchievementActive;
+
+  /// No description provided for @onboardingAppLeaderboard.
+  ///
+  /// In en, this message translates to:
+  /// **'App Leaderboard'**
+  String get onboardingAppLeaderboard;
+
+  /// No description provided for @onboardingLikesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'likes'**
+  String get onboardingLikesLabel;
 
   /// No description provided for @searchHint.
   ///
@@ -997,6 +1297,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User search is not available right now.'**
   String get searchUsersTodo;
+
+  /// No description provided for @developerPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If you are a developer, create an account to submit your app.'**
+  String get developerPromptTitle;
+
+  /// No description provided for @developerPromptRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get developerPromptRegister;
+
+  /// No description provided for @developerPromptContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Discovering'**
+  String get developerPromptContinue;
 }
 
 class _AppLocalizationsDelegate

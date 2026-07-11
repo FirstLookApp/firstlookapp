@@ -5,6 +5,7 @@ import 'package:firstlook/features/auth/presentation/widgets/auth_header.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -70,10 +71,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                 Text(
                   l10n.forgotPasswordTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0,
-                  ),
+                        color: AppColors.textPrimary(context),
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0,
+                      ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -144,10 +145,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         return;
                       }
 
-                      final AuthStatus? status = ref
-                          .read(authControllerProvider)
-                          .valueOrNull
-                          ?.status;
+                      final AuthStatus? status =
+                          ref.read(authControllerProvider).valueOrNull?.status;
                       if (status == AuthStatus.unauthenticated) {
                         context.go(RouteNames.loginPath);
                       }

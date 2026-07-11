@@ -28,8 +28,8 @@ class AuthTextField extends StatelessWidget {
       children: <Widget>[
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF62626A),
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 0,
@@ -41,8 +41,8 @@ class AuthTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           onChanged: onChanged,
-          style: const TextStyle(
-            color: AppColors.secondary,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -54,24 +54,24 @@ class AuthTextField extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w800,
             ),
-            hintStyle: const TextStyle(
-              color: Color(0xFFC9C9CF),
+            hintStyle: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
             filled: true,
-            fillColor: const Color(0xFFFAFAFB),
+            fillColor: AppColors.surfaceAlt(context),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 18,
               vertical: 17,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.outline(context)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: AppColors.outline(context)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),

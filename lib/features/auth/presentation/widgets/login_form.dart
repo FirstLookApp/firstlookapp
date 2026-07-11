@@ -55,7 +55,7 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         Text(
           l10n.authDiscoverTitle,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: AppColors.secondary,
+                color: AppColors.textPrimary(context),
                 fontSize: 26,
                 height: 1,
                 fontWeight: FontWeight.w900,
@@ -65,8 +65,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         const SizedBox(height: 8),
         Text(
           l10n.authDiscoverSubtitle,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 12,
             height: 1.45,
             fontWeight: FontWeight.w600,

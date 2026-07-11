@@ -4,6 +4,7 @@ import 'package:firstlook/features/auth/presentation/controllers/auth_controller
 import 'package:firstlook/features/auth/presentation/widgets/auth_header.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_primary_button.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/firstlook_app_icon.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class _OtpPageState extends ConsumerState<OtpPage> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -76,12 +77,14 @@ class _OtpPageState extends ConsumerState<OtpPage> {
                         const SizedBox(height: 28),
                         Text(
                           l10n.otpTitle,
-                          style:
-                              Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineSmall
+                              ?.copyWith(
+                                color: AppColors.textPrimary(context),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0,
+                              ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -146,27 +149,26 @@ class _OtpCodeField extends StatelessWidget {
                   animation: controller,
                   builder: (BuildContext context, _) {
                     final String value = controller.text;
-                    final String digit = index < value.length
-                        ? value[index]
-                        : '';
+                    final String digit =
+                        index < value.length ? value[index] : '';
 
                     return Container(
                       height: 50,
                       margin: EdgeInsets.only(right: index == 5 ? 0 : 6),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFAFAFB),
+                        color: AppColors.surfaceAlt(context),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: digit.isEmpty
-                              ? const Color(0xFFF0F0F3)
+                              ? AppColors.outline(context)
                               : const Color(0xFFFF1F2D),
                         ),
                       ),
                       child: Text(
                         digit,
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                         ),

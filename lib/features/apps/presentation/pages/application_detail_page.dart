@@ -57,18 +57,18 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
             AuthStatus.authenticated;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: AppColors.background(context),
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.of(context).maybePop(),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 18,
-            color: Colors.black,
+            color: AppColors.textPrimary(context),
           ),
         ),
       ),
@@ -107,8 +107,8 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                 const SizedBox(height: 22),
                 Text(
                   l10n.detailAbout,
-                  style: const TextStyle(
-                    color: AppColors.secondary,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
@@ -126,8 +126,8 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                 const SizedBox(height: 22),
                 Text(
                   l10n.detailComments,
-                  style: const TextStyle(
-                    color: AppColors.secondary,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                   ),
@@ -274,8 +274,8 @@ class _DetailHeader extends StatelessWidget {
                 textAlign: TextAlign.left,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppColors.secondary,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
                   fontSize: 17,
                   fontWeight: FontWeight.w900,
                 ),
@@ -290,8 +290,8 @@ class _DetailHeader extends StatelessWidget {
               ),
               label: Text(
                 _compactCount(app.likeCount),
-                style: const TextStyle(
-                  color: Colors.black,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                 ),
@@ -330,8 +330,8 @@ class _DetailHeader extends StatelessWidget {
                     app.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
                       fontSize: 19,
                       fontWeight: FontWeight.w900,
                     ),
@@ -395,13 +395,13 @@ class _MetaChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.chipFill,
+        color: AppColors.surfaceAlt(context),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         label.toUpperCase(),
-        style: const TextStyle(
-          color: AppColors.secondary,
+        style: TextStyle(
+          color: AppColors.textPrimary(context),
           fontSize: 9,
           fontWeight: FontWeight.w800,
         ),
@@ -434,7 +434,7 @@ class _ScreenshotRail extends StatelessWidget {
               width: 172,
               decoration: BoxDecoration(
                 color: AppColors.primarySoft,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: AppColors.outline(context)),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: path.isEmpty
@@ -464,14 +464,14 @@ class _CommentCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const <BoxShadow>[
+        border: Border.all(color: AppColors.outline(context)),
+        boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.shadow,
+            color: AppColors.adaptiveShadow(context),
             blurRadius: 16,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -497,8 +497,8 @@ class _CommentCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   item.username,
-                  style: const TextStyle(
-                    color: AppColors.secondary,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),
@@ -509,8 +509,8 @@ class _CommentCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             item.content,
-            style: const TextStyle(
-              color: Color(0xFF62626A),
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 12,
               height: 1.45,
             ),

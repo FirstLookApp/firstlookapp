@@ -16,7 +16,7 @@ Implemented areas:
 - OTP verification
 - Forgot/reset password
 - Discover
-- Drop / Test tabs
+- Discover, leaderboard, showcase placeholder, submit, and profile tabs
 - Application detail
 - Like / unlike
 - Store click tracking
@@ -24,9 +24,11 @@ Implemented areas:
 - Liked items
 - Profile
 - Submit application with multipart screenshot upload
-- Beta access request
 - Notifications
 - Logout with access/refresh token cache clearing
+- Dark mode with persisted theme setting
+- Profile comments
+- Avatar selection
 
 ## Tech Stack
 
@@ -104,7 +106,11 @@ Connected endpoints:
 - `POST /api/auth/forgot-password`
 - `POST /api/auth/reset-password`
 - `GET /api/profile/me`
+- `PUT /api/profile/me`
+- `GET /api/profile/avatars`
+- `POST /api/profile/select-avatar`
 - `GET /api/profile/favorites`
+- `GET /api/profile/comments`
 - `GET /api/profile/notifications`
 - `GET /api/profile/notifications/unread-count`
 - `POST /api/profile/notifications/{notificationId}/read`
@@ -115,23 +121,31 @@ Connected endpoints:
 - `GET /api/interactions/{applicationId}/comments`
 - `POST /api/interactions/{applicationId}/comments`
 - `POST /api/interactions/{applicationId}/store-click`
-- `POST /api/interactions/{applicationId}/beta-request`
 - `POST /api/applications`
 - `GET /api/applications/mine`
+- `GET /api/users/search`
+- `GET /api/users/{userId}/profile`
 
 Available but not fully wired in the mobile UI yet:
 
-- `POST /api/profile/select-avatar`
 - `PUT /api/applications/{applicationId}`
-- `GET /api/applications/my-beta-requests`
 - `POST /api/interactions/comments/{commentId}/report`
 
 ## Known Product / API Gaps
 
-- Profile comments: the mobile UI has a clean placeholder because Swagger does not expose a dedicated "my comments" endpoint for the current user.
-- Edit submitted application: the backend has `PUT /api/applications/{applicationId}`, but the edit flow is not part of the current Figma pass yet.
-- My beta requests: the backend has `GET /api/applications/my-beta-requests`, but no matching mobile screen has been implemented yet.
-- Avatar selection: the backend has `POST /api/profile/select-avatar`, but the current profile screen only displays the selected avatar/initial.
+- Community recommendations: Discover currently shows placeholder cards. Proposed endpoint: `GET /api/discovery/community-recommendations?platform=Android&pageNumber=1&pageSize=10`.
+- Public categories: Submit currently uses local fixed labels. Proposed endpoint: `GET /api/categories?destination=Drop&isActive=true&pageNumber=1&pageSize=50`.
+- Showcase / premium visibility: the Showcase tab and profile promote action intentionally show a coming-soon dialog. Proposed endpoints: `GET /api/showcase/plans` and `POST /api/showcase/requests`.
+- Notification bulk read: current app marks one notification as read when opened. Proposed endpoint: `POST /api/profile/notifications/read-all`.
+- Edit submitted application: backend has `PUT /api/applications/{applicationId}`, but no mobile edit screen has been implemented yet.
+- Comment reporting: backend has `POST /api/interactions/comments/{commentId}/report`, but no mobile report action is wired yet.
+
+## Security Notes
+
+- Tokens are stored through `flutter_secure_storage`.
+- API calls use centralized Dio configuration and auth refresh handling.
+- Production certificate pinning is not fully implemented yet; `certificate_pinning_service.dart` currently relies on normal TLS validation unless real pins are added.
+- See `../SEC_README.md` for the latest cross-repo security review.
 
 ## Run
 

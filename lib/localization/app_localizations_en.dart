@@ -12,6 +12,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'FirstLook';
 
   @override
+  String get onboardingDiscoverTitle => 'Discover Apps';
+
+  @override
+  String get onboardingDiscoverSubtitle =>
+      'Explore the newest mobile apps and discover your favorites.';
+
+  @override
+  String get onboardingFeatureNewApps => 'New applications';
+
+  @override
+  String get onboardingFeatureRealReviews => 'Real user reviews';
+
+  @override
+  String get onboardingFeatureDailyDiscoveries => 'Daily discoveries';
+
+  @override
+  String get onboardingStart => 'Get Started';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingReviewTitle => 'Share Your Experience';
+
+  @override
+  String get onboardingReviewSubtitle =>
+      'Rate the apps you use, leave reviews, and help other users make better choices.';
+
+  @override
+  String get onboardingFeatureTrustedRatings => 'Trusted ratings';
+
+  @override
+  String get onboardingFeatureCommunityExperience => 'Community experience';
+
+  @override
+  String get onboardingShareExperience => 'Share Your Experience';
+
+  @override
+  String get onboardingReviewCommentOne => 'Great design and very useful.';
+
+  @override
+  String get onboardingReviewCommentTwo => 'The interface is very successful.';
+
+  @override
+  String get onboardingReviewCommentThree => 'I definitely recommend it.';
+
+  @override
+  String onboardingHelpfulCount(int count) {
+    return '+$count people found this helpful';
+  }
+
+  @override
   String get commonRetry => 'Retry';
 
   @override
@@ -233,6 +285,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverSubtitle => 'Discover';
 
   @override
+  String get discoverWelcomeTitle => 'Hello';
+
+  @override
+  String get discoverWelcomeSubtitle =>
+      'Apps selected for you\nto discover today.';
+
+  @override
+  String get discoverNewDrops => 'New Drops';
+
+  @override
+  String get discoverDailyDiscovery => 'Daily Discovery';
+
+  @override
+  String get discoverNewLabel => 'new';
+
+  @override
+  String get discoverWeeklyDropsTitle => 'This Week\'s Drops 👑';
+
+  @override
+  String get discoverWeeklyDropsSubtitle =>
+      'The apps highlighted most by the community.';
+
+  @override
+  String get discoverCommunityTitle => 'Community Recommendations';
+
+  @override
+  String get discoverReviewerBadge => 'Top Reviewer';
+
+  @override
+  String get discoverPlaceholderReview =>
+      'Community reviews will appear here soon.';
+
+  @override
   String get leaderboardTitle => 'Leaderboard';
 
   @override
@@ -443,19 +528,93 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAvatarLoadError => 'Avatars cannot be loaded right now.';
 
   @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsSubtitle => 'Personalize your app experience.';
+
+  @override
   String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsLanguageSubtitle => 'Application language';
 
   @override
   String get settingsNotifications => 'Sound';
 
   @override
+  String get settingsSoundSubtitle => 'Notification and application sounds';
+
+  @override
   String get settingsVibration => 'Vibration';
+
+  @override
+  String get settingsVibrationSubtitle => 'Haptic feedback';
+
+  @override
+  String get settingsRateApp => 'Rate the App';
+
+  @override
+  String get settingsRateAppSubtitle =>
+      'Rate us on the App Store or Google Play.';
+
+  @override
+  String get settingsRateError => 'The app store could not be opened.';
+
+  @override
+  String get settingsDarkMode => 'Dark Mode';
+
+  @override
+  String get settingsDarkModeSubtitle => 'Dark appearance';
+
+  @override
+  String get settingsSoon => 'Coming soon';
+
+  @override
+  String get settingsComingSoon => 'COMING SOON';
+
+  @override
+  String get settingsDarkModeMessage => 'Dark mode is coming soon.';
 
   @override
   String get settingsOn => 'On';
 
   @override
   String get settingsOff => 'Off';
+
+  @override
+  String get onboardingRewardsTitle => 'Publish Your App, Reach the Top';
+
+  @override
+  String get onboardingRewardsSubtitle =>
+      'Share your app with the Firstlook community. Rise through the weekly app leaderboard as you earn likes and reach more people.';
+
+  @override
+  String get onboardingFeatureLeaderboard => 'Publish Your App';
+
+  @override
+  String get onboardingFeatureBadges => 'Earn Likes';
+
+  @override
+  String get onboardingFeatureDailyTasks => 'Climb the Leaderboard';
+
+  @override
+  String get onboardingStartDiscovering => 'Submit Your App';
+
+  @override
+  String get onboardingAchievementLeader => 'App of the Week';
+
+  @override
+  String get onboardingAchievementBadge => 'Rising Fast';
+
+  @override
+  String get onboardingAchievementActive => 'New App';
+
+  @override
+  String get onboardingAppLeaderboard => 'App Leaderboard';
+
+  @override
+  String get onboardingLikesLabel => 'likes';
 
   @override
   String get searchHint => 'Search apps or users';
@@ -472,4 +631,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchUsersTodo => 'User search is not available right now.';
+
+  @override
+  String get developerPromptTitle =>
+      'If you are a developer, create an account to submit your app.';
+
+  @override
+  String get developerPromptRegister => 'Create Account';
+
+  @override
+  String get developerPromptContinue => 'Continue Discovering';
 }

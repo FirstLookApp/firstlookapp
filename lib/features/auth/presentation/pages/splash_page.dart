@@ -12,7 +12,7 @@ class SplashPage extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -23,8 +23,8 @@ class SplashPage extends StatelessWidget {
             const SizedBox(height: 10),
             Text(
               l10n.splashTagline,
-              style: const TextStyle(
-                color: AppColors.textMuted,
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
                 fontWeight: FontWeight.w600,
               ),
             ),

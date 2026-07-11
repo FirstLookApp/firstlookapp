@@ -1,6 +1,9 @@
 abstract final class RouteNames {
   static const String login = 'login';
   static const String splash = 'splash';
+  static const String onboarding = 'onboarding';
+  static const String onboardingReview = 'onboardingReview';
+  static const String onboardingRewards = 'onboardingRewards';
   static const String register = 'register';
   static const String otp = 'otp';
   static const String forgotPassword = 'forgotPassword';
@@ -14,6 +17,9 @@ abstract final class RouteNames {
   static const String notifications = 'notifications';
 
   static const String splashPath = '/';
+  static const String onboardingPath = '/onboarding';
+  static const String onboardingReviewPath = '/onboarding/review';
+  static const String onboardingRewardsPath = '/onboarding/rewards';
   static const String loginPath = '/login';
   static const String registerPath = '/register';
   static const String otpPath = '/otp';

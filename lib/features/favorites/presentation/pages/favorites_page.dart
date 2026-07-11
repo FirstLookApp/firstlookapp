@@ -29,7 +29,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
         ref.watch(favoritesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => ref.invalidate(favoritesProvider),
@@ -49,8 +49,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                   const SizedBox(height: 30),
                   Text(
                     l10n.favoritesTitle,
-                    style: const TextStyle(
-                      color: AppColors.secondary,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
                     ),
@@ -105,14 +105,14 @@ class _FavoriteAppCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border),
+          color: AppColors.surface(context),
+          border: Border.all(color: AppColors.outline(context)),
           borderRadius: BorderRadius.circular(18),
-          boxShadow: const <BoxShadow>[
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.shadow,
+              color: AppColors.adaptiveShadow(context),
               blurRadius: 18,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -146,8 +146,8 @@ class _FavoriteAppCard extends StatelessWidget {
                     item.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
                       fontSize: 15,
                       fontWeight: FontWeight.w900,
                     ),
@@ -157,8 +157,8 @@ class _FavoriteAppCard extends StatelessWidget {
                     item.shortDescription,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
                       fontSize: 12,
                     ),
                   ),
@@ -195,8 +195,8 @@ class _EmptyFavorites extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 13,
               height: 1.35,
               fontWeight: FontWeight.w500,

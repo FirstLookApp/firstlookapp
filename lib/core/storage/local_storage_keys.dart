@@ -9,4 +9,6 @@ abstract final class LocalStorageKeys {
   static const String soundEnabled = 'sound_enabled';
   static const String vibrationEnabled = 'vibration_enabled';
   static const String languageCode = 'language_code';
+  static const String darkModeEnabled = 'dark_mode_enabled';
+  static const String onboardingCompleted = 'onboarding_completed_v3';
 }

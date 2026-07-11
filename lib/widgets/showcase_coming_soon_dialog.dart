@@ -14,7 +14,7 @@ Future<void> showShowcaseComingSoonDialog(BuildContext context) {
         backgroundColor: Colors.transparent,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface(dialogContext),
             borderRadius: BorderRadius.circular(26),
             boxShadow: <BoxShadow>[
               BoxShadow(
@@ -57,8 +57,8 @@ Future<void> showShowcaseComingSoonDialog(BuildContext context) {
                     Text(
                       l10n.showcaseComingSoonTitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.secondary,
+                      style: TextStyle(
+                        color: AppColors.textPrimary(dialogContext),
                         fontSize: 23,
                         fontWeight: FontWeight.w900,
                         height: 1.05,
@@ -69,8 +69,8 @@ Future<void> showShowcaseComingSoonDialog(BuildContext context) {
                     Text(
                       l10n.showcaseComingSoonMessage,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: AppColors.textSecondary(dialogContext),
                         fontSize: 14,
                         height: 1.45,
                         fontWeight: FontWeight.w600,
@@ -83,7 +83,7 @@ Future<void> showShowcaseComingSoonDialog(BuildContext context) {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9F0F1),
+                        color: AppColors.softPrimary(dialogContext),
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(
@@ -105,9 +105,9 @@ Future<void> showShowcaseComingSoonDialog(BuildContext context) {
                 child: IconButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
                   icon: const Icon(Icons.close_rounded),
-                  color: AppColors.secondary,
+                  color: AppColors.textPrimary(dialogContext),
                   style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFF5F5F7),
+                    backgroundColor: AppColors.surfaceAlt(dialogContext),
                     fixedSize: const Size(34, 34),
                     padding: EdgeInsets.zero,
                   ),

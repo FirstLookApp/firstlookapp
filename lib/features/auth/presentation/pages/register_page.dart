@@ -53,7 +53,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -72,7 +72,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 Text(
                   l10n.authDiscoverTitle,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.secondary,
+                        color: AppColors.textPrimary(context),
                         fontSize: 26,
                         height: 1,
                         fontWeight: FontWeight.w900,
@@ -82,8 +82,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                 const SizedBox(height: 8),
                 Text(
                   l10n.authDiscoverSubtitle,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
                     fontSize: 12,
                     height: 1.45,
                     fontWeight: FontWeight.w600,
@@ -132,8 +132,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                   onPressed: () => context.go(RouteNames.loginPath),
                   child: Text(
                     l10n.goToLogin,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                     ),

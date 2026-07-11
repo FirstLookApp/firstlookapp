@@ -27,7 +27,7 @@ class UserProfilePreviewPage extends ConsumerWidget {
         ref.watch(publicUserProfileProvider(userId));
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: profile.when(
           data: (PublicUserProfile user) => RefreshIndicator(
@@ -143,8 +143,8 @@ class _PublicProfileIdentity extends StatelessWidget {
         Text(
           displayName,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.secondary,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
             fontSize: 22,
             fontWeight: FontWeight.w900,
           ),
@@ -153,8 +153,8 @@ class _PublicProfileIdentity extends StatelessWidget {
         Text(
           '@${user.username}',
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 13,
             fontWeight: FontWeight.w800,
           ),
@@ -164,8 +164,8 @@ class _PublicProfileIdentity extends StatelessWidget {
           Text(
             user.biography.trim(),
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 13,
               height: 1.35,
               fontWeight: FontWeight.w600,
@@ -189,14 +189,14 @@ class _PublicStatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
+        color: AppColors.surface(context),
+        border: Border.all(color: AppColors.outline(context)),
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const <BoxShadow>[
+        boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.shadow,
+            color: AppColors.adaptiveShadow(context),
             blurRadius: 20,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -236,8 +236,8 @@ class _PublicStat extends StatelessWidget {
         children: <Widget>[
           Text(
             _compactCount(value),
-            style: const TextStyle(
-              color: AppColors.secondary,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
               fontSize: 17,
               fontWeight: FontWeight.w900,
             ),
@@ -245,8 +245,8 @@ class _PublicStat extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 10,
               fontWeight: FontWeight.w800,
             ),
@@ -266,8 +266,8 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: const TextStyle(
-        color: AppColors.secondary,
+      style: TextStyle(
+        color: AppColors.textPrimary(context),
         fontSize: 18,
         fontWeight: FontWeight.w900,
       ),
@@ -292,14 +292,14 @@ class _PublicApplicationCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border),
+          color: AppColors.surface(context),
+          border: Border.all(color: AppColors.outline(context)),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const <BoxShadow>[
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.shadow,
+              color: AppColors.adaptiveShadow(context),
               blurRadius: 16,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -331,8 +331,8 @@ class _PublicApplicationCard extends StatelessWidget {
                     item.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.secondary,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
@@ -342,15 +342,18 @@ class _PublicApplicationCard extends StatelessWidget {
                     item.shortDescription,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textSecondary(context),
+            ),
           ],
         ),
       ),
@@ -370,8 +373,8 @@ class _EmptyPublishedApps extends StatelessWidget {
       child: Text(
         message,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: AppColors.textMuted,
+        style: TextStyle(
+          color: AppColors.textSecondary(context),
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),

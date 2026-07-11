@@ -18,7 +18,11 @@ class AppShell extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      body: navigationShell,
+      backgroundColor: AppColors.background(context),
+      body: ColoredBox(
+        color: AppColors.background(context),
+        child: navigationShell,
+      ),
       bottomNavigationBar: _FirstLookBottomNav(
         currentIndex: navigationShell.currentIndex,
         items: <_BottomNavItem>[
@@ -79,9 +83,11 @@ class _FirstLookBottomNav extends StatelessWidget {
     final double indicatorWidth = slotWidth - 22;
 
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        border: Border(
+          top: BorderSide(color: AppColors.outline(context)),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -144,7 +150,7 @@ class _BottomNavButton extends StatelessWidget {
         ? AppColors.primary
         : isSelected
             ? AppColors.primary
-            : AppColors.textSoft;
+            : AppColors.textSecondary(context);
 
     return Semantics(
       selected: isSelected,
@@ -166,7 +172,8 @@ class _BottomNavButton extends StatelessWidget {
                   ? null
                   : BoxDecoration(
                       color: isSelected
-                          ? AppColors.primarySoft.withValues(alpha: 0.72)
+                          ? AppColors.softPrimary(context)
+                              .withValues(alpha: 0.82)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(18),
                     ),

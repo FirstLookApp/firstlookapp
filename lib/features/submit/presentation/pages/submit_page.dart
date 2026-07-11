@@ -96,7 +96,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -113,8 +113,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 22),
                 Text(
                   l10n.submitTitle,
-                  style: const TextStyle(
-                    color: AppColors.secondary,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 0,
@@ -123,8 +123,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 8),
                 Text(
                   l10n.submitSubtitle,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
                     fontSize: 12,
                     height: 1.35,
                     fontWeight: FontWeight.w600,
@@ -158,8 +158,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 6),
                 Text(
                   l10n.submitScreenshotSizeError,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -418,8 +418,8 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        color: Color(0xFF62626A),
+      style: TextStyle(
+        color: AppColors.textSecondary(context),
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 0,
@@ -449,10 +449,10 @@ class _ChipRow extends StatelessWidget {
         return ChoiceChip(
           selected: isSelected,
           label: Text(value),
-          selectedColor: Colors.black,
-          backgroundColor: const Color(0xFFF4F4F6),
+          selectedColor: AppColors.primary,
+          backgroundColor: AppColors.surfaceAlt(context),
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textMuted,
+            color: isSelected ? Colors.white : AppColors.textSecondary(context),
             fontSize: 11,
             fontWeight: FontWeight.w800,
           ),
@@ -525,8 +525,8 @@ class _AddScreenshotSlot extends StatelessWidget {
         width: 132,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: AppColors.inputFillLight,
-          border: Border.all(color: AppColors.border),
+          color: AppColors.surfaceAlt(context),
+          border: Border.all(color: AppColors.outline(context)),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -541,8 +541,8 @@ class _AddScreenshotSlot extends StatelessWidget {
             Text(
               pickLabel,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.textMuted,
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
               ),
@@ -573,8 +573,8 @@ class _ScreenshotSlot extends StatelessWidget {
           width: 132,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: const Color(0xFFF8F8FA),
-            border: Border.all(color: AppColors.border),
+            color: AppColors.surfaceAlt(context),
+            border: Border.all(color: AppColors.outline(context)),
             borderRadius: BorderRadius.circular(16),
           ),
           child: path == null

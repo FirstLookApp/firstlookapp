@@ -11,9 +11,12 @@ import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:firstlook/widgets/firstlook_logo.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FirstLookScreenHeader extends ConsumerWidget {
   const FirstLookScreenHeader({super.key});
@@ -178,7 +181,7 @@ class FirstLookSegmentedControl<T> extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: AppColors.chipFill,
+        color: AppColors.surfaceAlt(context),
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: Row(
@@ -201,7 +204,9 @@ class FirstLookSegmentedControl<T> extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : AppColors.secondary,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.textPrimary(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0,
@@ -278,14 +283,14 @@ class FirstLookSoftCard extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface(context),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const <BoxShadow>[
+        border: Border.all(color: AppColors.outline(context)),
+        boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.shadow,
+            color: AppColors.adaptiveShadow(context),
             blurRadius: 22,
-            offset: Offset(0, 10),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -298,183 +303,400 @@ Future<void> showFirstLookSettings(
   BuildContext context,
   WidgetRef ref,
 ) {
-  return showDialog<void>(
+  return showModalBottomSheet<void>(
     context: context,
-    builder: (BuildContext dialogContext) {
-      return Consumer(
-        builder: (BuildContext context, WidgetRef ref, Widget? child) {
-          final AppLocalizations l10n = AppLocalizations.of(context)!;
-          final AppFeedbackSettings settings =
-              ref.watch(appFeedbackSettingsProvider);
-          final Locale locale = ref.watch(appLocaleProvider);
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 46),
-            child: FirstLookSoftCard(
-              padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const FirstLookLogo(size: 36),
-                  const SizedBox(height: 12),
-                  _SettingsRow(
-                    label: l10n.settingsLanguage,
-                    left: 'TR',
-                    right: 'EN',
-                    selectedLeft: locale.languageCode == 'tr',
-                    onLeft: () => ref
-                        .read(appLocaleProvider.notifier)
-                        .setLocale(const Locale('tr')),
-                    onRight: () => ref
-                        .read(appLocaleProvider.notifier)
-                        .setLocale(const Locale('en')),
-                  ),
-                  _SettingsRow(
-                    label: l10n.settingsNotifications,
-                    left: l10n.settingsOn,
-                    right: l10n.settingsOff,
-                    selectedLeft: settings.soundEnabled,
-                    onLeft: () => ref
-                        .read(appFeedbackSettingsProvider.notifier)
-                        .setSoundEnabled(true),
-                    onRight: () => ref
-                        .read(appFeedbackSettingsProvider.notifier)
-                        .setSoundEnabled(false),
-                  ),
-                  _SettingsRow(
-                    label: l10n.settingsVibration,
-                    left: l10n.settingsOn,
-                    right: l10n.settingsOff,
-                    selectedLeft: settings.vibrationEnabled,
-                    onLeft: () => ref
-                        .read(appFeedbackSettingsProvider.notifier)
-                        .setVibrationEnabled(true),
-                    onRight: () => ref
-                        .read(appFeedbackSettingsProvider.notifier)
-                        .setVibrationEnabled(false),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 38,
-                    width: 136,
-                    child: FilledButton(
-                      onPressed: () {
-                        Navigator.of(dialogContext).pop();
-                        ref.read(authControllerProvider.notifier).logout();
-                      },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        textStyle: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      child: Text(l10n.logoutButton.toUpperCase()),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      );
-    },
+    useRootNavigator: true,
+    isScrollControlled: true,
+    enableDrag: true,
+    isDismissible: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withValues(alpha: 0.38),
+    builder: (_) => const _FirstLookSettingsSheet(),
   );
 }
 
-class _SettingsRow extends StatelessWidget {
-  const _SettingsRow({
-    required this.label,
-    required this.left,
-    required this.right,
-    required this.selectedLeft,
-    this.onLeft,
-    this.onRight,
-  });
+class _FirstLookSettingsSheet extends ConsumerStatefulWidget {
+  const _FirstLookSettingsSheet();
 
-  final String label;
-  final String left;
-  final String right;
-  final bool selectedLeft;
-  final VoidCallback? onLeft;
-  final VoidCallback? onRight;
+  @override
+  ConsumerState<_FirstLookSettingsSheet> createState() =>
+      _FirstLookSettingsSheetState();
+}
+
+class _FirstLookSettingsSheetState
+    extends ConsumerState<_FirstLookSettingsSheet>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 520),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _rateApp() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final Uri uri = defaultTargetPlatform == TargetPlatform.iOS
+        ? Uri.parse('https://apps.apple.com/search?term=Firstlook')
+        : Uri.parse(
+            'https://play.google.com/store/apps/details?id=com.example.firstlook',
+          );
+    final bool opened =
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.settingsRateError)),
+      );
+    }
+  }
+
+  Animation<double> _cardAnimation(int index) => CurvedAnimation(
+        parent: _controller,
+        curve: Interval(
+          0.12 + (index * 0.08),
+          0.56 + (index * 0.08),
+          curve: Curves.easeOutCubic,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.secondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final AppFeedbackSettings settings = ref.watch(appFeedbackSettingsProvider);
+    final Locale locale = ref.watch(appLocaleProvider);
+    final bool darkModeEnabled = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final double height = MediaQuery.sizeOf(context).height * 0.74;
+
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.background(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Color(0x26000000),
+              blurRadius: 36,
+              offset: Offset(0, -10),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            children: <Widget>[
+              const SizedBox(height: 10),
+              Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE2E2E7),
+                  borderRadius: BorderRadius.circular(99),
+                ),
               ),
-            ),
-          ),
-          Container(
-            height: 28,
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              color: AppColors.chipFill,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: <Widget>[
-                _SettingsPill(
-                  label: left,
-                  selected: selectedLeft,
-                  onTap: onLeft,
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+                  child: Column(
+                    children: <Widget>[
+                      const FirstLookLogo(size: 27),
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.settingsTitle,
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 23,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        l10n.settingsSubtitle,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      _AnimatedSettingsItem(
+                        animation: _cardAnimation(0),
+                        child: _SettingsCard(
+                          icon: Icons.language_rounded,
+                          title: l10n.settingsLanguage,
+                          subtitle: l10n.settingsLanguageSubtitle,
+                          trailing: SizedBox(
+                            width: 116,
+                            child: FirstLookSegmentedControl<String>(
+                              values: const <String>['TR', 'EN'],
+                              selected:
+                                  locale.languageCode == 'tr' ? 'TR' : 'EN',
+                              labelBuilder: (String value) => value,
+                              onChanged: (String value) => ref
+                                  .read(appLocaleProvider.notifier)
+                                  .setLocale(Locale(value.toLowerCase())),
+                              height: 36,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _AnimatedSettingsItem(
+                        animation: _cardAnimation(1),
+                        child: _SettingsCard(
+                          icon: Icons.volume_up_outlined,
+                          title: l10n.settingsNotifications,
+                          subtitle: l10n.settingsSoundSubtitle,
+                          trailing: CupertinoSwitch(
+                            value: settings.soundEnabled,
+                            activeTrackColor: AppColors.primary,
+                            onChanged: (bool value) => ref
+                                .read(appFeedbackSettingsProvider.notifier)
+                                .setSoundEnabled(value),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _AnimatedSettingsItem(
+                        animation: _cardAnimation(2),
+                        child: _SettingsCard(
+                          icon: Icons.vibration_rounded,
+                          title: l10n.settingsVibration,
+                          subtitle: l10n.settingsVibrationSubtitle,
+                          trailing: CupertinoSwitch(
+                            value: settings.vibrationEnabled,
+                            activeTrackColor: AppColors.primary,
+                            onChanged: (bool value) => ref
+                                .read(appFeedbackSettingsProvider.notifier)
+                                .setVibrationEnabled(value),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _AnimatedSettingsItem(
+                        animation: _cardAnimation(3),
+                        child: _SettingsCard(
+                          icon: Icons.star_outline_rounded,
+                          title: l10n.settingsRateApp,
+                          subtitle: l10n.settingsRateAppSubtitle,
+                          onTap: _rateApp,
+                          trailing: const Icon(
+                            Icons.chevron_right_rounded,
+                            color: AppColors.textSoft,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _AnimatedSettingsItem(
+                        animation: _cardAnimation(4),
+                        child: _SettingsCard(
+                          icon: Icons.dark_mode_outlined,
+                          iconColor: AppColors.textMuted,
+                          iconBackground: AppColors.surfaceAlt(context),
+                          title: l10n.settingsDarkMode,
+                          subtitle: l10n.settingsDarkModeSubtitle,
+                          trailing: CupertinoSwitch(
+                            value: darkModeEnabled,
+                            activeTrackColor: AppColors.primary,
+                            onChanged: (bool value) => ref
+                                .read(themeModeProvider.notifier)
+                                .setDarkMode(value),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _SettingsLogoutButton(
+                        label: l10n.logoutButton.toUpperCase(),
+                        onPressed: () async {
+                          final GoRouter router = GoRouter.of(context);
+                          Navigator.of(context).pop();
+                          await ref
+                              .read(authControllerProvider.notifier)
+                              .logout();
+                          router.go(RouteNames.loginPath);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                _SettingsPill(
-                  label: right,
-                  selected: !selectedLeft,
-                  onTap: onRight,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _SettingsPill extends StatelessWidget {
-  const _SettingsPill({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+class _AnimatedSettingsItem extends StatelessWidget {
+  const _AnimatedSettingsItem({required this.animation, required this.child});
 
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
+  final Animation<double> animation;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 46,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.08),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      ),
+    );
+  }
+}
+
+class _SettingsCard extends StatelessWidget {
+  const _SettingsCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    this.onTap,
+    this.iconColor = AppColors.primary,
+    this.iconBackground = AppColors.primarySoft,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+  final VoidCallback? onTap;
+  final Color iconColor;
+  final Color iconBackground;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface(context),
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 70),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outline(context)),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppColors.adaptiveShadow(context),
+                blurRadius: 16,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+          child: Row(
+            children: <Widget>[
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: iconBackground,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textPrimary(context),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontSize: 10,
+                        height: 1.25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              trailing,
+            ],
+          ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: selected ? Colors.white : AppColors.secondary,
-            fontSize: 9,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
+      ),
+    );
+  }
+}
+
+class _SettingsLogoutButton extends StatefulWidget {
+  const _SettingsLogoutButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  State<_SettingsLogoutButton> createState() => _SettingsLogoutButtonState();
+}
+
+class _SettingsLogoutButtonState extends State<_SettingsLogoutButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => setState(() => _pressed = true),
+      onPointerUp: (_) => setState(() => _pressed = false),
+      onPointerCancel: (_) => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.98 : 1,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: FilledButton.icon(
+            onPressed: widget.onPressed,
+            icon: const Icon(Icons.logout_rounded, size: 19),
+            label: Text(widget.label),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.8,
+              ),
+            ),
           ),
         ),
       ),
@@ -554,13 +776,13 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface(context),
                   borderRadius: BorderRadius.circular(26),
-                  boxShadow: const <BoxShadow>[
+                  boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: AppColors.shadow,
+                      color: AppColors.adaptiveShadow(context),
                       blurRadius: 34,
-                      offset: Offset(0, 18),
+                      offset: const Offset(0, 18),
                     ),
                   ],
                 ),
@@ -777,7 +999,7 @@ class _SearchSectionTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: AppColors.secondary,
+            color: AppColors.textPrimary(context),
             fontWeight: FontWeight.w900,
           ),
     );
@@ -894,8 +1116,8 @@ class _SearchEmpty extends StatelessWidget {
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),

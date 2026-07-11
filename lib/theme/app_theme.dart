@@ -17,9 +17,23 @@ abstract final class AppTheme {
   }
 
   static ThemeData get dark {
-    final ColorScheme colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.seedDark,
-      brightness: Brightness.dark,
+    const ColorScheme colorScheme = ColorScheme.dark(
+      primary: AppColors.seedDark,
+      onPrimary: Colors.white,
+      surface: Color(0xFF101114),
+      onSurface: Color(0xFFF4F4F5),
+      onSurfaceVariant: Color(0xFFA9ABB3),
+      surfaceContainerLowest: Color(0xFF101114),
+      surfaceContainerLow: Color(0xFF181A1F),
+      surfaceContainer: Color(0xFF202329),
+      surfaceContainerHigh: Color(0xFF272A31),
+      surfaceContainerHighest: Color(0xFF30343C),
+      surfaceTint: Colors.transparent,
+      outline: Color(0xFF3A3F48),
+      outlineVariant: Color(0xFF2C3037),
+      shadow: Colors.black,
+      scrim: Colors.black,
+      error: Color(0xFFFF6B72),
     );
 
     return _buildTheme(
@@ -59,6 +73,8 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
+      applyElevationOverlayColor: false,
+      canvasColor: colorScheme.surface,
       scaffoldBackgroundColor: colorScheme.surface,
       textTheme: textTheme,
       fontFamily: GoogleFonts.baloo2().fontFamily,
@@ -81,11 +97,11 @@ abstract final class AppTheme {
             : colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
@@ -111,6 +127,27 @@ abstract final class AppTheme {
             : colorScheme.surfaceContainerLow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        ),
+      ),
+      dividerColor: brightness == Brightness.dark
+          ? const Color(0xFF2C3037)
+          : AppColors.border,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: brightness == Brightness.dark
+            ? const Color(0xFF101114)
+            : Colors.white,
+        modalBackgroundColor: brightness == Brightness.dark
+            ? const Color(0xFF101114)
+            : Colors.white,
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: brightness == Brightness.dark
+            ? const Color(0xFF2A2D34)
+            : const Color(0xFF25252A),
+        contentTextStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: GoogleFonts.baloo2().fontFamily,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

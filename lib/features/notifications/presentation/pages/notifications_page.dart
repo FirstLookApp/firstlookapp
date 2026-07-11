@@ -20,18 +20,18 @@ class NotificationsPage extends ConsumerWidget {
         ref.watch(notificationsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
+        backgroundColor: AppColors.background(context),
+        surfaceTintColor: AppColors.background(context),
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_new_rounded,
             size: 18,
-            color: Colors.black,
+            color: AppColors.textPrimary(context),
           ),
         ),
       ),
@@ -108,8 +108,8 @@ class _NotificationsTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: const TextStyle(
-        color: Colors.black,
+      style: TextStyle(
+        color: AppColors.textPrimary(context),
         fontSize: 21,
         fontWeight: FontWeight.w900,
         height: 1,
@@ -143,12 +143,12 @@ class _NotificationTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: item.isRead
-                    ? const Color(0xFFFCFCFD)
-                    : AppColors.primarySoft.withValues(alpha: 0.55),
+                    ? AppColors.surface(context)
+                    : AppColors.softPrimary(context),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: item.isRead
-                      ? const Color(0xFFF0F0F3)
+                      ? AppColors.outline(context)
                       : AppColors.primary.withValues(alpha: 0.18),
                 ),
               ),
@@ -186,7 +186,7 @@ class _NotificationTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: Colors.black,
+                            color: AppColors.textPrimary(context),
                             fontSize: 13,
                             fontWeight:
                                 item.isRead ? FontWeight.w800 : FontWeight.w900,
@@ -199,8 +199,8 @@ class _NotificationTile extends StatelessWidget {
                           item.message,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
                             fontSize: 11,
                             height: 1.3,
                             fontWeight: FontWeight.w600,
@@ -210,9 +210,9 @@ class _NotificationTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(
+                  Icon(
                     Icons.chevron_right_rounded,
-                    color: AppColors.textSoft,
+                    color: AppColors.textSecondary(context),
                     size: 20,
                   ),
                 ],
@@ -242,9 +242,9 @@ class _NotificationDetailSheet extends StatelessWidget {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(22, 12, 22, 28),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        decoration: BoxDecoration(
+          color: AppColors.surface(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -255,7 +255,7 @@ class _NotificationDetailSheet extends StatelessWidget {
                 width: 38,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: AppColors.border,
+                  color: AppColors.outline(context),
                   borderRadius: BorderRadius.circular(99),
                 ),
               ),
@@ -265,8 +265,8 @@ class _NotificationDetailSheet extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               item.title,
-              style: const TextStyle(
-                color: Colors.black,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
                 fontSize: 20,
                 height: 1.15,
                 fontWeight: FontWeight.w900,
@@ -275,8 +275,8 @@ class _NotificationDetailSheet extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               createdAt,
-              style: const TextStyle(
-                color: AppColors.textMuted,
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -284,8 +284,8 @@ class _NotificationDetailSheet extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               item.message,
-              style: const TextStyle(
-                color: AppColors.secondary,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
                 fontSize: 15,
                 height: 1.55,
                 fontWeight: FontWeight.w500,
@@ -328,8 +328,8 @@ class _EmptyNotifications extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 70),
       padding: const EdgeInsets.only(top: 30),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: AppColors.outline(context))),
       ),
       child: Column(
         children: <Widget>[
@@ -342,8 +342,8 @@ class _EmptyNotifications extends StatelessWidget {
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 12,
               height: 1.35,
               fontWeight: FontWeight.w600,

@@ -12,6 +12,10 @@ import 'package:firstlook/features/auth/presentation/pages/splash_page.dart';
 import 'package:firstlook/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:firstlook/features/home/presentation/pages/discover_page.dart';
 import 'package:firstlook/features/notifications/presentation/pages/notifications_page.dart';
+import 'package:firstlook/features/onboarding/presentation/controllers/onboarding_controller.dart';
+import 'package:firstlook/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:firstlook/features/onboarding/presentation/pages/review_onboarding_page.dart';
+import 'package:firstlook/features/onboarding/presentation/pages/reward_onboarding_page.dart';
 import 'package:firstlook/features/profile/presentation/pages/profile_page.dart';
 import 'package:firstlook/features/profile/presentation/pages/user_profile_preview_page.dart';
 import 'package:firstlook/features/submit/presentation/pages/submit_page.dart';
@@ -40,6 +44,10 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
       }
     },
   );
+  ref.listen<bool>(
+    onboardingControllerProvider,
+    (bool? previous, bool next) => refreshNotifier.notify(),
+  );
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -56,12 +64,26 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
       final AuthState? currentAuthState = authState.valueOrNull;
       final AuthStatus? status = currentAuthState?.status;
       final bool isAuthenticated = status == AuthStatus.authenticated;
+      final bool onboardingCompleted = ref.read(onboardingControllerProvider);
+      final bool isOnboardingRoute = <String>{
+        RouteNames.onboardingPath,
+        RouteNames.onboardingReviewPath,
+        RouteNames.onboardingRewardsPath,
+      }.contains(state.matchedLocation);
       final bool isAuthRoute = <String>{
         RouteNames.loginPath,
         RouteNames.registerPath,
         RouteNames.otpPath,
         RouteNames.forgotPasswordPath,
       }.contains(state.matchedLocation);
+
+      if (!onboardingCompleted && !isOnboardingRoute) {
+        return RouteNames.onboardingPath;
+      }
+
+      if (onboardingCompleted && isOnboardingRoute) {
+        return RouteNames.discoverPath;
+      }
 
       if (status == AuthStatus.otpRequired &&
           state.matchedLocation != RouteNames.otpPath) {
@@ -89,6 +111,71 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
         path: RouteNames.splashPath,
         name: RouteNames.splash,
         builder: (_, __) => const SplashPage(),
+      ),
+      GoRoute(
+        path: RouteNames.onboardingPath,
+        name: RouteNames.onboarding,
+        builder: (_, __) => const OnboardingPage(),
+      ),
+      GoRoute(
+        path: RouteNames.onboardingReviewPath,
+        name: RouteNames.onboardingReview,
+        pageBuilder: (_, __) => CustomTransitionPage<void>(
+          transitionDuration: const Duration(milliseconds: 320),
+          reverseTransitionDuration: const Duration(milliseconds: 240),
+          child: const ReviewOnboardingPage(),
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            final Animation<double> curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOutCubic,
+            );
+            return FadeTransition(
+              opacity: curved,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.025),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: child,
+              ),
+            );
+          },
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.onboardingRewardsPath,
+        name: RouteNames.onboardingRewards,
+        pageBuilder: (_, __) => CustomTransitionPage<void>(
+          transitionDuration: const Duration(milliseconds: 320),
+          reverseTransitionDuration: const Duration(milliseconds: 240),
+          child: const RewardOnboardingPage(),
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            final Animation<double> curved = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOutCubic,
+            );
+            return FadeTransition(
+              opacity: curved,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.025),
+                  end: Offset.zero,
+                ).animate(curved),
+                child: child,
+              ),
+            );
+          },
+        ),
       ),
       GoRoute(
         path: RouteNames.loginPath,
@@ -218,7 +305,9 @@ final appRouterProvider = Provider<GoRouter>((Ref ref) {
 });
 
 bool _requiresAuthentication(String path) {
-  return path == RouteNames.favoritesPath ||
+  return path == RouteNames.submitPath ||
+      path.startsWith('${RouteNames.submitPath}/') ||
+      path == RouteNames.favoritesPath ||
       path.startsWith('${RouteNames.favoritesPath}/') ||
       path == RouteNames.profilePath ||
       path.startsWith('${RouteNames.profilePath}/') ||

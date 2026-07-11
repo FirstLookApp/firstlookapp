@@ -12,6 +12,58 @@ class AppLocalizationsTr extends AppLocalizations {
   String get appName => 'FirstLook';
 
   @override
+  String get onboardingDiscoverTitle => 'Uygulamaları Keşfet';
+
+  @override
+  String get onboardingDiscoverSubtitle =>
+      'En yeni mobil uygulamaları incele, favorilerini keşfet.';
+
+  @override
+  String get onboardingFeatureNewApps => 'Yeni uygulamalar';
+
+  @override
+  String get onboardingFeatureRealReviews => 'Gerçek kullanıcı yorumları';
+
+  @override
+  String get onboardingFeatureDailyDiscoveries => 'Günlük keşifler';
+
+  @override
+  String get onboardingStart => 'Hemen Başla';
+
+  @override
+  String get onboardingSkip => 'Geç';
+
+  @override
+  String get onboardingReviewTitle => 'Deneyimini Paylaş';
+
+  @override
+  String get onboardingReviewSubtitle =>
+      'Kullandığın uygulamaları değerlendir, yorum yap ve diğer kullanıcıların daha doğru seçim yapmasına yardımcı ol.';
+
+  @override
+  String get onboardingFeatureTrustedRatings => 'Güvenilir puanlama';
+
+  @override
+  String get onboardingFeatureCommunityExperience => 'Topluluk deneyimi';
+
+  @override
+  String get onboardingShareExperience => 'Deneyimini Paylaş';
+
+  @override
+  String get onboardingReviewCommentOne => 'Harika tasarım ve çok kullanışlı.';
+
+  @override
+  String get onboardingReviewCommentTwo => 'Arayüzü oldukça başarılı.';
+
+  @override
+  String get onboardingReviewCommentThree => 'Kesinlikle tavsiye ederim.';
+
+  @override
+  String onboardingHelpfulCount(int count) {
+    return '+$count kişi faydalı buldu';
+  }
+
+  @override
   String get commonRetry => 'Tekrar Dene';
 
   @override
@@ -232,6 +284,39 @@ class AppLocalizationsTr extends AppLocalizations {
   String get discoverSubtitle => 'Keşfet';
 
   @override
+  String get discoverWelcomeTitle => 'Merhaba';
+
+  @override
+  String get discoverWelcomeSubtitle =>
+      'Bugün keşfetmen için\nseçtiğimiz uygulamalar.';
+
+  @override
+  String get discoverNewDrops => 'Yeni Drop';
+
+  @override
+  String get discoverDailyDiscovery => 'Günlük Keşif';
+
+  @override
+  String get discoverNewLabel => 'yeni';
+
+  @override
+  String get discoverWeeklyDropsTitle => 'Bu Haftanın Drop\'ları 👑';
+
+  @override
+  String get discoverWeeklyDropsSubtitle =>
+      'Topluluk tarafından en çok öne çıkan uygulamalar.';
+
+  @override
+  String get discoverCommunityTitle => 'Topluluğun Önerileri';
+
+  @override
+  String get discoverReviewerBadge => 'Top Reviewer';
+
+  @override
+  String get discoverPlaceholderReview =>
+      'Topluluk yorumları yakında burada yer alacak.';
+
+  @override
   String get leaderboardTitle => 'Liderlik Tablosu';
 
   @override
@@ -441,19 +526,93 @@ class AppLocalizationsTr extends AppLocalizations {
   String get profileAvatarLoadError => 'Avatarlar şu anda yüklenemiyor.';
 
   @override
-  String get settingsLanguage => 'Dil Seçeneği';
+  String get settingsTitle => 'Ayarlar';
+
+  @override
+  String get settingsSubtitle => 'Uygulama deneyimini kişiselleştir.';
+
+  @override
+  String get settingsLanguage => 'Dil';
+
+  @override
+  String get settingsLanguageSubtitle => 'Uygulama dili';
 
   @override
   String get settingsNotifications => 'Ses';
 
   @override
+  String get settingsSoundSubtitle => 'Bildirim ve uygulama sesleri';
+
+  @override
   String get settingsVibration => 'Titreşim';
+
+  @override
+  String get settingsVibrationSubtitle => 'Dokunsal geri bildirim';
+
+  @override
+  String get settingsRateApp => 'Uygulamayı Puanla';
+
+  @override
+  String get settingsRateAppSubtitle =>
+      'Bizi App Store veya Google Play\'de değerlendir.';
+
+  @override
+  String get settingsRateError => 'Uygulama mağazası açılamadı.';
+
+  @override
+  String get settingsDarkMode => 'Koyu Tema';
+
+  @override
+  String get settingsDarkModeSubtitle => 'Karanlık görünüm';
+
+  @override
+  String get settingsSoon => 'Yakında';
+
+  @override
+  String get settingsComingSoon => 'COMING SOON';
+
+  @override
+  String get settingsDarkModeMessage => 'Koyu tema yakında eklenecek.';
 
   @override
   String get settingsOn => 'Açık';
 
   @override
   String get settingsOff => 'Kapalı';
+
+  @override
+  String get onboardingRewardsTitle => 'Uygulamanı Yayınla, Zirveye Çık';
+
+  @override
+  String get onboardingRewardsSubtitle =>
+      'Uygulamanı Firstlook topluluğuyla paylaş. Beğeni topladıkça haftalık uygulama liderliğinde yüksel ve daha fazla kişiye ulaş.';
+
+  @override
+  String get onboardingFeatureLeaderboard => 'Uygulamanı Yayınla';
+
+  @override
+  String get onboardingFeatureBadges => 'Beğeni Topla';
+
+  @override
+  String get onboardingFeatureDailyTasks => 'Liderlikte Yüksel';
+
+  @override
+  String get onboardingStartDiscovering => 'Uygulamanı Gönder';
+
+  @override
+  String get onboardingAchievementLeader => 'Haftanın Uygulaması';
+
+  @override
+  String get onboardingAchievementBadge => 'Hızla Yükseliyor';
+
+  @override
+  String get onboardingAchievementActive => 'Yeni Uygulama';
+
+  @override
+  String get onboardingAppLeaderboard => 'Uygulama Liderliği';
+
+  @override
+  String get onboardingLikesLabel => 'beğeni';
 
   @override
   String get searchHint => 'Uygulama veya kullanıcı ara';
@@ -470,4 +629,14 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get searchUsersTodo => 'Kullanıcı araması şu anda kullanılamıyor.';
+
+  @override
+  String get developerPromptTitle =>
+      'Eğer geliştiriciyseniz uygulama göndermek için kayıt olun.';
+
+  @override
+  String get developerPromptRegister => 'Kayıt Ol';
+
+  @override
+  String get developerPromptContinue => 'Keşfetmeye Devam Et';
 }

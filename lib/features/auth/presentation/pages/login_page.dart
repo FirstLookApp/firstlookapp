@@ -1,6 +1,7 @@
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/auth/presentation/widgets/login_form.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +15,7 @@ class LoginPage extends StatelessWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: Stack(
           children: <Widget>[

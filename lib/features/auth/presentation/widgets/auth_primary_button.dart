@@ -29,10 +29,10 @@ class AuthPrimaryButton extends StatelessWidget {
       backgroundColor: WidgetStateProperty.resolveWith<Color>(
         (Set<WidgetState> states) {
           if (states.contains(WidgetState.disabled)) {
-            return outlined ? Colors.white : const Color(0xFFE9E9EE);
+            return AppColors.surfaceAlt(context);
           }
 
-          return outlined ? Colors.white : AppColors.primary;
+          return outlined ? AppColors.surface(context) : AppColors.primary;
         },
       ),
       foregroundColor: WidgetStateProperty.resolveWith<Color>(
@@ -52,7 +52,7 @@ class AuthPrimaryButton extends StatelessWidget {
 
           return BorderSide(
             color: states.contains(WidgetState.disabled)
-                ? AppColors.border
+                ? AppColors.outline(context)
                 : AppColors.primary,
           );
         },

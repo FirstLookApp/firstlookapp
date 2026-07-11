@@ -70,8 +70,28 @@ final authControllerProvider = AsyncNotifierProvider<AuthController, AuthState>(
   AuthController.new,
 );
 
-final themeModeProvider = StateProvider<ThemeMode>(
-  (Ref ref) => ThemeMode.system,
+class ThemeModeController extends StateNotifier<ThemeMode> {
+  ThemeModeController()
+      : super(
+          (HiveService.preferencesBox.get(
+            LocalStorageKeys.darkModeEnabled,
+            defaultValue: false,
+          ) as bool)
+              ? ThemeMode.dark
+              : ThemeMode.light,
+        );
+
+  Future<void> setDarkMode(bool enabled) async {
+    state = enabled ? ThemeMode.dark : ThemeMode.light;
+    await HiveService.preferencesBox.put(
+      LocalStorageKeys.darkModeEnabled,
+      enabled,
+    );
+  }
+}
+
+final themeModeProvider = StateNotifierProvider<ThemeModeController, ThemeMode>(
+  (Ref ref) => ThemeModeController(),
 );
 
 class AppLocaleController extends StateNotifier<Locale> {

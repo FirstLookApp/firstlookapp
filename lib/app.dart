@@ -1,7 +1,10 @@
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/app_router.dart';
+import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/localization/app_localizations.dart';
+import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_theme.dart';
+import 'package:firstlook/widgets/firstlook_startup_experience.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,7 @@ class FirstLookApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ThemeMode themeMode = ref.watch(themeModeProvider);
     final Locale locale = ref.watch(appLocaleProvider);
+    final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
     final GoRouter router = ref.watch(appRouterProvider);
 
     return MaterialApp.router(
@@ -21,10 +25,20 @@ class FirstLookApp extends ConsumerWidget {
           AppLocalizations.of(context)?.appName ?? 'FirstLook',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
+      themeAnimationDuration: Duration.zero,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       locale: locale,
       routerConfig: router,
+      builder: (BuildContext context, Widget? child) {
+        return ColoredBox(
+          color: AppColors.background(context),
+          child: FirstLookStartupExperience(
+            isAppReady: !authState.isLoading,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        );
+      },
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
         AppLocalizations.delegate,

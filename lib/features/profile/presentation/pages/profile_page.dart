@@ -34,7 +34,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     final AsyncValue<UserProfile> profile = ref.watch(profileProvider);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background(context),
       body: SafeArea(
         child: profile.when(
           data: (UserProfile user) => RefreshIndicator(
@@ -91,24 +91,34 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     );
   }
 
-  Future<void> _showProfileEditor(BuildContext context, UserProfile user) async {
-    final TextEditingController firstName = TextEditingController(text: user.firstName);
-    final TextEditingController lastName = TextEditingController(text: user.lastName);
-    final TextEditingController biography = TextEditingController(text: user.biography);
+  Future<void> _showProfileEditor(
+      BuildContext context, UserProfile user) async {
+    final TextEditingController firstName =
+        TextEditingController(text: user.firstName);
+    final TextEditingController lastName =
+        TextEditingController(text: user.lastName);
+    final TextEditingController biography =
+        TextEditingController(text: user.biography);
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext sheetContext) => SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
+        padding: EdgeInsets.fromLTRB(
+            20, 20, 20, MediaQuery.viewInsetsOf(sheetContext).bottom + 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            const Text('Profili düzenle', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+            const Text('Profili düzenle',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
             const SizedBox(height: 24),
-            TextField(controller: firstName, decoration: const InputDecoration(labelText: 'Ad')),
+            TextField(
+                controller: firstName,
+                decoration: const InputDecoration(labelText: 'Ad')),
             const SizedBox(height: 18),
-            TextField(controller: lastName, decoration: const InputDecoration(labelText: 'Soyad')),
+            TextField(
+                controller: lastName,
+                decoration: const InputDecoration(labelText: 'Soyad')),
             const SizedBox(height: 18),
             TextField(
               controller: biography,
@@ -130,10 +140,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             FilledButton(
               onPressed: () async {
                 await ref.read(firstLookRepositoryProvider).updateProfile(
-                  firstName: firstName.text.trim(),
-                  lastName: lastName.text.trim(),
-                  biography: biography.text.trim(),
-                );
+                      firstName: firstName.text.trim(),
+                      lastName: lastName.text.trim(),
+                      biography: biography.text.trim(),
+                    );
                 ref.invalidate(profileProvider);
                 if (sheetContext.mounted) Navigator.of(sheetContext).pop();
               },
@@ -204,8 +214,8 @@ class _ProfileIdentity extends StatelessWidget {
         Text(
           displayName.isEmpty ? user.username : displayName,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.secondary,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
             fontSize: 20,
             fontWeight: FontWeight.w900,
           ),
@@ -214,8 +224,8 @@ class _ProfileIdentity extends StatelessWidget {
         Text(
           user.biography.isEmpty ? '@${user.username}' : user.biography,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
@@ -278,9 +288,9 @@ class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
         ref.watch(profileAvatarsProvider);
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(
         20,
@@ -302,7 +312,7 @@ class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
                       child: Text(
                         l10n.profileAvatarTitle,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.secondary,
+                              color: AppColors.textPrimary(context),
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -315,8 +325,8 @@ class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
                 ),
                 Text(
                   l10n.profileAvatarSubtitle,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -382,6 +392,7 @@ class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
 
   Future<void> _saveAvatar(BuildContext context) async {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final String? avatarId = _selectedAvatarId;
     if (avatarId == null) {
       return;
@@ -393,7 +404,9 @@ class _AvatarPickerSheetState extends ConsumerState<_AvatarPickerSheet> {
       ref.invalidate(profileProvider);
       if (context.mounted) {
         Navigator.of(context).pop();
-        AppSnackbar.show(context, message: l10n.profileAvatarSaved);
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.profileAvatarSaved)),
+        );
       }
     } catch (_) {
       if (context.mounted) {
@@ -430,7 +443,8 @@ class _AvatarOptionTile extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: selected ? AppColors.primary : AppColors.border,
+                color:
+                    selected ? AppColors.primary : AppColors.outline(context),
                 width: selected ? 3 : 1,
               ),
             ),
@@ -451,8 +465,8 @@ class _AvatarOptionTile extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppColors.secondary,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
               fontSize: 10,
               fontWeight: FontWeight.w800,
             ),
@@ -476,8 +490,8 @@ class _AvatarEmpty extends StatelessWidget {
         child: Text(
           message,
           textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: AppColors.textMuted,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
             fontSize: 13,
             height: 1.4,
             fontWeight: FontWeight.w700,
@@ -502,14 +516,14 @@ class _StatsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border),
+        color: AppColors.surface(context),
+        border: Border.all(color: AppColors.outline(context)),
         borderRadius: BorderRadius.circular(18),
-        boxShadow: const <BoxShadow>[
+        boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.shadow,
+            color: AppColors.adaptiveShadow(context),
             blurRadius: 20,
-            offset: Offset(0, 8),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -542,8 +556,8 @@ class _Stat extends StatelessWidget {
         children: <Widget>[
           Text(
             _compactCount(value),
-            style: const TextStyle(
-              color: AppColors.secondary,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
               fontSize: 17,
               fontWeight: FontWeight.w900,
             ),
@@ -551,8 +565,8 @@ class _Stat extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
-              color: AppColors.textMuted,
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
               fontSize: 10,
               fontWeight: FontWeight.w800,
             ),
@@ -580,7 +594,7 @@ class _ProfileTabs extends StatelessWidget {
       height: 42,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.chipFill,
+        color: AppColors.surfaceAlt(context),
         borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
@@ -626,7 +640,9 @@ class _TabButton extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? AppColors.secondary : AppColors.textMuted,
+              color: selected
+                  ? AppColors.secondary
+                  : AppColors.textSecondary(context),
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
@@ -697,14 +713,14 @@ class _ProfileApplicationCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border),
+          color: AppColors.surface(context),
+          border: Border.all(color: AppColors.outline(context)),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const <BoxShadow>[
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.shadow,
+              color: AppColors.adaptiveShadow(context),
               blurRadius: 16,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -736,8 +752,8 @@ class _ProfileApplicationCard extends StatelessWidget {
                     item.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.secondary,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                     ),
@@ -747,15 +763,18 @@ class _ProfileApplicationCard extends StatelessWidget {
                     item.shortDescription,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
                       fontSize: 12,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textSecondary(context),
+            ),
           ],
         ),
       ),
@@ -828,14 +847,14 @@ class _ProfileCommentCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: AppColors.border),
+          color: AppColors.surface(context),
+          border: Border.all(color: AppColors.outline(context)),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const <BoxShadow>[
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.shadow,
+              color: AppColors.adaptiveShadow(context),
               blurRadius: 16,
-              offset: Offset(0, 8),
+              offset: const Offset(0, 8),
             ),
           ],
         ),
@@ -873,8 +892,8 @@ class _ProfileCommentCard extends StatelessWidget {
                           item.applicationName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.secondary,
+                          style: TextStyle(
+                            color: AppColors.textPrimary(context),
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                           ),
@@ -883,8 +902,8 @@ class _ProfileCommentCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         _formatProfileCommentDate(item.createdAt),
-                        style: const TextStyle(
-                          color: AppColors.textMuted,
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                         ),
@@ -913,7 +932,7 @@ class _ProfileCommentCard extends StatelessWidget {
                           style: TextStyle(
                             color: receivedComment
                                 ? AppColors.primary
-                                : AppColors.secondary,
+                                : AppColors.textPrimary(context),
                             fontSize: 10,
                             fontWeight: FontWeight.w900,
                           ),
@@ -924,8 +943,8 @@ class _ProfileCommentCard extends StatelessWidget {
                           '@${item.commenterUsername}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textMuted,
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
                           ),
@@ -937,8 +956,8 @@ class _ProfileCommentCard extends StatelessWidget {
                     item.content,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppColors.textMuted,
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
                       fontSize: 12,
                       height: 1.35,
                       fontWeight: FontWeight.w600,
@@ -948,7 +967,10 @@ class _ProfileCommentCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(Icons.chevron_right_rounded, color: AppColors.textMuted),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textSecondary(context),
+            ),
           ],
         ),
       ),
@@ -972,8 +994,8 @@ class _CommentsPlaceholder extends StatelessWidget {
       child: Text(
         message.isEmpty ? l10n.commonNoData : message,
         textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: AppColors.textMuted,
+        style: TextStyle(
+          color: AppColors.textSecondary(context),
           fontSize: 13,
           height: 1.4,
         ),
