@@ -289,7 +289,7 @@ class FirstLookRemoteDataSource {
         'firstName': firstName,
         'lastName': lastName,
         'biography': biography,
-        'avatarId': avatarId,
+        if (avatarId != null) 'avatarId': avatarId,
       },
     );
     return ApiEnvelope<UserProfile>.fromJson(
