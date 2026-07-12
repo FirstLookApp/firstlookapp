@@ -208,7 +208,23 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
       return;
     }
 
-    final Uri? uri = Uri.tryParse(directUrl);
+    String destinationUrl = directUrl;
+    try {
+      final String trackedUrl =
+          await ref.read(firstLookRepositoryProvider).trackStoreClick(
+                id: app.id,
+                platform: widget.initialPlatform,
+              );
+      ref.invalidate(activeDropProvider);
+      ref.invalidate(leaderboardProvider);
+      if (trackedUrl.trim().isNotEmpty) {
+        destinationUrl = trackedUrl;
+      }
+    } catch (_) {
+      // Opening the verified local URL is still better than blocking the user.
+    }
+
+    final Uri? uri = Uri.tryParse(destinationUrl);
     if (uri == null) {
       _showMessage(l10n.commonUnexpectedError);
       return;
@@ -220,13 +236,6 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
       _showMessage(l10n.commonUnexpectedError);
       return;
     }
-
-    unawaited(
-      ref.read(firstLookRepositoryProvider).trackStoreClick(
-            id: app.id,
-            platform: widget.initialPlatform,
-          ),
-    );
   }
 
   String? _resolveStoreUrl(ApplicationDetail app) {

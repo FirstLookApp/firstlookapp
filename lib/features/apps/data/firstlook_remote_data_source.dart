@@ -249,7 +249,7 @@ class FirstLookRemoteDataSource {
     final Response<Map<String, dynamic>> response =
         await _dio.post<Map<String, dynamic>>(
       '${ApiPaths.interactions}/$id/store-click',
-      data: <String, dynamic>{'platform': platform.label},
+      data: <String, dynamic>{'platform': platform.apiValue},
       options: Options(extra: <String, dynamic>{'requiresAuth': false}),
     );
 
