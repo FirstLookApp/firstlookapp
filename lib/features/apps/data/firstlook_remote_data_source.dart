@@ -250,7 +250,6 @@ class FirstLookRemoteDataSource {
         await _dio.post<Map<String, dynamic>>(
       '${ApiPaths.interactions}/$id/store-click',
       data: <String, dynamic>{'platform': platform.apiValue},
-      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
     );
 
     final ApiEnvelope<String> envelope = ApiEnvelope<String>.fromJson(
