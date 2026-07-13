@@ -945,9 +945,7 @@ class _SearchSheetState extends ConsumerState<_SearchSheet> {
         final repository = ref.read(firstLookRepositoryProvider);
         final List<PagedResult<ApplicationListItem>> pages = await Future.wait(
           <Future<PagedResult<ApplicationListItem>>>[
-            repository.myApplications(
-              search: query,
-            ),
+            repository.searchApplications(search: query),
           ],
         );
 

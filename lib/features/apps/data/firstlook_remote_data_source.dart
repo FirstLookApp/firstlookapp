@@ -448,6 +448,31 @@ class FirstLookRemoteDataSource {
     return envelope.data;
   }
 
+  Future<PagedResult<ApplicationListItem>> searchApplications({
+    required String search,
+    int pageNumber = 1,
+    int pageSize = 20,
+  }) async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.discoverySearch,
+      queryParameters: <String, dynamic>{
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
+        'Search': search,
+      },
+      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
+    );
+
+    return ApiEnvelope<PagedResult<ApplicationListItem>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => PagedResult<ApplicationListItem>.fromJson(
+        json,
+        ApplicationListItem.fromJson,
+      ),
+    ).data;
+  }
+
   Future<PublicUserProfile> userProfile(String userId) async {
     final Response<Map<String, dynamic>> response =
         await _dio.get<Map<String, dynamic>>(ApiPaths.userProfile(userId));
