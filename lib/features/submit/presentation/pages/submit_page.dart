@@ -36,7 +36,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   final TextEditingController _appStoreUrl = TextEditingController();
   final TextEditingController _googlePlayUrl = TextEditingController();
 
-  int _selectedCategoryIndex = 1;
+  int _selectedCategoryIndex = 0;
   PlatformType _selectedPlatform = PlatformType.android;
   List<PlatformFile> _screenshots = <PlatformFile>[];
 
@@ -63,11 +63,10 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
-    final List<String> categories = <String>[
-      l10n.submitCategoryGame,
-      l10n.submitCategoryFinance,
-      l10n.submitCategoryEducation,
-    ];
+    final AsyncValue<List<String>> categoriesState =
+        ref.watch(dropCategoriesProvider);
+    final List<String> categories =
+        categoriesState.valueOrNull ?? const <String>[];
     final AsyncValue<String?> submitState =
         ref.watch(submitApplicationControllerProvider);
 
@@ -139,13 +138,25 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 16),
                 _Label(text: l10n.submitCategory),
                 const SizedBox(height: 8),
-                _ChipRow(
-                  values: categories,
-                  selected: categories[_selectedCategoryIndex],
-                  onChanged: (String value) => setState(
-                    () => _selectedCategoryIndex = categories.indexOf(value),
+                if (categoriesState.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (categories.isEmpty)
+                  Text(
+                    l10n.commonUnexpectedError,
+                    style: TextStyle(color: AppColors.textSecondary(context)),
+                  )
+                else
+                  _ChipRow(
+                    values: categories,
+                    selected: categories[_selectedCategoryIndex.clamp(
+                        0, categories.length - 1)],
+                    onChanged: (String value) => setState(
+                      () => _selectedCategoryIndex = categories.indexOf(value),
+                    ),
                   ),
-                ),
                 const SizedBox(height: 16),
                 _Label(text: l10n.submitScreenshotsLabel),
                 const SizedBox(height: 8),
@@ -220,7 +231,9 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 AuthPrimaryButton(
                   label: l10n.submitButton,
                   isLoading: submitState.isLoading,
-                  onPressed: () => _submit(l10n, categories),
+                  onPressed: categories.isEmpty
+                      ? null
+                      : () => _submit(l10n, categories),
                 ),
               ],
             ),
@@ -402,7 +415,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     }
 
     setState(() {
-      _selectedCategoryIndex = 1;
+      _selectedCategoryIndex = 0;
       _selectedPlatform = PlatformType.android;
       _screenshots = <PlatformFile>[];
     });

@@ -473,6 +473,24 @@ class FirstLookRemoteDataSource {
     ).data;
   }
 
+  Future<List<String>> dropCategories() async {
+    final Response<Map<String, dynamic>> response =
+        await _dio.get<Map<String, dynamic>>(
+      ApiPaths.categories,
+      queryParameters: const <String, dynamic>{'destination': 1},
+      options: Options(extra: <String, dynamic>{'requiresAuth': false}),
+    );
+
+    return ApiEnvelope<List<String>>.fromJson(
+      response.data ?? <String, dynamic>{},
+      (Object? json) => (json as List<dynamic>? ?? const <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map((Map<String, dynamic> item) => item['name'] as String? ?? '')
+          .where((String name) => name.isNotEmpty)
+          .toList(growable: false),
+    ).data;
+  }
+
   Future<PublicUserProfile> userProfile(String userId) async {
     final Response<Map<String, dynamic>> response =
         await _dio.get<Map<String, dynamic>>(ApiPaths.userProfile(userId));

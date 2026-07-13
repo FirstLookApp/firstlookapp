@@ -162,4 +162,8 @@ class FirstLookRepository {
       pageSize: pageSize,
     );
   }
+
+  Future<List<String>> dropCategories() {
+    return _remoteDataSource.dropCategories();
+  }
 }

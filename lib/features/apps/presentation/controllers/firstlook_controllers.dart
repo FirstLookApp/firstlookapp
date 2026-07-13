@@ -18,6 +18,10 @@ final activeDropProvider = FutureProvider<ActiveDropBatch?>((Ref ref) {
       );
 });
 
+final dropCategoriesProvider = FutureProvider<List<String>>((Ref ref) {
+  return ref.watch(firstLookRepositoryProvider).dropCategories();
+});
+
 final leaderboardPeriodProvider =
     StateProvider<LeaderboardPeriod>((Ref ref) => LeaderboardPeriod.weekly);
 
