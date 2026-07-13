@@ -51,6 +51,16 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.invalidate(dropCategoriesProvider);
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _name.dispose();
     _description.dispose();
@@ -149,12 +159,55 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                     style: TextStyle(color: AppColors.textSecondary(context)),
                   )
                 else
-                  _ChipRow(
-                    values: categories,
-                    selected: categories[_selectedCategoryIndex.clamp(
-                        0, categories.length - 1)],
-                    onChanged: (String value) => setState(
-                      () => _selectedCategoryIndex = categories.indexOf(value),
+                  DropdownButtonFormField<String>(
+                    key: ValueKey<String>(categories[_selectedCategoryIndex
+                        .clamp(0, categories.length - 1)]),
+                    initialValue: categories[
+                        _selectedCategoryIndex.clamp(0, categories.length - 1)],
+                    isExpanded: true,
+                    items: categories
+                        .map(
+                          (String category) => DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          ),
+                        )
+                        .toList(growable: false),
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        setState(
+                          () => _selectedCategoryIndex =
+                              categories.indexOf(value),
+                        );
+                      }
+                    },
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    dropdownColor: AppColors.surfaceAlt(context),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.surfaceAlt(context),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 4,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide:
+                            BorderSide(color: AppColors.outline(context)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide:
+                            BorderSide(color: AppColors.outline(context)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: const BorderSide(color: AppColors.primary),
+                      ),
                     ),
                   ),
                 const SizedBox(height: 16),
@@ -437,45 +490,6 @@ class _Label extends StatelessWidget {
         fontWeight: FontWeight.w800,
         letterSpacing: 0,
       ),
-    );
-  }
-}
-
-class _ChipRow extends StatelessWidget {
-  const _ChipRow({
-    required this.values,
-    required this.selected,
-    required this.onChanged,
-  });
-
-  final List<String> values;
-  final String selected;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      children: values.map((String value) {
-        final bool isSelected = value == selected;
-
-        return ChoiceChip(
-          selected: isSelected,
-          label: Text(value),
-          selectedColor: AppColors.primary,
-          backgroundColor: AppColors.surfaceAlt(context),
-          labelStyle: TextStyle(
-            color: isSelected ? Colors.white : AppColors.textSecondary(context),
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-          ),
-          side: BorderSide.none,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          onSelected: (_) => onChanged(value),
-        );
-      }).toList(),
     );
   }
 }
