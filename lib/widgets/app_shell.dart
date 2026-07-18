@@ -80,7 +80,7 @@ class _FirstLookBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final int effectiveCount = items.where((_) => true).length;
     final double slotWidth = MediaQuery.sizeOf(context).width / effectiveCount;
-    final double indicatorWidth = slotWidth - 22;
+    final double indicatorWidth = slotWidth - 30;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -279,22 +279,21 @@ class _BottomNavGlow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
-      height: 56,
+      height: 52,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         gradient: LinearGradient(
           colors: <Color>[
+            AppColors.primary.withValues(alpha: 0.06),
             AppColors.primary.withValues(alpha: 0.10),
-            AppColors.primary.withValues(alpha: 0.16),
-            AppColors.primary.withValues(alpha: 0.08),
+            AppColors.primary.withValues(alpha: 0.05),
           ],
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.12),
-            blurRadius: 24,
-            spreadRadius: 1,
-            offset: const Offset(0, 8),
+            color: AppColors.primary.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
           ),
         ],
       ),

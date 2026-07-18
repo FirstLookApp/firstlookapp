@@ -317,7 +317,21 @@ class AppLocalizationsTr extends AppLocalizations {
       'Topluluk yorumları yakında burada yer alacak.';
 
   @override
+  String get discoverEmptyDropTitle => 'Yeni Drop hazırlanıyor';
+
+  @override
+  String get discoverEmptyDropMessage =>
+      'Sıradaki seçki hazırlanıyor. Yayına girdiğinde öne çıkan uygulamalar burada sıralanacak.';
+
+  @override
   String get leaderboardTitle => 'Liderlik Tablosu';
+
+  @override
+  String get leaderboardEmptyTitle => 'Liderlik verileri hazırlanıyor';
+
+  @override
+  String get leaderboardEmptyMessage =>
+      'Yeni etkileşimler geldikçe en çok öne çıkan uygulamalar burada görünecek.';
 
   @override
   String get discoverBannerTimer => 'Bitiş tarihi yakında';
@@ -424,7 +438,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitDestination => 'Hedef';
 
   @override
-  String get submitScreenshotsLabel => 'EKRAN GÖRÜNTÜLERİ (MAKS. 5)';
+  String get submitScreenshotsLabel => 'EKRAN GÖRÜNTÜLERİ (3-5)';
 
   @override
   String get submitPickScreenshots => 'Görsel seç';
@@ -432,6 +446,14 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get submitScreenshotSizeError =>
       'Her ekran görüntüsü en fazla 2 MB olabilir.';
+
+  @override
+  String get submitScreenshotRequirements =>
+      '3 ila 5 ekran görüntüsü seçin. Her biri en fazla 2 MB olabilir.';
+
+  @override
+  String get submitScreenshotCountError =>
+      'En az 3, en fazla 5 ekran görüntüsü seçin.';
 
   @override
   String get submitScreenshotLimitPrefix => 'En fazla ekran görüntüsü sayısı:';

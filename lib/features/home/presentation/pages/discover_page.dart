@@ -201,33 +201,28 @@ class _DiscoverPageState extends ConsumerState<DiscoverPage>
                           animation: _entranceController,
                           child: _WelcomeSection(dropCount: items.length),
                         ),
-                        const SizedBox(height: 24),
-                        _DiscoverEntrance(
-                          animation: _entranceController,
-                          scaleFrom: 0.985,
-                          child: _WeeklyBanner(
-                            title: bannerTitle,
-                            endsAt: bannerEndsAt,
-                            badge: bannerDescription,
-                            backgroundImagePath: bannerBackgroundImagePath,
+                        if (drop != null) ...<Widget>[
+                          const SizedBox(height: 24),
+                          _DiscoverEntrance(
+                            animation: _entranceController,
+                            scaleFrom: 0.985,
+                            child: _WeeklyBanner(
+                              title: bannerTitle,
+                              endsAt: bannerEndsAt,
+                              badge: bannerDescription,
+                              backgroundImagePath: bannerBackgroundImagePath,
+                            ),
                           ),
-                        ),
+                        ],
                         const SizedBox(height: 30),
                         const _DiscoverSectionHeader(),
                         const SizedBox(height: 14),
                         if (items.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 32),
-                            child: Center(
-                              child: Text(
-                                l10n.commonNoData,
-                                style: TextStyle(
-                                  color: AppColors.textSecondary(context),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
+                          _PremiumEmptyState(
+                            icon: Icons.workspace_premium_rounded,
+                            title: l10n.discoverEmptyDropTitle,
+                            message: l10n.discoverEmptyDropMessage,
+                            badge: l10n.settingsSoon,
                           )
                         else
                           Container(
@@ -453,6 +448,136 @@ class _DiscoverSectionHeader extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PremiumEmptyState extends StatelessWidget {
+  const _PremiumEmptyState({
+    required this.icon,
+    required this.title,
+    required this.message,
+    required this.badge,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+  final String badge;
+
+  @override
+  Widget build(BuildContext context) {
+    const List<int> ranks = <int>[2, 1, 3];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            AppColors.surface(context),
+            AppColors.softPrimary(context).withValues(alpha: 0.56),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.outline(context)),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.adaptiveShadow(context),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 48,
+                height: 48,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.softPrimary(context),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: AppColors.primary, size: 25),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: AppColors.textPrimary(context),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      message,
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontSize: 11,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: List<Widget>.generate(ranks.length, (int index) {
+              final bool winner = ranks[index] == 1;
+              return Expanded(
+                child: Column(
+                  children: <Widget>[
+                    _RankMedalAsset(
+                      rank: ranks[index],
+                      dimension: winner ? 74 : 64,
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.softPrimary(context),
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.primary,
+                  size: 14,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  badge,
+                  style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -742,18 +867,11 @@ class LeaderboardPage extends ConsumerWidget {
                     ),
                     const SizedBox(height: 22),
                     if (items.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 32),
-                        child: Center(
-                          child: Text(
-                            l10n.commonNoData,
-                            style: TextStyle(
-                              color: AppColors.textSecondary(context),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
+                      _PremiumEmptyState(
+                        icon: Icons.leaderboard_rounded,
+                        title: l10n.leaderboardEmptyTitle,
+                        message: l10n.leaderboardEmptyMessage,
+                        badge: l10n.settingsSoon,
                       )
                     else
                       _OwnerLeaderboard(
@@ -920,7 +1038,7 @@ class _OwnerLeaderboardPodium extends StatelessWidget {
     final ApplicationListItem? third = itemForRank(3);
 
     return SizedBox(
-      height: 190,
+      height: 220,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -978,11 +1096,7 @@ class _OwnerPodiumEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color rankColor = switch (rank) {
-      1 => const Color(0xFFFFC23E),
-      2 => const Color(0xFFC9D0DD),
-      _ => const Color(0xFFD9984F),
-    };
+    final double medalSize = isWinner ? 46 : 40;
 
     return Material(
       color: Colors.transparent,
@@ -993,32 +1107,12 @@ class _OwnerPodiumEntry extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
           child: Column(
             children: <Widget>[
-              Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  if (isWinner)
-                    const Positioned(
-                      top: -22,
-                      child: Icon(
-                        Icons.workspace_premium_rounded,
-                        color: Color(0xFFFFC23E),
-                        size: 25,
-                      ),
-                    ),
-                  _LeaderboardOwnerAvatar(item: item, size: avatarSize),
-                  Positioned(
-                    right: -4,
-                    bottom: -4,
-                    child: _RankBadge(
-                      rank: rank,
-                      backgroundColor: rankColor,
-                      textColor: Colors.white,
-                      size: 25,
-                    ),
-                  ),
-                ],
+              _RankMedalAsset(
+                rank: rank,
+                dimension: medalSize,
               ),
+              const SizedBox(height: 4),
+              _LeaderboardOwnerAvatar(item: item, size: avatarSize),
               const SizedBox(height: 10),
               Text(
                 item.name,
@@ -1783,6 +1877,10 @@ class _LaurelRankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (_RankMedalAsset.supports(rank)) {
+      return _RankMedalAsset(rank: rank, dimension: 56);
+    }
+
     return SizedBox.square(
       dimension: 56,
       child: Stack(
@@ -1819,6 +1917,31 @@ class _LaurelRankBadge extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _RankMedalAsset extends StatelessWidget {
+  const _RankMedalAsset({required this.rank, required this.dimension});
+
+  final int rank;
+  final double dimension;
+
+  static bool supports(int rank) => rank >= 1 && rank <= 3;
+
+  String get _assetPath => 'assets/icons/drop-rank-$rank.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.square(
+      dimension: dimension,
+      child: Image.asset(
+        _assetPath,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+        isAntiAlias: true,
+        semanticLabel: rank.toString(),
       ),
     );
   }

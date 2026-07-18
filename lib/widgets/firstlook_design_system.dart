@@ -7,6 +7,7 @@ import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
+import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/theme/app_colors.dart';
 import 'package:firstlook/theme/app_spacing.dart';
@@ -368,12 +369,21 @@ class _FirstLookSettingsSheetState
         ),
       );
 
+  void _closeAndGo(String location) {
+    final GoRouter router = GoRouter.of(context);
+    Navigator.of(context).pop();
+    router.go(location);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final AppFeedbackSettings settings = ref.watch(appFeedbackSettingsProvider);
     final Locale locale = ref.watch(appLocaleProvider);
     final bool darkModeEnabled = ref.watch(themeModeProvider) == ThemeMode.dark;
+    final bool isAuthenticated =
+        ref.watch(authControllerProvider).valueOrNull?.status ==
+            AuthStatus.authenticated;
     final double height = MediaQuery.sizeOf(context).height * 0.74;
 
     return SizedBox(
@@ -531,17 +541,26 @@ class _FirstLookSettingsSheetState
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _SettingsLogoutButton(
-                        label: l10n.logoutButton.toUpperCase(),
-                        onPressed: () async {
-                          final GoRouter router = GoRouter.of(context);
-                          Navigator.of(context).pop();
-                          await ref
-                              .read(authControllerProvider.notifier)
-                              .logout();
-                          router.go(RouteNames.loginPath);
-                        },
-                      ),
+                      if (isAuthenticated)
+                        _SettingsLogoutButton(
+                          label: l10n.logoutButton.toUpperCase(),
+                          onPressed: () async {
+                            final GoRouter router = GoRouter.of(context);
+                            Navigator.of(context).pop();
+                            await ref
+                                .read(authControllerProvider.notifier)
+                                .logout();
+                            router.go(RouteNames.loginPath);
+                          },
+                        )
+                      else
+                        _SettingsAuthActions(
+                          loginLabel: l10n.authLoginCta,
+                          registerLabel: l10n.authRegisterCta,
+                          onLogin: () => _closeAndGo(RouteNames.loginPath),
+                          onRegister: () =>
+                              _closeAndGo(RouteNames.registerPath),
+                        ),
                     ],
                   ),
                 ),
@@ -677,6 +696,80 @@ class _SettingsLogoutButton extends StatefulWidget {
 
   @override
   State<_SettingsLogoutButton> createState() => _SettingsLogoutButtonState();
+}
+
+class _SettingsAuthActions extends StatelessWidget {
+  const _SettingsAuthActions({
+    required this.loginLabel,
+    required this.registerLabel,
+    required this.onLogin,
+    required this.onRegister,
+  });
+
+  final String loginLabel;
+  final String registerLabel;
+  final VoidCallback onLogin;
+  final VoidCallback onRegister;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: onLogin,
+              icon: const Icon(Icons.login_rounded, size: 18),
+              label: Text(
+                loginLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: SizedBox(
+            height: 52,
+            child: OutlinedButton.icon(
+              onPressed: onRegister,
+              icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+              label: Text(
+                registerLabel,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _SettingsLogoutButtonState extends State<_SettingsLogoutButton> {

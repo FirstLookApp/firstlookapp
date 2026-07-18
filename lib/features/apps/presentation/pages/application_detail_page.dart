@@ -349,17 +349,6 @@ class _DetailHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    app.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppColors.textPrimary(context),
-                      fontSize: 19,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
                   if (onOpenStore != null) ...<Widget>[
                     Align(
                       alignment: Alignment.centerLeft,
@@ -394,7 +383,7 @@ class _DetailHeader extends StatelessWidget {
                       child: TextButton.icon(
                         onPressed: onOwnerTap,
                         style: TextButton.styleFrom(
-                          foregroundColor: AppColors.secondary,
+                          foregroundColor: AppColors.textSecondary(context),
                           padding: EdgeInsets.zero,
                           minimumSize: const Size(0, 28),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -474,7 +463,7 @@ class _ScreenshotRail extends StatelessWidget {
         screenshots.isEmpty ? <String>[''] : screenshots;
 
     return SizedBox(
-      height: 260,
+      height: 286,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemBuilder: (BuildContext context, int index) {
@@ -490,7 +479,7 @@ class _ScreenshotRail extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: Container(
-                width: 172,
+                width: 136,
                 decoration: BoxDecoration(
                   color: AppColors.primarySoft,
                   border: Border.all(color: AppColors.outline(context)),

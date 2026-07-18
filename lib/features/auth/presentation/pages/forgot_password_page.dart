@@ -50,119 +50,138 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.background(context),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 390),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.large,
-                18,
-                AppSpacing.large,
-                AppSpacing.large,
-              ),
-              children: <Widget>[
-                const AuthHeader(),
-                const SizedBox(height: 28),
-                const Center(child: FirstLookAppIcon(size: 96)),
-                const SizedBox(height: 28),
-                Text(
-                  l10n.forgotPasswordTitle,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.textPrimary(context),
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0,
-                      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) {
+          _goBack();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 390),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.large,
+                  18,
+                  AppSpacing.large,
+                  AppSpacing.large,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.forgotPasswordSubtitle,
-                  style: const TextStyle(
-                    color: Color(0xFF7C7C84),
-                    fontSize: 12,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
+                children: <Widget>[
+                  AuthHeader(onBack: _goBack),
+                  const SizedBox(height: 28),
+                  const Center(child: FirstLookAppIcon(size: 96)),
+                  const SizedBox(height: 28),
+                  Text(
+                    l10n.forgotPasswordTitle,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: AppColors.textPrimary(context),
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0,
+                        ),
                   ),
-                ),
-                const SizedBox(height: 34),
-                if (!_codeSent)
-                  AuthTextField(
-                    controller: _email,
-                    label: l10n.authEmailAddressLabel,
-                    hint: l10n.loginEmailHint,
-                    keyboardType: TextInputType.emailAddress,
-                  )
-                else ...<Widget>[
-                  AuthTextField(
-                    controller: _otp,
-                    label: l10n.authOtpLabel,
-                    hint: l10n.authOtpHint,
-                    keyboardType: TextInputType.number,
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.forgotPasswordSubtitle,
+                    style: const TextStyle(
+                      color: Color(0xFF7C7C84),
+                      fontSize: 12,
+                      height: 1.45,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  const SizedBox(height: 14),
-                  AuthTextField(
-                    controller: _password,
-                    label: l10n.authNewPasswordLabel,
-                    hint: l10n.loginPasswordHint,
-                    obscureText: true,
-                    onChanged: (_) => _clearPasswordError(),
-                  ),
-                  const SizedBox(height: 14),
-                  AuthTextField(
-                    controller: _passwordConfirmation,
-                    label: l10n.authPasswordConfirmationLabel,
-                    hint: l10n.registerConfirmPasswordHint,
-                    obscureText: true,
-                    errorText: _passwordError,
-                    onChanged: (_) => _clearPasswordError(),
-                  ),
-                ],
-                const SizedBox(height: 24),
-                AuthPrimaryButton(
-                  label: _codeSent
-                      ? l10n.resetPasswordButton
-                      : l10n.forgotPasswordButton,
-                  isLoading: authState.isLoading,
-                  onPressed: () async {
-                    if (_codeSent) {
-                      if (_password.text != _passwordConfirmation.text) {
-                        setState(
-                          () => _passwordError = l10n.authPasswordMismatch,
-                        );
+                  const SizedBox(height: 34),
+                  if (!_codeSent)
+                    AuthTextField(
+                      controller: _email,
+                      label: l10n.authEmailAddressLabel,
+                      hint: l10n.loginEmailHint,
+                      keyboardType: TextInputType.emailAddress,
+                    )
+                  else ...<Widget>[
+                    AuthTextField(
+                      controller: _otp,
+                      label: l10n.authOtpLabel,
+                      hint: l10n.authOtpHint,
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 14),
+                    AuthTextField(
+                      controller: _password,
+                      label: l10n.authNewPasswordLabel,
+                      hint: l10n.loginPasswordHint,
+                      obscureText: true,
+                      onChanged: (_) => _clearPasswordError(),
+                    ),
+                    const SizedBox(height: 14),
+                    AuthTextField(
+                      controller: _passwordConfirmation,
+                      label: l10n.authPasswordConfirmationLabel,
+                      hint: l10n.registerConfirmPasswordHint,
+                      obscureText: true,
+                      errorText: _passwordError,
+                      onChanged: (_) => _clearPasswordError(),
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  AuthPrimaryButton(
+                    label: _codeSent
+                        ? l10n.resetPasswordButton
+                        : l10n.forgotPasswordButton,
+                    isLoading: authState.isLoading,
+                    onPressed: () async {
+                      if (_codeSent) {
+                        if (_password.text != _passwordConfirmation.text) {
+                          setState(
+                            () => _passwordError = l10n.authPasswordMismatch,
+                          );
+                          return;
+                        }
+
+                        await ref
+                            .read(authControllerProvider.notifier)
+                            .resetPassword(
+                              email: _email.text.trim(),
+                              otp: _otp.text.trim(),
+                              newPassword: _password.text,
+                            );
+                        if (!context.mounted) {
+                          return;
+                        }
+
+                        final AuthStatus? status = ref
+                            .read(authControllerProvider)
+                            .valueOrNull
+                            ?.status;
+                        if (status == AuthStatus.unauthenticated) {
+                          context.go(RouteNames.loginPath);
+                        }
                         return;
                       }
-
                       await ref
                           .read(authControllerProvider.notifier)
-                          .resetPassword(
-                            email: _email.text.trim(),
-                            otp: _otp.text.trim(),
-                            newPassword: _password.text,
-                          );
-                      if (!context.mounted) {
-                        return;
-                      }
-
-                      final AuthStatus? status =
-                          ref.read(authControllerProvider).valueOrNull?.status;
-                      if (status == AuthStatus.unauthenticated) {
-                        context.go(RouteNames.loginPath);
-                      }
-                      return;
-                    }
-                    await ref
-                        .read(authControllerProvider.notifier)
-                        .forgotPassword(_email.text.trim());
-                  },
-                ),
-              ],
+                          .forgotPassword(_email.text.trim());
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+
+    context.go(RouteNames.loginPath);
   }
 
   void _clearPasswordError() {

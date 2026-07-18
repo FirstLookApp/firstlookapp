@@ -43,6 +43,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final AsyncValue<AuthState> authState = ref.watch(authControllerProvider);
+    final bool compact = MediaQuery.sizeOf(context).height < 760;
 
     ref.listen<AsyncValue<AuthState>>(authControllerProvider,
         (_, AsyncValue<AuthState> next) {
@@ -52,109 +53,149 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.background(context),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 390),
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.large,
-                18,
-                AppSpacing.large,
-                AppSpacing.large,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) {
+          _goBack();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background(context),
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 390),
+                  child: ListView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.large,
+                      18,
+                      AppSpacing.large,
+                      AppSpacing.large,
+                    ),
+                    children: <Widget>[
+                      SizedBox(height: compact ? 4 : 30),
+                      Center(
+                        child: FirstLookAppIcon(size: compact ? 76 : 104),
+                      ),
+                      SizedBox(height: compact ? 20 : 46),
+                      Text(
+                        l10n.authDiscoverTitle,
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  color: AppColors.textPrimary(context),
+                                  fontSize: compact ? 24 : 26,
+                                  height: 1,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0,
+                                ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.authDiscoverSubtitle,
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 12,
+                          height: 1.45,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: compact ? 18 : 30),
+                      AuthTextField(
+                        controller: _fullName,
+                        label: l10n.authFullNameLabel,
+                        hint: l10n.registerNameHint,
+                        keyboardType: TextInputType.name,
+                      ),
+                      SizedBox(height: compact ? 10 : 14),
+                      AuthTextField(
+                        controller: _email,
+                        label: l10n.authEmailAddressLabel,
+                        hint: l10n.loginEmailHint,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      SizedBox(height: compact ? 10 : 14),
+                      AuthTextField(
+                        controller: _password,
+                        label: l10n.authPasswordLabel,
+                        hint: l10n.loginPasswordHint,
+                        obscureText: true,
+                        onChanged: (_) => setState(() => _formError = null),
+                      ),
+                      SizedBox(height: compact ? 10 : 14),
+                      AuthTextField(
+                        controller: _passwordConfirmation,
+                        label: l10n.authPasswordConfirmationLabel,
+                        hint: l10n.registerConfirmPasswordHint,
+                        obscureText: true,
+                        errorText: _passwordsDoNotMatch
+                            ? l10n.authPasswordMismatch
+                            : null,
+                        onChanged: (_) => setState(() => _formError = null),
+                      ),
+                      SizedBox(height: compact ? 24 : 42),
+                      AuthPrimaryButton(
+                        label: l10n.authRegisterCta,
+                        isLoading: authState.isLoading,
+                        onPressed: () => _submit(context, l10n),
+                      ),
+                      SizedBox(height: compact ? 8 : 14),
+                      TextButton(
+                        onPressed: () => context.go(RouteNames.loginPath),
+                        child: Text(
+                          l10n.goToLogin,
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      if (_formError != null || authState.hasError)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            _formError ?? l10n.commonUnexpectedError,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
-              children: <Widget>[
-                const SizedBox(height: 30),
-                const Center(child: FirstLookAppIcon(size: 104)),
-                const SizedBox(height: 46),
-                Text(
-                  l10n.authDiscoverTitle,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.textPrimary(context),
-                        fontSize: 26,
-                        height: 1,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0,
-                      ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.authDiscoverSubtitle,
-                  style: TextStyle(
-                    color: AppColors.textSecondary(context),
-                    fontSize: 12,
-                    height: 1.45,
-                    fontWeight: FontWeight.w600,
+              Positioned(
+                top: 4,
+                left: 6,
+                child: IconButton(
+                  tooltip: l10n.commonBack,
+                  onPressed: _goBack,
+                  icon: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 18,
+                    color: AppColors.textPrimary(context),
                   ),
                 ),
-                const SizedBox(height: 30),
-                AuthTextField(
-                  controller: _fullName,
-                  label: l10n.authFullNameLabel,
-                  hint: l10n.registerNameHint,
-                  keyboardType: TextInputType.name,
-                ),
-                const SizedBox(height: 14),
-                AuthTextField(
-                  controller: _email,
-                  label: l10n.authEmailAddressLabel,
-                  hint: l10n.loginEmailHint,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 14),
-                AuthTextField(
-                  controller: _password,
-                  label: l10n.authPasswordLabel,
-                  hint: l10n.loginPasswordHint,
-                  obscureText: true,
-                  onChanged: (_) => setState(() => _formError = null),
-                ),
-                const SizedBox(height: 14),
-                AuthTextField(
-                  controller: _passwordConfirmation,
-                  label: l10n.authPasswordConfirmationLabel,
-                  hint: l10n.registerConfirmPasswordHint,
-                  obscureText: true,
-                  errorText:
-                      _passwordsDoNotMatch ? l10n.authPasswordMismatch : null,
-                  onChanged: (_) => setState(() => _formError = null),
-                ),
-                const SizedBox(height: 42),
-                AuthPrimaryButton(
-                  label: l10n.authRegisterCta,
-                  isLoading: authState.isLoading,
-                  onPressed: () => _submit(context, l10n),
-                ),
-                const SizedBox(height: 14),
-                TextButton(
-                  onPressed: () => context.go(RouteNames.loginPath),
-                  child: Text(
-                    l10n.goToLogin,
-                    style: TextStyle(
-                      color: AppColors.textSecondary(context),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                if (_formError != null || authState.hasError)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      _formError ?? l10n.commonUnexpectedError,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  void _goBack() {
+    if (context.canPop()) {
+      context.pop();
+      return;
+    }
+
+    context.go(RouteNames.loginPath);
   }
 
   Future<void> _submit(

@@ -692,11 +692,35 @@ abstract class AppLocalizations {
   /// **'Community reviews will appear here soon.'**
   String get discoverPlaceholderReview;
 
+  /// No description provided for @discoverEmptyDropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A new Drop is being prepared'**
+  String get discoverEmptyDropTitle;
+
+  /// No description provided for @discoverEmptyDropMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The next collection is being curated. Featured applications will appear here when it goes live.'**
+  String get discoverEmptyDropMessage;
+
   /// No description provided for @leaderboardTitle.
   ///
   /// In en, this message translates to:
   /// **'Leaderboard'**
   String get leaderboardTitle;
+
+  /// No description provided for @leaderboardEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaderboard data is being prepared'**
+  String get leaderboardEmptyTitle;
+
+  /// No description provided for @leaderboardEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The most prominent applications will appear here as new engagement arrives.'**
+  String get leaderboardEmptyMessage;
 
   /// No description provided for @discoverBannerTimer.
   ///
@@ -899,7 +923,7 @@ abstract class AppLocalizations {
   /// No description provided for @submitScreenshotsLabel.
   ///
   /// In en, this message translates to:
-  /// **'SCREENSHOTS (MAX. 5)'**
+  /// **'SCREENSHOTS (3-5)'**
   String get submitScreenshotsLabel;
 
   /// No description provided for @submitPickScreenshots.
@@ -913,6 +937,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Each screenshot must be at most 2 MB.'**
   String get submitScreenshotSizeError;
+
+  /// No description provided for @submitScreenshotRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose 3 to 5 screenshots. Each one can be at most 2 MB.'**
+  String get submitScreenshotRequirements;
+
+  /// No description provided for @submitScreenshotCountError.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least 3 and at most 5 screenshots.'**
+  String get submitScreenshotCountError;
 
   /// No description provided for @submitScreenshotLimitPrefix.
   ///

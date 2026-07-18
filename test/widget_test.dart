@@ -10,6 +10,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('drop rank assets decode without errors',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Row(
+            children: <Widget>[
+              for (final String path in <String>[
+                'assets/icons/drop-rank-1.png',
+                'assets/icons/drop-rank-2.png',
+                'assets/icons/drop-rank-3.png',
+              ])
+                Image.asset(
+                  path,
+                  width: 56,
+                  height: 56,
+                  filterQuality: FilterQuality.high,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Image), findsNWidgets(3));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('dark logo keeps its blend inside the image paint',
       (WidgetTester tester) async {
     await tester.pumpWidget(

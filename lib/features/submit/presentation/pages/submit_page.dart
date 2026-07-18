@@ -27,6 +27,7 @@ class SubmitPage extends ConsumerStatefulWidget {
 }
 
 class _SubmitPageState extends ConsumerState<SubmitPage> {
+  static const int _minScreenshotCount = 3;
   static const int _maxScreenshotCount = 5;
   static const int _maxScreenshotSizeBytes = 2 * 1024 * 1024;
 
@@ -215,13 +216,15 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 8),
                 _ScreenshotPickerPreview(
                   files: _screenshots,
+                  minimumCount: _minScreenshotCount,
+                  maximumCount: _maxScreenshotCount,
                   pickLabel: l10n.submitPickScreenshots,
                   onPick: _pickScreenshots,
                   onRemove: _removeScreenshot,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  l10n.submitScreenshotSizeError,
+                  l10n.submitScreenshotRequirements,
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 12,
@@ -381,6 +384,15 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       return;
     }
 
+    if (_screenshots.length < _minScreenshotCount ||
+        _screenshots.length > _maxScreenshotCount) {
+      AppSnackbar.show(
+        context,
+        message: l10n.submitScreenshotCountError,
+      );
+      return;
+    }
+
     if (videoUrl.isEmpty) {
       AppSnackbar.show(
         context,
@@ -497,31 +509,39 @@ class _Label extends StatelessWidget {
 class _ScreenshotPickerPreview extends StatelessWidget {
   const _ScreenshotPickerPreview({
     required this.files,
+    required this.minimumCount,
+    required this.maximumCount,
     required this.pickLabel,
     required this.onPick,
     required this.onRemove,
   });
 
   final List<PlatformFile> files;
+  final int minimumCount;
+  final int maximumCount;
   final String pickLabel;
   final VoidCallback onPick;
   final ValueChanged<PlatformFile> onRemove;
 
   @override
   Widget build(BuildContext context) {
+    final int itemCount = files.length < minimumCount
+        ? minimumCount
+        : files.length < maximumCount
+            ? files.length + 1
+            : files.length;
+
     return SizedBox(
       height: 118,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: files.isEmpty
-            ? 2
-            : (files.length < 5 ? files.length + 1 : files.length),
+        itemCount: itemCount,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (BuildContext context, int index) {
           if (index >= files.length) {
             return _AddScreenshotSlot(
               onPick: onPick,
-              pickLabel: files.isEmpty && index == 1 ? '' : pickLabel,
+              pickLabel: index == files.length ? pickLabel : '',
             );
           }
 

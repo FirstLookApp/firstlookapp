@@ -318,7 +318,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Community reviews will appear here soon.';
 
   @override
+  String get discoverEmptyDropTitle => 'A new Drop is being prepared';
+
+  @override
+  String get discoverEmptyDropMessage =>
+      'The next collection is being curated. Featured applications will appear here when it goes live.';
+
+  @override
   String get leaderboardTitle => 'Leaderboard';
+
+  @override
+  String get leaderboardEmptyTitle => 'Leaderboard data is being prepared';
+
+  @override
+  String get leaderboardEmptyMessage =>
+      'The most prominent applications will appear here as new engagement arrives.';
 
   @override
   String get discoverBannerTimer => 'End time coming soon';
@@ -425,7 +439,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitDestination => 'Destination';
 
   @override
-  String get submitScreenshotsLabel => 'SCREENSHOTS (MAX. 5)';
+  String get submitScreenshotsLabel => 'SCREENSHOTS (3-5)';
 
   @override
   String get submitPickScreenshots => 'Pick image';
@@ -433,6 +447,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get submitScreenshotSizeError =>
       'Each screenshot must be at most 2 MB.';
+
+  @override
+  String get submitScreenshotRequirements =>
+      'Choose 3 to 5 screenshots. Each one can be at most 2 MB.';
+
+  @override
+  String get submitScreenshotCountError =>
+      'Choose at least 3 and at most 5 screenshots.';
 
   @override
   String get submitScreenshotLimitPrefix => 'Maximum screenshot count:';
