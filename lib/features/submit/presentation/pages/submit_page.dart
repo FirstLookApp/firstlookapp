@@ -45,6 +45,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   List<PlatformFile> _screenshots = <PlatformFile>[];
   List<String> _existingScreenshots = <String>[];
   bool _hasAttemptedSubmit = false;
+  bool _requiresApprovalOnSuccess = false;
 
   bool get _isEditing => widget.applicationToEdit != null;
 
@@ -140,7 +141,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
           next.whenOrNull(
             data: (bool updated) {
               if (updated && mounted) {
-                context.pop(true);
+                context.pop(_requiresApprovalOnSuccess);
               }
             },
             error: (Object error, StackTrace stackTrace) {
@@ -532,6 +533,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     );
 
     if (_isEditing) {
+      _requiresApprovalOnSuccess = _requiresStoreLinkReview(payload);
       ref
           .read(
             updateApplicationControllerProvider(
@@ -542,6 +544,23 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     } else {
       ref.read(submitApplicationControllerProvider.notifier).submit(payload);
     }
+  }
+
+  bool _requiresStoreLinkReview(SubmitApplicationPayload payload) {
+    final ApplicationDetail? application = widget.applicationToEdit;
+    if (application == null || !application.isApproved) {
+      return false;
+    }
+
+    String? normalize(String? value) {
+      final String normalized = value?.trim() ?? '';
+      return normalized.isEmpty ? null : normalized;
+    }
+
+    return normalize(application.appStoreUrl) !=
+            normalize(payload.appStoreUrl) ||
+        normalize(application.googlePlayUrl) !=
+            normalize(payload.googlePlayUrl);
   }
 
   bool _isValidStoreUrl(String value) {

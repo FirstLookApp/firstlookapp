@@ -112,7 +112,8 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                             return;
                           }
 
-                          final bool? updated = await context.push<bool>(
+                          final bool? requiresApproval =
+                              await context.push<bool>(
                             RouteNames.applicationEditLocation(
                               id: app.id,
                               platform: app.platform,
@@ -120,11 +121,15 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                             ),
                             extra: app,
                           );
-                          if (updated == true && mounted) {
+                          if (requiresApproval != null && mounted) {
                             ref.invalidate(
                               applicationDetailProvider(request),
                             );
-                            _showMessage(l10n.editApplicationSuccess);
+                            _showMessage(
+                              requiresApproval
+                                  ? l10n.editApplicationReviewSuccess
+                                  : l10n.editApplicationSuccess,
+                            );
                           }
                         }
                       : null,

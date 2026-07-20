@@ -171,6 +171,7 @@
   "editApplicationSubtitle": "Aktif Drop'ta olmayan uygulamanızın bilgilerini güncelleyin.",
   "editApplicationButton": "Değişiklikleri kaydet",
   "editApplicationSuccess": "Değişiklikler kaydedildi.",
+  "editApplicationReviewSuccess": "Mağaza bağlantıları değiştirildi. Uygulamanız tekrar onaya gönderildi.",
   "editReplaceScreenshots": "Görselleri değiştir",
   "editScreenshotRequirements": "Mevcut görseller korunur. Değiştirmek için 3 ila 5 yeni görsel seçin.",
   "detailApprovedBadge": "Onaylandı",

@@ -171,6 +171,7 @@
   "editApplicationSubtitle": "Update an application that is not in an active Drop.",
   "editApplicationButton": "Save changes",
   "editApplicationSuccess": "Changes saved.",
+  "editApplicationReviewSuccess": "Store links changed. Your application was submitted for approval again.",
   "editReplaceScreenshots": "Replace images",
   "editScreenshotRequirements": "Existing images are kept. Select 3 to 5 new images to replace them.",
   "detailApprovedBadge": "Approved",

@@ -501,6 +501,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editApplicationSuccess => 'Changes saved.';
 
   @override
+  String get editApplicationReviewSuccess =>
+      'Store links changed. Your application was submitted for approval again.';
+
+  @override
   String get editReplaceScreenshots => 'Replace images';
 
   @override

@@ -500,6 +500,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get editApplicationSuccess => 'Değişiklikler kaydedildi.';
 
   @override
+  String get editApplicationReviewSuccess =>
+      'Mağaza bağlantıları değiştirildi. Uygulamanız tekrar onaya gönderildi.';
+
+  @override
   String get editReplaceScreenshots => 'Görselleri değiştir';
 
   @override

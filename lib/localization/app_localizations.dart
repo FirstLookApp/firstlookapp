@@ -1034,6 +1034,12 @@ abstract class AppLocalizations {
   /// **'Changes saved.'**
   String get editApplicationSuccess;
 
+  /// No description provided for @editApplicationReviewSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Store links changed. Your application was submitted for approval again.'**
+  String get editApplicationReviewSuccess;
+
   /// No description provided for @editReplaceScreenshots.
   ///
   /// In en, this message translates to:

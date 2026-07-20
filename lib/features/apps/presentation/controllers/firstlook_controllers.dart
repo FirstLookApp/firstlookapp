@@ -147,6 +147,8 @@ class UpdateApplicationController extends StateNotifier<AsyncValue<bool>> {
       _ref
         ..invalidate(myApplicationsProvider)
         ..invalidate(profileProvider)
+        ..invalidate(notificationsProvider)
+        ..invalidate(unreadNotificationCountProvider)
         ..invalidate(applicationDetailProvider);
       state = const AsyncData<bool>(true);
     } catch (error, stackTrace) {
