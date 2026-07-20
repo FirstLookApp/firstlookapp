@@ -424,7 +424,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitDescriptionHint => 'What core value does your app provide?';
 
   @override
-  String get submitVideoUrl => 'Video URL';
+  String get submitVideoUrl => 'Video URL (Optional)';
 
   @override
   String get submitVideoUrlHint => 'https://youtube.com/...';

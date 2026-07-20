@@ -413,15 +413,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       return;
     }
 
-    if (videoUrl.isEmpty) {
-      AppSnackbar.show(
-        context,
-        message: '${l10n.submitVideoUrl} ${l10n.submitFieldIsRequiredSuffix}',
-      );
-      return;
-    }
-
-    if (!_isValidStoreUrl(videoUrl)) {
+    if (videoUrl.isNotEmpty && !_isValidStoreUrl(videoUrl)) {
       AppSnackbar.show(
         context,
         message: '${l10n.submitVideoUrl} ${l10n.submitInvalidUrlSuffix}',

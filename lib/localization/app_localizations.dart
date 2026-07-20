@@ -893,7 +893,7 @@ abstract class AppLocalizations {
   /// No description provided for @submitVideoUrl.
   ///
   /// In en, this message translates to:
-  /// **'Video URL'**
+  /// **'Video URL (Optional)'**
   String get submitVideoUrl;
 
   /// No description provided for @submitVideoUrlHint.

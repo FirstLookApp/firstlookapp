@@ -147,7 +147,7 @@
   "submitCategoryEducation": "Eğitim",
   "submitDescription": "Açıklama",
   "submitDescriptionHint": "Uygulamanın sunduğu temel değerler nelerdir?",
-  "submitVideoUrl": "Video URL",
+  "submitVideoUrl": "Video URL (Opsiyonel)",
   "submitVideoUrlHint": "https://youtube.com/...",
   "submitAppStoreUrl": "App Store URL",
   "submitGooglePlayUrl": "Google Play URL",

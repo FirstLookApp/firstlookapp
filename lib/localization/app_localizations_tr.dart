@@ -423,7 +423,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Uygulamanın sunduğu temel değerler nelerdir?';
 
   @override
-  String get submitVideoUrl => 'Video URL';
+  String get submitVideoUrl => 'Video URL (Opsiyonel)';
 
   @override
   String get submitVideoUrlHint => 'https://youtube.com/...';

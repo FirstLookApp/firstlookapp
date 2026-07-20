@@ -147,7 +147,7 @@
   "submitCategoryEducation": "Education",
   "submitDescription": "Description",
   "submitDescriptionHint": "What core value does your app provide?",
-  "submitVideoUrl": "Video URL",
+  "submitVideoUrl": "Video URL (Optional)",
   "submitVideoUrlHint": "https://youtube.com/...",
   "submitAppStoreUrl": "App Store URL",
   "submitGooglePlayUrl": "Google Play URL",
