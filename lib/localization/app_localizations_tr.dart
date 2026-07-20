@@ -487,6 +487,45 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitButton => 'İncelemeye gönder';
 
   @override
+  String get editApplicationTitle => 'Uygulamayı Düzenle';
+
+  @override
+  String get editApplicationSubtitle =>
+      'Aktif Drop\'ta olmayan uygulamanızın bilgilerini güncelleyin.';
+
+  @override
+  String get editApplicationButton => 'Değişiklikleri kaydet';
+
+  @override
+  String get editApplicationSuccess => 'Değişiklikler kaydedildi.';
+
+  @override
+  String get editReplaceScreenshots => 'Görselleri değiştir';
+
+  @override
+  String get editScreenshotRequirements =>
+      'Mevcut görseller korunur. Değiştirmek için 3 ila 5 yeni görsel seçin.';
+
+  @override
+  String get detailApprovedBadge => 'Onaylandı';
+
+  @override
+  String get detailNotApprovedBadge => 'Onaylanmadı';
+
+  @override
+  String get detailInDropBadge => 'Drop\'ta';
+
+  @override
+  String get detailNotInDropBadge => 'Drop\'ta değil';
+
+  @override
+  String get detailEditApplication => 'Düzenle';
+
+  @override
+  String get detailEditBlocked =>
+      'Aktif Drop içerisindeki uygulamalar düzenlenemez.';
+
+  @override
   String get profileMyApps => 'Uygulamalarım';
 
   @override

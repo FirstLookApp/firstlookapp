@@ -66,20 +66,7 @@ class FirstLookRemoteDataSource {
   }
 
   Future<String> submitApplication(SubmitApplicationPayload payload) async {
-    final FormData formData = FormData.fromMap(<String, dynamic>{
-      'Name': payload.name,
-      'Category': payload.category,
-      'Description': payload.description,
-      'VideoUrl': payload.videoUrl,
-      'Platform': payload.platform.apiValue,
-      'AppStoreUrl': payload.appStoreUrl,
-      'GooglePlayUrl': payload.googlePlayUrl,
-      'SubmitDestination': payload.destination.apiValue,
-      if (payload.screenshotPaths.isNotEmpty)
-        'Screenshots': await Future.wait<MultipartFile>(
-          payload.screenshotPaths.map(MultipartFile.fromFile),
-        ),
-    });
+    final FormData formData = await _applicationFormData(payload);
 
     final Response<Map<String, dynamic>> response =
         await _dio.post<Map<String, dynamic>>(
@@ -93,6 +80,35 @@ class FirstLookRemoteDataSource {
     );
 
     return envelope.data;
+  }
+
+  Future<void> updateApplication({
+    required String id,
+    required SubmitApplicationPayload payload,
+  }) async {
+    await _dio.put<Map<String, dynamic>>(
+      ApiPaths.application(id),
+      data: await _applicationFormData(payload),
+    );
+  }
+
+  Future<FormData> _applicationFormData(
+    SubmitApplicationPayload payload,
+  ) async {
+    return FormData.fromMap(<String, dynamic>{
+      'Name': payload.name,
+      'Category': payload.category,
+      'Description': payload.description,
+      'VideoUrl': payload.videoUrl,
+      'Platform': payload.platform.apiValue,
+      'AppStoreUrl': payload.appStoreUrl,
+      'GooglePlayUrl': payload.googlePlayUrl,
+      'SubmitDestination': payload.destination.apiValue,
+      if (payload.screenshotPaths.isNotEmpty)
+        'Screenshots': await Future.wait<MultipartFile>(
+          payload.screenshotPaths.map(MultipartFile.fromFile),
+        ),
+    });
   }
 
   Future<ApplicationDetail> detail({
@@ -150,7 +166,42 @@ class FirstLookRemoteDataSource {
       ),
     );
 
-    return envelope.data;
+    final ApplicationDetail detail = envelope.data;
+    if (detail.hasDropState) {
+      return detail;
+    }
+
+    return _enrichLegacyDetailFromMyApplications(detail);
+  }
+
+  Future<ApplicationDetail> _enrichLegacyDetailFromMyApplications(
+    ApplicationDetail detail,
+  ) async {
+    try {
+      final PagedResult<ApplicationListItem> mine = await myApplications(
+        pageNumber: 1,
+        pageSize: 100,
+      );
+      final ApplicationListItem? item =
+          mine.items.cast<ApplicationListItem?>().firstWhere(
+                (ApplicationListItem? entry) => entry?.id == detail.id,
+                orElse: () => null,
+              );
+      if (item == null) {
+        return detail;
+      }
+
+      final bool isInActiveDrop = await _isApplicationInActiveDrop(detail.id);
+      return detail.copyWith(
+        isOwner: true,
+        isApproved: item.moderationStatus == 3,
+        isInDrop: isInActiveDrop,
+        hasDropState: true,
+        canEdit: !isInActiveDrop,
+      );
+    } on DioException {
+      return detail;
+    }
   }
 
   Future<ApplicationDetail?> _fallbackDetailFromMyApplications(
@@ -170,6 +221,8 @@ class FirstLookRemoteDataSource {
         return null;
       }
 
+      final bool isInActiveDrop = await _isApplicationInActiveDrop(item.id);
+
       return ApplicationDetail(
         id: item.id,
         name: item.name,
@@ -188,10 +241,33 @@ class FirstLookRemoteDataSource {
         commentCount: 0,
         ownerId: '',
         ownerUsername: '',
+        isOwner: true,
+        isApproved: item.moderationStatus == 3,
+        isInDrop: isInActiveDrop,
+        hasDropState: true,
+        canEdit: !isInActiveDrop,
       );
     } on DioException {
       return null;
     }
+  }
+
+  Future<bool> _isApplicationInActiveDrop(String applicationId) async {
+    for (final PlatformType platform in PlatformType.values) {
+      try {
+        final ActiveDropBatch? drop = await activeDrop(platform: platform);
+        if (drop?.items.any(
+              (ApplicationListItem item) => item.id == applicationId,
+            ) ??
+            false) {
+          return true;
+        }
+      } on DioException {
+        // The API remains authoritative when an edit request is submitted.
+      }
+    }
+
+    return false;
   }
 
   Future<PagedResult<CommentItem>> comments(String id) async {

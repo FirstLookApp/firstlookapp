@@ -26,6 +26,9 @@ abstract final class ApiPaths {
   static const String leaderboard = '/api/discovery/leaderboard';
   static const String interactions = '/api/interactions';
 
+  static String application(String applicationId) =>
+      '$applications/$applicationId';
+
   static String userProfile(String userId) => '/api/users/$userId/profile';
 
   static String markNotificationRead(String notificationId) =>

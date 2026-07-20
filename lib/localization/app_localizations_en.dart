@@ -488,6 +488,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitButton => 'Submit for review';
 
   @override
+  String get editApplicationTitle => 'Edit Application';
+
+  @override
+  String get editApplicationSubtitle =>
+      'Update an application that is not in an active Drop.';
+
+  @override
+  String get editApplicationButton => 'Save changes';
+
+  @override
+  String get editApplicationSuccess => 'Changes saved.';
+
+  @override
+  String get editReplaceScreenshots => 'Replace images';
+
+  @override
+  String get editScreenshotRequirements =>
+      'Existing images are kept. Select 3 to 5 new images to replace them.';
+
+  @override
+  String get detailApprovedBadge => 'Approved';
+
+  @override
+  String get detailNotApprovedBadge => 'Not approved';
+
+  @override
+  String get detailInDropBadge => 'In Drop';
+
+  @override
+  String get detailNotInDropBadge => 'Not in Drop';
+
+  @override
+  String get detailEditApplication => 'Edit';
+
+  @override
+  String get detailEditBlocked =>
+      'Applications in an active Drop cannot be edited.';
+
+  @override
   String get profileMyApps => 'My applications';
 
   @override

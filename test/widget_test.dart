@@ -1,6 +1,7 @@
 import 'package:firstlook/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:firstlook/features/onboarding/presentation/pages/review_onboarding_page.dart';
 import 'package:firstlook/features/onboarding/presentation/pages/reward_onboarding_page.dart';
+import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/localization/app_localizations.dart';
 import 'package:firstlook/widgets/firstlook_logo.dart';
 import 'package:firstlook/widgets/firstlook_startup_experience.dart';
@@ -10,6 +11,39 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('application detail parses owner and Drop permissions', () {
+    final ApplicationDetail detail = ApplicationDetail.fromJson(
+      <String, dynamic>{
+        'id': 'app-id',
+        'name': 'FirstLook',
+        'isOwner': true,
+        'isApproved': false,
+        'isInDrop': true,
+        'canEdit': false,
+      },
+    );
+
+    expect(detail.isOwner, isTrue);
+    expect(detail.isApproved, isFalse);
+    expect(detail.isInDrop, isTrue);
+    expect(detail.hasDropState, isTrue);
+    expect(detail.canEdit, isFalse);
+  });
+
+  test('my application item parses moderation and publication statuses', () {
+    final ApplicationListItem item = ApplicationListItem.fromJson(
+      <String, dynamic>{
+        'id': 'app-id',
+        'name': 'FirstLook',
+        'moderationStatus': 3,
+        'publicationStatus': 1,
+      },
+    );
+
+    expect(item.moderationStatus, 3);
+    expect(item.publicationStatus, 1);
+  });
+
   testWidgets('drop rank assets decode without errors',
       (WidgetTester tester) async {
     await tester.pumpWidget(

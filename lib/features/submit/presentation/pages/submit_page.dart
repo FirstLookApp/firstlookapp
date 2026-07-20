@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firstlook/core/errors/app_exception.dart';
+import 'package:firstlook/core/network/url_resolver.dart';
 import 'package:firstlook/core/providers/app_providers.dart';
 import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
@@ -20,7 +21,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 class SubmitPage extends ConsumerStatefulWidget {
-  const SubmitPage({super.key});
+  const SubmitPage({this.applicationToEdit, super.key});
+
+  final ApplicationDetail? applicationToEdit;
 
   @override
   ConsumerState<SubmitPage> createState() => _SubmitPageState();
@@ -37,10 +40,13 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   final TextEditingController _appStoreUrl = TextEditingController();
   final TextEditingController _googlePlayUrl = TextEditingController();
 
-  int _selectedCategoryIndex = 0;
+  String? _selectedCategory;
   PlatformType _selectedPlatform = PlatformType.android;
   List<PlatformFile> _screenshots = <PlatformFile>[];
+  List<String> _existingScreenshots = <String>[];
   bool _hasAttemptedSubmit = false;
+
+  bool get _isEditing => widget.applicationToEdit != null;
 
   bool get _showsAndroidField {
     return _selectedPlatform == PlatformType.android ||
@@ -55,6 +61,17 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   @override
   void initState() {
     super.initState();
+    final ApplicationDetail? application = widget.applicationToEdit;
+    if (application != null) {
+      _name.text = application.name;
+      _description.text = application.description;
+      _videoUrl.text = application.videoUrl;
+      _appStoreUrl.text = application.appStoreUrl ?? '';
+      _googlePlayUrl.text = application.googlePlayUrl ?? '';
+      _selectedCategory = application.category;
+      _selectedPlatform = PlatformType.fromApiValue(application.platform);
+      _existingScreenshots = List<String>.of(application.screenshots);
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         ref.invalidate(dropCategoriesProvider);
@@ -79,8 +96,18 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
         ref.watch(dropCategoriesProvider);
     final List<String> categories =
         categoriesState.valueOrNull ?? const <String>[];
+    final String? selectedCategory = categories.isEmpty
+        ? null
+        : categories.contains(_selectedCategory)
+            ? _selectedCategory
+            : categories.first;
     final AsyncValue<String?> submitState =
         ref.watch(submitApplicationControllerProvider);
+    final AsyncValue<bool> updateState = _isEditing
+        ? ref.watch(
+            updateApplicationControllerProvider(widget.applicationToEdit!.id),
+          )
+        : const AsyncData<bool>(false);
 
     ref.listen<AsyncValue<String?>>(
       submitApplicationControllerProvider,
@@ -106,6 +133,29 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       },
     );
 
+    if (_isEditing) {
+      ref.listen<AsyncValue<bool>>(
+        updateApplicationControllerProvider(widget.applicationToEdit!.id),
+        (AsyncValue<bool>? previous, AsyncValue<bool> next) {
+          next.whenOrNull(
+            data: (bool updated) {
+              if (updated && mounted) {
+                context.pop(true);
+              }
+            },
+            error: (Object error, StackTrace stackTrace) {
+              AppSnackbar.show(
+                context,
+                message: error is AppException
+                    ? error.message
+                    : l10n.commonUnexpectedError,
+              );
+            },
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: SafeArea(
@@ -123,7 +173,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const FirstLookAppHeader(),
                 const SizedBox(height: 22),
                 Text(
-                  l10n.submitTitle,
+                  _isEditing ? l10n.editApplicationTitle : l10n.submitTitle,
                   style: TextStyle(
                     color: AppColors.textPrimary(context),
                     fontSize: 24,
@@ -133,7 +183,9 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.submitSubtitle,
+                  _isEditing
+                      ? l10n.editApplicationSubtitle
+                      : l10n.submitSubtitle,
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 12,
@@ -162,10 +214,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                   )
                 else
                   DropdownButtonFormField<String>(
-                    key: ValueKey<String>(categories[_selectedCategoryIndex
-                        .clamp(0, categories.length - 1)]),
-                    initialValue: categories[
-                        _selectedCategoryIndex.clamp(0, categories.length - 1)],
+                    key: ValueKey<String>(selectedCategory!),
+                    initialValue: selectedCategory,
                     isExpanded: true,
                     items: categories
                         .map(
@@ -177,10 +227,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                         .toList(growable: false),
                     onChanged: (String? value) {
                       if (value != null) {
-                        setState(
-                          () => _selectedCategoryIndex =
-                              categories.indexOf(value),
-                        );
+                        setState(() => _selectedCategory = value);
                       }
                     },
                     style: TextStyle(
@@ -217,15 +264,20 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 const SizedBox(height: 8),
                 _ScreenshotPickerPreview(
                   files: _screenshots,
+                  existingPaths: _existingScreenshots,
                   minimumCount: _minScreenshotCount,
                   maximumCount: _maxScreenshotCount,
-                  pickLabel: l10n.submitPickScreenshots,
+                  pickLabel: _isEditing && _screenshots.isEmpty
+                      ? l10n.editReplaceScreenshots
+                      : l10n.submitPickScreenshots,
                   onPick: _pickScreenshots,
                   onRemove: _removeScreenshot,
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  l10n.submitScreenshotRequirements,
+                  _isEditing && _screenshots.isEmpty
+                      ? l10n.editScreenshotRequirements
+                      : l10n.submitScreenshotRequirements,
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 12,
@@ -298,11 +350,15 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                 ],
                 const SizedBox(height: 16),
                 AuthPrimaryButton(
-                  label: l10n.submitButton,
-                  isLoading: submitState.isLoading,
-                  onPressed: categories.isEmpty
+                  label: _isEditing
+                      ? l10n.editApplicationButton
+                      : l10n.submitButton,
+                  isLoading: _isEditing
+                      ? updateState.isLoading
+                      : submitState.isLoading,
+                  onPressed: selectedCategory == null
                       ? null
-                      : () => _submit(l10n, categories),
+                      : () => _submit(l10n, selectedCategory),
                 ),
               ],
             ),
@@ -377,11 +433,16 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     });
   }
 
-  bool get _hasValidScreenshotCount =>
-      _screenshots.length >= _minScreenshotCount &&
-      _screenshots.length <= _maxScreenshotCount;
+  bool get _hasValidScreenshotCount {
+    if (_isEditing && _screenshots.isEmpty) {
+      return true;
+    }
 
-  void _submit(AppLocalizations l10n, List<String> categories) {
+    return _screenshots.length >= _minScreenshotCount &&
+        _screenshots.length <= _maxScreenshotCount;
+  }
+
+  void _submit(AppLocalizations l10n, String category) {
     final bool isAuthenticated =
         ref.read(authControllerProvider).valueOrNull?.status ==
             AuthStatus.authenticated;
@@ -455,22 +516,32 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       return;
     }
 
-    ref.read(submitApplicationControllerProvider.notifier).submit(
-          SubmitApplicationPayload(
-            name: name,
-            category: categories[_selectedCategoryIndex],
-            description: description,
-            videoUrl: videoUrl,
-            platform: _selectedPlatform,
-            appStoreUrl: _showsIosField ? appStoreUrl : '',
-            googlePlayUrl: _showsAndroidField ? googlePlayUrl : '',
-            destination: SubmitDestination.drop,
-            screenshotPaths: _screenshots
-                .map((PlatformFile file) => file.path)
-                .whereType<String>()
-                .toList(growable: false),
-          ),
-        );
+    final SubmitApplicationPayload payload = SubmitApplicationPayload(
+      name: name,
+      category: category,
+      description: description,
+      videoUrl: videoUrl,
+      platform: _selectedPlatform,
+      appStoreUrl: _showsIosField ? appStoreUrl : '',
+      googlePlayUrl: _showsAndroidField ? googlePlayUrl : '',
+      destination: SubmitDestination.drop,
+      screenshotPaths: _screenshots
+          .map((PlatformFile file) => file.path)
+          .whereType<String>()
+          .toList(growable: false),
+    );
+
+    if (_isEditing) {
+      ref
+          .read(
+            updateApplicationControllerProvider(
+              widget.applicationToEdit!.id,
+            ).notifier,
+          )
+          .update(payload);
+    } else {
+      ref.read(submitApplicationControllerProvider.notifier).submit(payload);
+    }
   }
 
   bool _isValidStoreUrl(String value) {
@@ -492,9 +563,10 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     }
 
     setState(() {
-      _selectedCategoryIndex = 0;
+      _selectedCategory = null;
       _selectedPlatform = PlatformType.android;
       _screenshots = <PlatformFile>[];
+      _existingScreenshots = <String>[];
       _hasAttemptedSubmit = false;
     });
   }
@@ -522,6 +594,7 @@ class _Label extends StatelessWidget {
 class _ScreenshotPickerPreview extends StatelessWidget {
   const _ScreenshotPickerPreview({
     required this.files,
+    required this.existingPaths,
     required this.minimumCount,
     required this.maximumCount,
     required this.pickLabel,
@@ -530,6 +603,7 @@ class _ScreenshotPickerPreview extends StatelessWidget {
   });
 
   final List<PlatformFile> files;
+  final List<String> existingPaths;
   final int minimumCount;
   final int maximumCount;
   final String pickLabel;
@@ -538,6 +612,27 @@ class _ScreenshotPickerPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (files.isEmpty && existingPaths.isNotEmpty) {
+      return SizedBox(
+        height: 118,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: existingPaths.length + 1,
+          separatorBuilder: (_, __) => const SizedBox(width: 10),
+          itemBuilder: (BuildContext context, int index) {
+            if (index == existingPaths.length) {
+              return _AddScreenshotSlot(
+                onPick: onPick,
+                pickLabel: pickLabel,
+              );
+            }
+
+            return _RemoteScreenshotSlot(path: existingPaths[index]);
+          },
+        ),
+      );
+    }
+
     final int itemCount = files.length < minimumCount
         ? minimumCount
         : files.length < maximumCount
@@ -563,6 +658,33 @@ class _ScreenshotPickerPreview extends StatelessWidget {
             onRemove: () => onRemove(files[index]),
           );
         },
+      ),
+    );
+  }
+}
+
+class _RemoteScreenshotSlot extends StatelessWidget {
+  const _RemoteScreenshotSlot({required this.path});
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 132,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt(context),
+        border: Border.all(color: AppColors.outline(context)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Image.network(
+        UrlResolver.media(path),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.broken_image_outlined,
+          color: AppColors.primary,
+        ),
       ),
     );
   }

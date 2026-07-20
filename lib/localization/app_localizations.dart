@@ -1010,6 +1010,78 @@ abstract class AppLocalizations {
   /// **'Submit for review'**
   String get submitButton;
 
+  /// No description provided for @editApplicationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Application'**
+  String get editApplicationTitle;
+
+  /// No description provided for @editApplicationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update an application that is not in an active Drop.'**
+  String get editApplicationSubtitle;
+
+  /// No description provided for @editApplicationButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get editApplicationButton;
+
+  /// No description provided for @editApplicationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved.'**
+  String get editApplicationSuccess;
+
+  /// No description provided for @editReplaceScreenshots.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace images'**
+  String get editReplaceScreenshots;
+
+  /// No description provided for @editScreenshotRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing images are kept. Select 3 to 5 new images to replace them.'**
+  String get editScreenshotRequirements;
+
+  /// No description provided for @detailApprovedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get detailApprovedBadge;
+
+  /// No description provided for @detailNotApprovedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not approved'**
+  String get detailNotApprovedBadge;
+
+  /// No description provided for @detailInDropBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'In Drop'**
+  String get detailInDropBadge;
+
+  /// No description provided for @detailNotInDropBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in Drop'**
+  String get detailNotInDropBadge;
+
+  /// No description provided for @detailEditApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get detailEditApplication;
+
+  /// No description provided for @detailEditBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Applications in an active Drop cannot be edited.'**
+  String get detailEditBlocked;
+
   /// No description provided for @profileMyApps.
   ///
   /// In en, this message translates to:

@@ -98,6 +98,12 @@ final submitApplicationControllerProvider = StateNotifierProvider.autoDispose<
   return SubmitApplicationController(ref);
 });
 
+final updateApplicationControllerProvider = StateNotifierProvider.autoDispose
+    .family<UpdateApplicationController, AsyncValue<bool>, String>(
+  (Ref ref, String applicationId) =>
+      UpdateApplicationController(ref, applicationId),
+);
+
 class SubmitApplicationController extends StateNotifier<AsyncValue<String?>> {
   SubmitApplicationController(this._ref)
       : super(const AsyncData<String?>(null));
@@ -118,6 +124,33 @@ class SubmitApplicationController extends StateNotifier<AsyncValue<String?>> {
       state = AsyncData<String?>(applicationId);
     } catch (error, stackTrace) {
       state = AsyncError<String?>(_errorParser.parse(error), stackTrace);
+    }
+  }
+}
+
+class UpdateApplicationController extends StateNotifier<AsyncValue<bool>> {
+  UpdateApplicationController(this._ref, this._applicationId)
+      : super(const AsyncData<bool>(false));
+
+  final Ref _ref;
+  final String _applicationId;
+  final ApiErrorParser _errorParser = const ApiErrorParser();
+
+  Future<void> update(SubmitApplicationPayload payload) async {
+    state = const AsyncLoading<bool>();
+
+    try {
+      await _ref.read(firstLookRepositoryProvider).updateApplication(
+            id: _applicationId,
+            payload: payload,
+          );
+      _ref
+        ..invalidate(myApplicationsProvider)
+        ..invalidate(profileProvider)
+        ..invalidate(applicationDetailProvider);
+      state = const AsyncData<bool>(true);
+    } catch (error, stackTrace) {
+      state = AsyncError<bool>(_errorParser.parse(error), stackTrace);
     }
   }
 }

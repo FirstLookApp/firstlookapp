@@ -69,6 +69,8 @@ class ApplicationListItem {
     required this.category,
     required this.destination,
     required this.platform,
+    required this.moderationStatus,
+    required this.publicationStatus,
     required this.mainScreenshot,
     required this.shortDescription,
     required this.score,
@@ -86,6 +88,8 @@ class ApplicationListItem {
       destination:
           json['destination'] as int? ?? SubmitDestination.drop.apiValue,
       platform: json['platform'] as int? ?? PlatformType.both.apiValue,
+      moderationStatus: json['moderationStatus'] as int? ?? 2,
+      publicationStatus: json['publicationStatus'] as int? ?? 1,
       mainScreenshot: json['mainScreenshot'] as String? ?? '',
       shortDescription: json['shortDescription'] as String? ?? '',
       score: (json['score'] as num?)?.toDouble() ?? 0,
@@ -101,6 +105,8 @@ class ApplicationListItem {
   final String category;
   final int destination;
   final int platform;
+  final int moderationStatus;
+  final int publicationStatus;
   final String mainScreenshot;
   final String shortDescription;
   final double score;
@@ -222,6 +228,11 @@ class ApplicationDetail {
     required this.commentCount,
     required this.ownerId,
     required this.ownerUsername,
+    required this.isOwner,
+    required this.isApproved,
+    required this.isInDrop,
+    required this.hasDropState,
+    required this.canEdit,
   });
 
   factory ApplicationDetail.fromJson(Map<String, dynamic> json) {
@@ -246,6 +257,11 @@ class ApplicationDetail {
       commentCount: json['commentCount'] as int? ?? 0,
       ownerId: json['ownerId'] as String? ?? '',
       ownerUsername: json['ownerUsername'] as String? ?? '',
+      isOwner: json['isOwner'] as bool? ?? false,
+      isApproved: json['isApproved'] as bool? ?? false,
+      isInDrop: json['isInDrop'] as bool? ?? false,
+      hasDropState: json.containsKey('isInDrop'),
+      canEdit: json['canEdit'] as bool? ?? false,
     );
   }
 
@@ -264,6 +280,42 @@ class ApplicationDetail {
   final int commentCount;
   final String ownerId;
   final String ownerUsername;
+  final bool isOwner;
+  final bool isApproved;
+  final bool isInDrop;
+  final bool hasDropState;
+  final bool canEdit;
+
+  ApplicationDetail copyWith({
+    bool? isOwner,
+    bool? isApproved,
+    bool? isInDrop,
+    bool? hasDropState,
+    bool? canEdit,
+  }) {
+    return ApplicationDetail(
+      id: id,
+      name: name,
+      category: category,
+      description: description,
+      videoUrl: videoUrl,
+      platform: platform,
+      appStoreUrl: appStoreUrl,
+      googlePlayUrl: googlePlayUrl,
+      destination: destination,
+      screenshots: screenshots,
+      isLiked: isLiked,
+      likeCount: likeCount,
+      commentCount: commentCount,
+      ownerId: ownerId,
+      ownerUsername: ownerUsername,
+      isOwner: isOwner ?? this.isOwner,
+      isApproved: isApproved ?? this.isApproved,
+      isInDrop: isInDrop ?? this.isInDrop,
+      hasDropState: hasDropState ?? this.hasDropState,
+      canEdit: canEdit ?? this.canEdit,
+    );
+  }
 }
 
 class CommentItem {

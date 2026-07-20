@@ -26,6 +26,13 @@ class FirstLookRepository {
     return _remoteDataSource.submitApplication(payload);
   }
 
+  Future<void> updateApplication({
+    required String id,
+    required SubmitApplicationPayload payload,
+  }) {
+    return _remoteDataSource.updateApplication(id: id, payload: payload);
+  }
+
   Future<ApplicationDetail> detail({
     required String id,
     required PlatformType platform,

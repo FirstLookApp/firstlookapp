@@ -41,6 +41,14 @@ abstract final class RouteNames {
     return '${_shellRootFor(currentPath)}/applications/$id?platform=$platform';
   }
 
+  static String applicationEditLocation({
+    required String id,
+    required int platform,
+    String? currentPath,
+  }) {
+    return '${_shellRootFor(currentPath)}/applications/$id/edit?platform=$platform';
+  }
+
   static String userProfileLocation(String id, {String? currentPath}) {
     return '${_shellRootFor(currentPath)}/users/$id';
   }

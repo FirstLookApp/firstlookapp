@@ -90,6 +90,11 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                   app: app,
                   openStoreLabel: l10n.detailOpenStore,
                   createdByLabel: l10n.detailCreatedBy,
+                  approvedLabel: l10n.detailApprovedBadge,
+                  notApprovedLabel: l10n.detailNotApprovedBadge,
+                  inDropLabel: l10n.detailInDropBadge,
+                  notInDropLabel: l10n.detailNotInDropBadge,
+                  editLabel: l10n.detailEditApplication,
                   onOpenStore:
                       canOpenStore ? () => _handleOpenStore(app, l10n) : null,
                   onOwnerTap: app.ownerId.isEmpty || app.ownerUsername.isEmpty
@@ -100,6 +105,29 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                               currentPath: GoRouterState.of(context).uri.path,
                             ),
                           ),
+                  onEdit: app.isOwner
+                      ? () async {
+                          if (!app.canEdit) {
+                            _showMessage(l10n.detailEditBlocked);
+                            return;
+                          }
+
+                          final bool? updated = await context.push<bool>(
+                            RouteNames.applicationEditLocation(
+                              id: app.id,
+                              platform: app.platform,
+                              currentPath: GoRouterState.of(context).uri.path,
+                            ),
+                            extra: app,
+                          );
+                          if (updated == true && mounted) {
+                            ref.invalidate(
+                              applicationDetailProvider(request),
+                            );
+                            _showMessage(l10n.editApplicationSuccess);
+                          }
+                        }
+                      : null,
                   onLike: () async {
                     if (!isAuthenticated) {
                       context.push(RouteNames.loginPath);
@@ -269,23 +297,34 @@ class _DetailHeader extends StatelessWidget {
     required this.app,
     required this.openStoreLabel,
     required this.createdByLabel,
+    required this.approvedLabel,
+    required this.notApprovedLabel,
+    required this.inDropLabel,
+    required this.notInDropLabel,
+    required this.editLabel,
     required this.onOpenStore,
     required this.onOwnerTap,
+    required this.onEdit,
     required this.onLike,
   });
 
   final ApplicationDetail app;
   final String openStoreLabel;
   final String createdByLabel;
+  final String approvedLabel;
+  final String notApprovedLabel;
+  final String inDropLabel;
+  final String notInDropLabel;
+  final String editLabel;
   final VoidCallback? onOpenStore;
   final VoidCallback? onOwnerTap;
+  final VoidCallback? onEdit;
   final VoidCallback onLike;
 
   @override
   Widget build(BuildContext context) {
     final String imagePath =
         app.screenshots.isEmpty ? '' : app.screenshots.first;
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
 
     return Column(
       children: <Widget>[
@@ -304,6 +343,57 @@ class _DetailHeader extends StatelessWidget {
                 ),
               ),
             ),
+            if (app.isOwner) ...<Widget>[
+              const SizedBox(width: 8),
+              _DetailStatusBadge(
+                label: app.isApproved ? approvedLabel : notApprovedLabel,
+                icon: app.isApproved
+                    ? Icons.verified_rounded
+                    : Icons.schedule_rounded,
+                emphasized: app.isApproved,
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: <Widget>[
+            if (onEdit != null)
+              TextButton.icon(
+                onPressed: onEdit,
+                style: TextButton.styleFrom(
+                  foregroundColor: app.canEdit
+                      ? AppColors.primary
+                      : AppColors.textSecondary(context),
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: Icon(
+                  app.canEdit
+                      ? Icons.edit_outlined
+                      : Icons.lock_outline_rounded,
+                  size: 17,
+                ),
+                label: Text(
+                  editLabel,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            const Spacer(),
+            if (app.hasDropState) ...<Widget>[
+              _DetailStatusBadge(
+                label: app.isInDrop ? inDropLabel : notInDropLabel,
+                icon: app.isInDrop
+                    ? Icons.local_fire_department_rounded
+                    : Icons.remove_circle_outline_rounded,
+                emphasized: app.isInDrop,
+              ),
+              const SizedBox(width: 6),
+            ],
             TextButton.icon(
               onPressed: onLike,
               icon: Icon(
@@ -410,7 +500,6 @@ class _DetailHeader extends StatelessWidget {
                     runSpacing: 6,
                     children: <Widget>[
                       _MetaChip(label: app.category),
-                      _MetaChip(label: l10n.dropTab),
                     ],
                   ),
                 ],
@@ -419,6 +508,54 @@ class _DetailHeader extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _DetailStatusBadge extends StatelessWidget {
+  const _DetailStatusBadge({
+    required this.label,
+    required this.icon,
+    required this.emphasized,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color foreground =
+        emphasized ? AppColors.primary : AppColors.textSecondary(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: emphasized
+            ? AppColors.softPrimary(context)
+            : AppColors.surfaceAlt(context),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: emphasized
+              ? AppColors.primary.withValues(alpha: 0.28)
+              : AppColors.outline(context),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 13, color: foreground),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: foreground,
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

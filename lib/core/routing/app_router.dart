@@ -327,6 +327,17 @@ GoRoute _detailRoute() {
   return GoRoute(
     path: 'applications/:id',
     builder: (_, GoRouterState state) => _detailPage(state),
+    routes: <RouteBase>[
+      GoRoute(
+        path: 'edit',
+        builder: (_, GoRouterState state) {
+          final Object? application = state.extra;
+          return application is ApplicationDetail
+              ? SubmitPage(applicationToEdit: application)
+              : _detailPage(state);
+        },
+      ),
+    ],
   );
 }
 
