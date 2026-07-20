@@ -40,6 +40,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   int _selectedCategoryIndex = 0;
   PlatformType _selectedPlatform = PlatformType.android;
   List<PlatformFile> _screenshots = <PlatformFile>[];
+  bool _hasAttemptedSubmit = false;
 
   bool get _showsAndroidField {
     return _selectedPlatform == PlatformType.android ||
@@ -231,6 +232,18 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                if (_hasAttemptedSubmit &&
+                    !_hasValidScreenshotCount) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.submitScreenshotCountError,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 AuthTextField(
                   controller: _videoUrl,
@@ -364,6 +377,10 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     });
   }
 
+  bool get _hasValidScreenshotCount =>
+      _screenshots.length >= _minScreenshotCount &&
+      _screenshots.length <= _maxScreenshotCount;
+
   void _submit(AppLocalizations l10n, List<String> categories) {
     final bool isAuthenticated =
         ref.read(authControllerProvider).valueOrNull?.status ==
@@ -379,17 +396,20 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     final String googlePlayUrl = _googlePlayUrl.text.trim();
     final String appStoreUrl = _appStoreUrl.text.trim();
 
-    if (name.isEmpty || description.isEmpty) {
-      AppSnackbar.show(context, message: l10n.submitRequiredFields);
-      return;
+    if (!_hasAttemptedSubmit) {
+      setState(() => _hasAttemptedSubmit = true);
     }
 
-    if (_screenshots.length < _minScreenshotCount ||
-        _screenshots.length > _maxScreenshotCount) {
+    if (!_hasValidScreenshotCount) {
       AppSnackbar.show(
         context,
         message: l10n.submitScreenshotCountError,
       );
+      return;
+    }
+
+    if (name.isEmpty || description.isEmpty) {
+      AppSnackbar.show(context, message: l10n.submitRequiredFields);
       return;
     }
 
@@ -483,6 +503,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       _selectedCategoryIndex = 0;
       _selectedPlatform = PlatformType.android;
       _screenshots = <PlatformFile>[];
+      _hasAttemptedSubmit = false;
     });
   }
 }
