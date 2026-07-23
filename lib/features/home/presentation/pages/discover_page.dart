@@ -821,38 +821,78 @@ String _formatDropCountdown(
   return l10n.dropCountdown(duration);
 }
 
-class LeaderboardPage extends ConsumerWidget {
+class LeaderboardPage extends ConsumerStatefulWidget {
   const LeaderboardPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LeaderboardPage> createState() => _LeaderboardPageState();
+}
+
+class _LeaderboardPageState extends ConsumerState<LeaderboardPage> {
+  static const Duration _periodTransitionDuration = Duration(
+    milliseconds: 280,
+  );
+
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(
+      initialPage: LeaderboardPeriod.weekly.index,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final LeaderboardPeriod selectedPeriod = ref.watch(
       leaderboardPeriodProvider,
     );
-    final AsyncValue<PagedResult<ApplicationListItem>> leaderboard =
-        ref.watch(leaderboardProvider(selectedPeriod));
+
+    ref.listen<LeaderboardPeriod>(leaderboardPeriodProvider, (
+      LeaderboardPeriod? previous,
+      LeaderboardPeriod next,
+    ) {
+      if (!_pageController.hasClients || previous == next) {
+        return;
+      }
+
+      final int currentPage =
+          (_pageController.page ?? _pageController.initialPage.toDouble())
+              .round();
+      if (currentPage == next.index) {
+        return;
+      }
+
+      _pageController.animateToPage(
+        next.index,
+        duration: _periodTransitionDuration,
+        curve: Curves.easeInOutCubic,
+      );
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: ColoredBox(
         color: AppColors.background(context),
         child: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () async => ref.invalidate(
-              leaderboardProvider(selectedPeriod),
-            ),
-            child: leaderboard.when(
-              data: (PagedResult<ApplicationListItem> result) {
-                final List<ApplicationListItem> items = result.items;
-
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.screenHorizontal,
-                    12,
-                    AppSpacing.screenHorizontal,
-                    24,
-                  ),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenHorizontal,
+                  12,
+                  AppSpacing.screenHorizontal,
+                  0,
+                ),
+                child: Column(
                   children: <Widget>[
                     const FirstLookAppHeader(),
                     const SizedBox(height: 28),
@@ -865,36 +905,99 @@ class LeaderboardPage extends ConsumerWidget {
                             period;
                       },
                     ),
-                    const SizedBox(height: 22),
-                    if (items.isEmpty)
-                      _PremiumEmptyState(
-                        icon: Icons.leaderboard_rounded,
-                        title: l10n.leaderboardEmptyTitle,
-                        message: l10n.leaderboardEmptyMessage,
-                        badge: l10n.settingsSoon,
-                      )
-                    else
-                      _OwnerLeaderboard(
-                        items: items,
-                        onTap: (ApplicationListItem item) => context.push(
-                          RouteNames.applicationDetailLocation(
-                            id: item.id,
-                            platform: item.platform,
-                            currentPath: RouteNames.leaderboardPath,
-                          ),
-                        ),
-                      ),
                   ],
+                ),
+              ),
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: LeaderboardPeriod.values.length,
+                  physics: const PageScrollPhysics(
+                    parent: ClampingScrollPhysics(),
+                  ),
+                  onPageChanged: (int index) {
+                    final LeaderboardPeriod period =
+                        LeaderboardPeriod.values[index];
+                    if (period != ref.read(leaderboardPeriodProvider)) {
+                      ref.read(leaderboardPeriodProvider.notifier).state =
+                          period;
+                    }
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    return _LeaderboardPeriodPage(
+                      period: LeaderboardPeriod.values[index],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardPeriodPage extends ConsumerWidget {
+  const _LeaderboardPeriodPage({required this.period});
+
+  final LeaderboardPeriod period;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final AsyncValue<PagedResult<ApplicationListItem>> leaderboard = ref.watch(
+      leaderboardProvider(period),
+    );
+
+    return ColoredBox(
+      color: AppColors.background(context),
+      child: RefreshIndicator(
+        onRefresh: () async {
+          ref.invalidate(leaderboardProvider(period));
+          await ref.read(leaderboardProvider(period).future);
+        },
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.screenHorizontal,
+            22,
+            AppSpacing.screenHorizontal,
+            24,
+          ),
+          children: <Widget>[
+            leaderboard.when(
+              data: (PagedResult<ApplicationListItem> result) {
+                if (result.items.isEmpty) {
+                  return _PremiumEmptyState(
+                    icon: Icons.leaderboard_rounded,
+                    title: l10n.leaderboardEmptyTitle,
+                    message: l10n.leaderboardEmptyMessage,
+                    badge: l10n.settingsSoon,
+                  );
+                }
+
+                return _OwnerLeaderboard(
+                  items: result.items,
+                  onTap: (ApplicationListItem item) => context.push(
+                    RouteNames.applicationDetailLocation(
+                      id: item.id,
+                      platform: item.platform,
+                      currentPath: RouteNames.leaderboardPath,
+                    ),
+                  ),
                 );
               },
               error: (Object error, StackTrace stackTrace) => AppErrorState(
                 message: error.toString(),
-                onRetry: () =>
-                    ref.invalidate(leaderboardProvider(selectedPeriod)),
+                onRetry: () => ref.invalidate(leaderboardProvider(period)),
               ),
-              loading: () => const AppLoadingIndicator(),
+              loading: () => const Padding(
+                padding: EdgeInsets.only(top: 42),
+                child: AppLoadingIndicator(),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -922,49 +1025,62 @@ class _LeaderboardPeriodTabs extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.outline(context)),
       ),
-      child: Row(
-        children: periods.map((LeaderboardPeriod period) {
-          final bool isSelected = period == selected;
-          return Expanded(
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => onChanged(period),
-                borderRadius: BorderRadius.circular(12),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? AppColors.surface(context)
-                        : Colors.transparent,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isSelected
-                        ? <BoxShadow>[
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 9,
-                              offset: const Offset(0, 3),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Text(
-                    _leaderboardPeriodLabel(period, isTurkish),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textSecondary(context),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final double tabWidth = constraints.maxWidth / periods.length;
+
+          return SizedBox(
+            height: 36,
+            child: Stack(
+              children: <Widget>[
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  left: tabWidth * selected.index,
+                  top: 0,
+                  bottom: 0,
+                  width: tabWidth,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface(context),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
-              ),
+                Row(
+                  children: periods.map((LeaderboardPeriod period) {
+                    final bool isSelected = period == selected;
+                    return Expanded(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => onChanged(period),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Center(
+                            child: AnimatedDefaultTextStyle(
+                              duration: const Duration(milliseconds: 140),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary(context),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900,
+                              ),
+                              child: Text(
+                                _leaderboardPeriodLabel(period, isTurkish),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(growable: false),
+                ),
+              ],
             ),
           );
-        }).toList(growable: false),
+        },
       ),
     );
   }
