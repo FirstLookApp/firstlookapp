@@ -14,6 +14,7 @@ lib/generated/
 .idea/
 .vscode/
 *.iml
+.DS_Store
 
 # Native
 android/.gradle/

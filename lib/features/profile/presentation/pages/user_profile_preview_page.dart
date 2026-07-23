@@ -286,6 +286,10 @@ class _PublicApplicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String imagePath = item.applicationIconPath?.isNotEmpty ?? false
+        ? item.applicationIconPath!
+        : item.mainScreenshot;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -310,14 +314,14 @@ class _PublicApplicationCard extends StatelessWidget {
               child: SizedBox(
                 width: 48,
                 height: 48,
-                child: item.mainScreenshot.isEmpty
+                child: imagePath.isEmpty
                     ? const ColoredBox(
                         color: AppColors.primarySoft,
                         child:
                             Icon(Icons.apps_rounded, color: AppColors.primary),
                       )
                     : Image.network(
-                        UrlResolver.media(item.mainScreenshot),
+                        UrlResolver.media(imagePath),
                         fit: BoxFit.cover,
                       ),
               ),

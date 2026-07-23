@@ -920,6 +920,42 @@ abstract class AppLocalizations {
   /// **'Destination'**
   String get submitDestination;
 
+  /// No description provided for @submitAppIconLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'APPLICATION ICON'**
+  String get submitAppIconLabel;
+
+  /// No description provided for @submitPickAppIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose icon'**
+  String get submitPickAppIcon;
+
+  /// No description provided for @submitChangeAppIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Change icon'**
+  String get submitChangeAppIcon;
+
+  /// No description provided for @submitAppIconRequirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your application icon in PNG or JPG format, up to 2 MB.'**
+  String get submitAppIconRequirements;
+
+  /// No description provided for @submitAppIconRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'An application icon is required.'**
+  String get submitAppIconRequired;
+
+  /// No description provided for @submitAppIconSizeError.
+  ///
+  /// In en, this message translates to:
+  /// **'The application icon can be at most 2 MB.'**
+  String get submitAppIconSizeError;
+
   /// No description provided for @submitScreenshotsLabel.
   ///
   /// In en, this message translates to:
@@ -1087,6 +1123,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Applications in an active Drop cannot be edited.'**
   String get detailEditBlocked;
+
+  /// No description provided for @detailRequestSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Request support'**
+  String get detailRequestSupport;
+
+  /// No description provided for @storyShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request support'**
+  String get storyShareTitle;
+
+  /// No description provided for @storyShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Story card is ready. Share it on Instagram to help your app reach more people.'**
+  String get storyShareSubtitle;
+
+  /// No description provided for @storyShareBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'FIRSTLOOK DROP'**
+  String get storyShareBadge;
+
+  /// No description provided for @storyShareHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'My app is live'**
+  String get storyShareHeadline;
+
+  /// No description provided for @storyShareSupportCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Be one of the first supporters. Explore it, like it and help it stand out with your comment.'**
+  String get storyShareSupportCopy;
+
+  /// No description provided for @storyShareCta.
+  ///
+  /// In en, this message translates to:
+  /// **'DISCOVER IT TOO'**
+  String get storyShareCta;
+
+  /// No description provided for @storyShareButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Share to Instagram Story'**
+  String get storyShareButton;
+
+  /// No description provided for @storySharePreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing Story'**
+  String get storySharePreparing;
+
+  /// No description provided for @storyShareUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Instagram is not installed or Story sharing is unavailable.'**
+  String get storyShareUnavailable;
+
+  /// No description provided for @storyShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The Story could not be prepared. Please try again.'**
+  String get storyShareFailed;
 
   /// No description provided for @profileMyApps.
   ///

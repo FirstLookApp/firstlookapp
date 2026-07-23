@@ -104,6 +104,10 @@ class FirstLookRemoteDataSource {
       'AppStoreUrl': payload.appStoreUrl,
       'GooglePlayUrl': payload.googlePlayUrl,
       'SubmitDestination': payload.destination.apiValue,
+      if (payload.applicationIconPath != null)
+        'ApplicationIcon': await MultipartFile.fromFile(
+          payload.applicationIconPath!,
+        ),
       if (payload.screenshotPaths.isNotEmpty)
         'Screenshots': await Future.wait<MultipartFile>(
           payload.screenshotPaths.map(MultipartFile.fromFile),
@@ -198,6 +202,7 @@ class FirstLookRemoteDataSource {
         isInDrop: isInActiveDrop,
         hasDropState: true,
         canEdit: !isInActiveDrop,
+        applicationIconPath: item.applicationIconPath,
       );
     } on DioException {
       return detail;
@@ -246,6 +251,7 @@ class FirstLookRemoteDataSource {
         isInDrop: isInActiveDrop,
         hasDropState: true,
         canEdit: !isInActiveDrop,
+        applicationIconPath: item.applicationIconPath,
       );
     } on DioException {
       return null;

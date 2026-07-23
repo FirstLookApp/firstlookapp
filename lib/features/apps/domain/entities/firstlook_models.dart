@@ -78,6 +78,7 @@ class ApplicationListItem {
     required this.ownerUsername,
     required this.ownerAvatarUrl,
     required this.likeCount,
+    required this.applicationIconPath,
   });
 
   factory ApplicationListItem.fromJson(Map<String, dynamic> json) {
@@ -97,6 +98,7 @@ class ApplicationListItem {
       ownerUsername: json['ownerUsername'] as String? ?? '',
       ownerAvatarUrl: json['ownerAvatarUrl'] as String?,
       likeCount: json['likeCount'] as int? ?? 0,
+      applicationIconPath: json['applicationIconPath'] as String?,
     );
   }
 
@@ -114,6 +116,7 @@ class ApplicationListItem {
   final String ownerUsername;
   final String? ownerAvatarUrl;
   final int likeCount;
+  final String? applicationIconPath;
 }
 
 class ActiveDropBatch {
@@ -173,6 +176,7 @@ class SubmitApplicationPayload {
     required this.appStoreUrl,
     required this.googlePlayUrl,
     required this.destination,
+    required this.applicationIconPath,
     required this.screenshotPaths,
   });
 
@@ -184,6 +188,7 @@ class SubmitApplicationPayload {
   final String appStoreUrl;
   final String googlePlayUrl;
   final SubmitDestination destination;
+  final String? applicationIconPath;
   final List<String> screenshotPaths;
 }
 
@@ -233,6 +238,7 @@ class ApplicationDetail {
     required this.isInDrop,
     required this.hasDropState,
     required this.canEdit,
+    required this.applicationIconPath,
   });
 
   factory ApplicationDetail.fromJson(Map<String, dynamic> json) {
@@ -262,6 +268,7 @@ class ApplicationDetail {
       isInDrop: json['isInDrop'] as bool? ?? false,
       hasDropState: json.containsKey('isInDrop'),
       canEdit: json['canEdit'] as bool? ?? false,
+      applicationIconPath: json['applicationIconPath'] as String?,
     );
   }
 
@@ -285,6 +292,7 @@ class ApplicationDetail {
   final bool isInDrop;
   final bool hasDropState;
   final bool canEdit;
+  final String? applicationIconPath;
 
   ApplicationDetail copyWith({
     bool? isOwner,
@@ -292,6 +300,7 @@ class ApplicationDetail {
     bool? isInDrop,
     bool? hasDropState,
     bool? canEdit,
+    String? applicationIconPath,
   }) {
     return ApplicationDetail(
       id: id,
@@ -314,6 +323,7 @@ class ApplicationDetail {
       isInDrop: isInDrop ?? this.isInDrop,
       hasDropState: hasDropState ?? this.hasDropState,
       canEdit: canEdit ?? this.canEdit,
+      applicationIconPath: applicationIconPath ?? this.applicationIconPath,
     );
   }
 }

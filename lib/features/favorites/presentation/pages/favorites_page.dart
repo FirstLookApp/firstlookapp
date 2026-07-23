@@ -99,6 +99,10 @@ class _FavoriteAppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String imagePath = item.applicationIconPath?.isNotEmpty ?? false
+        ? item.applicationIconPath!
+        : item.mainScreenshot;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -123,7 +127,7 @@ class _FavoriteAppCard extends StatelessWidget {
               child: SizedBox(
                 width: 54,
                 height: 54,
-                child: item.mainScreenshot.isEmpty
+                child: imagePath.isEmpty
                     ? const ColoredBox(
                         color: AppColors.primarySoft,
                         child: Icon(
@@ -132,7 +136,7 @@ class _FavoriteAppCard extends StatelessWidget {
                         ),
                       )
                     : Image.network(
-                        UrlResolver.media(item.mainScreenshot),
+                        UrlResolver.media(imagePath),
                         fit: BoxFit.cover,
                       ),
               ),

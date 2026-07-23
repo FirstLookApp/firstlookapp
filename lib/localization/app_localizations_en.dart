@@ -439,6 +439,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get submitDestination => 'Destination';
 
   @override
+  String get submitAppIconLabel => 'APPLICATION ICON';
+
+  @override
+  String get submitPickAppIcon => 'Choose icon';
+
+  @override
+  String get submitChangeAppIcon => 'Change icon';
+
+  @override
+  String get submitAppIconRequirements =>
+      'Choose your application icon in PNG or JPG format, up to 2 MB.';
+
+  @override
+  String get submitAppIconRequired => 'An application icon is required.';
+
+  @override
+  String get submitAppIconSizeError =>
+      'The application icon can be at most 2 MB.';
+
+  @override
   String get submitScreenshotsLabel => 'SCREENSHOTS (3-5)';
 
   @override
@@ -529,6 +549,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get detailEditBlocked =>
       'Applications in an active Drop cannot be edited.';
+
+  @override
+  String get detailRequestSupport => 'Request support';
+
+  @override
+  String get storyShareTitle => 'Request support';
+
+  @override
+  String get storyShareSubtitle =>
+      'Your Story card is ready. Share it on Instagram to help your app reach more people.';
+
+  @override
+  String get storyShareBadge => 'FIRSTLOOK DROP';
+
+  @override
+  String get storyShareHeadline => 'My app is live';
+
+  @override
+  String get storyShareSupportCopy =>
+      'Be one of the first supporters. Explore it, like it and help it stand out with your comment.';
+
+  @override
+  String get storyShareCta => 'DISCOVER IT TOO';
+
+  @override
+  String get storyShareButton => 'Share to Instagram Story';
+
+  @override
+  String get storySharePreparing => 'Preparing Story';
+
+  @override
+  String get storyShareUnavailable =>
+      'Instagram is not installed or Story sharing is unavailable.';
+
+  @override
+  String get storyShareFailed =>
+      'The Story could not be prepared. Please try again.';
 
   @override
   String get profileMyApps => 'My applications';

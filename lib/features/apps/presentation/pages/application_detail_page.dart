@@ -8,6 +8,7 @@ import 'package:firstlook/core/routing/route_names.dart';
 import 'package:firstlook/core/errors/app_exception.dart';
 import 'package:firstlook/features/apps/domain/entities/firstlook_models.dart';
 import 'package:firstlook/features/apps/presentation/controllers/firstlook_controllers.dart';
+import 'package:firstlook/features/apps/presentation/widgets/support_story_share_sheet.dart';
 import 'package:firstlook/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:firstlook/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:firstlook/localization/app_localizations.dart';
@@ -95,6 +96,7 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                   inDropLabel: l10n.detailInDropBadge,
                   notInDropLabel: l10n.detailNotInDropBadge,
                   editLabel: l10n.detailEditApplication,
+                  requestSupportLabel: l10n.detailRequestSupport,
                   onOpenStore:
                       canOpenStore ? () => _handleOpenStore(app, l10n) : null,
                   onOwnerTap: app.ownerId.isEmpty || app.ownerUsername.isEmpty
@@ -132,6 +134,12 @@ class _ApplicationDetailPageState extends ConsumerState<ApplicationDetailPage> {
                             );
                           }
                         }
+                      : null,
+                  onRequestSupport: app.isOwner && app.isInDrop
+                      ? () => SupportStoryShareSheet.show(
+                            context,
+                            application: app,
+                          )
                       : null,
                   onLike: () async {
                     if (!isAuthenticated) {
@@ -307,9 +315,11 @@ class _DetailHeader extends StatelessWidget {
     required this.inDropLabel,
     required this.notInDropLabel,
     required this.editLabel,
+    required this.requestSupportLabel,
     required this.onOpenStore,
     required this.onOwnerTap,
     required this.onEdit,
+    required this.onRequestSupport,
     required this.onLike,
   });
 
@@ -321,15 +331,20 @@ class _DetailHeader extends StatelessWidget {
   final String inDropLabel;
   final String notInDropLabel;
   final String editLabel;
+  final String requestSupportLabel;
   final VoidCallback? onOpenStore;
   final VoidCallback? onOwnerTap;
   final VoidCallback? onEdit;
+  final VoidCallback? onRequestSupport;
   final VoidCallback onLike;
 
   @override
   Widget build(BuildContext context) {
-    final String imagePath =
-        app.screenshots.isEmpty ? '' : app.screenshots.first;
+    final String imagePath = app.applicationIconPath?.isNotEmpty ?? false
+        ? app.applicationIconPath!
+        : app.screenshots.isEmpty
+            ? ''
+            : app.screenshots.first;
 
     return Column(
       children: <Widget>[
@@ -382,6 +397,24 @@ class _DetailHeader extends StatelessWidget {
                 ),
                 label: Text(
                   editLabel,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            if (onRequestSupport != null)
+              TextButton.icon(
+                onPressed: onRequestSupport,
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  minimumSize: const Size(0, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(Icons.ios_share_rounded, size: 17),
+                label: Text(
+                  requestSupportLabel,
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w900,

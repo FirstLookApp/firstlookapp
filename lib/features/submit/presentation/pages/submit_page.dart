@@ -33,6 +33,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
   static const int _minScreenshotCount = 3;
   static const int _maxScreenshotCount = 5;
   static const int _maxScreenshotSizeBytes = 2 * 1024 * 1024;
+  static const int _maxApplicationIconSizeBytes = 2 * 1024 * 1024;
 
   final TextEditingController _name = TextEditingController();
   final TextEditingController _description = TextEditingController();
@@ -42,12 +43,19 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
 
   String? _selectedCategory;
   PlatformType _selectedPlatform = PlatformType.android;
+  PlatformFile? _applicationIcon;
+  String? _existingApplicationIconPath;
   List<PlatformFile> _screenshots = <PlatformFile>[];
   List<String> _existingScreenshots = <String>[];
   bool _hasAttemptedSubmit = false;
   bool _requiresApprovalOnSuccess = false;
 
   bool get _isEditing => widget.applicationToEdit != null;
+
+  bool get _hasApplicationIcon {
+    return _applicationIcon?.path != null ||
+        (_existingApplicationIconPath?.isNotEmpty ?? false);
+  }
 
   bool get _showsAndroidField {
     return _selectedPlatform == PlatformType.android ||
@@ -71,6 +79,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       _googlePlayUrl.text = application.googlePlayUrl ?? '';
       _selectedCategory = application.category;
       _selectedPlatform = PlatformType.fromApiValue(application.platform);
+      _existingApplicationIconPath = application.applicationIconPath;
       _existingScreenshots = List<String>.of(application.screenshots);
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -261,6 +270,37 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
                     ),
                   ),
                 const SizedBox(height: 16),
+                _Label(text: l10n.submitAppIconLabel),
+                const SizedBox(height: 8),
+                _ApplicationIconPicker(
+                  file: _applicationIcon,
+                  existingPath: _existingApplicationIconPath,
+                  pickLabel: l10n.submitPickAppIcon,
+                  changeLabel: l10n.submitChangeAppIcon,
+                  onPick: _pickApplicationIcon,
+                  onRemove: _removeApplicationIcon,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  l10n.submitAppIconRequirements,
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (_hasAttemptedSubmit && !_hasApplicationIcon) ...<Widget>[
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.submitAppIconRequired,
+                    style: const TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
                 _Label(text: l10n.submitScreenshotsLabel),
                 const SizedBox(height: 8),
                 _ScreenshotPickerPreview(
@@ -426,6 +466,38 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     });
   }
 
+  Future<void> _pickApplicationIcon() async {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+      type: FileType.image,
+    );
+
+    if (result == null || result.files.isEmpty) {
+      return;
+    }
+
+    final PlatformFile file = result.files.first;
+    if (file.path == null) {
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    if (file.size <= 0 || file.size > _maxApplicationIconSizeBytes) {
+      AppSnackbar.show(context, message: l10n.submitAppIconSizeError);
+      return;
+    }
+
+    setState(() => _applicationIcon = file);
+  }
+
+  void _removeApplicationIcon() {
+    setState(() => _applicationIcon = null);
+  }
+
   void _removeScreenshot(PlatformFile file) {
     setState(() {
       _screenshots = _screenshots
@@ -460,6 +532,11 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
 
     if (!_hasAttemptedSubmit) {
       setState(() => _hasAttemptedSubmit = true);
+    }
+
+    if (!_hasApplicationIcon) {
+      AppSnackbar.show(context, message: l10n.submitAppIconRequired);
+      return;
     }
 
     if (!_hasValidScreenshotCount) {
@@ -526,6 +603,7 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
       appStoreUrl: _showsIosField ? appStoreUrl : '',
       googlePlayUrl: _showsAndroidField ? googlePlayUrl : '',
       destination: SubmitDestination.drop,
+      applicationIconPath: _applicationIcon?.path,
       screenshotPaths: _screenshots
           .map((PlatformFile file) => file.path)
           .whereType<String>()
@@ -584,6 +662,8 @@ class _SubmitPageState extends ConsumerState<SubmitPage> {
     setState(() {
       _selectedCategory = null;
       _selectedPlatform = PlatformType.android;
+      _applicationIcon = null;
+      _existingApplicationIconPath = null;
       _screenshots = <PlatformFile>[];
       _existingScreenshots = <String>[];
       _hasAttemptedSubmit = false;
@@ -605,6 +685,221 @@ class _Label extends StatelessWidget {
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 0,
+      ),
+    );
+  }
+}
+
+class _ApplicationIconPicker extends StatelessWidget {
+  const _ApplicationIconPicker({
+    required this.file,
+    required this.existingPath,
+    required this.pickLabel,
+    required this.changeLabel,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final PlatformFile? file;
+  final String? existingPath;
+  final String pickLabel;
+  final String changeLabel;
+  final VoidCallback onPick;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? localPath = file?.path;
+    final String? remotePath =
+        localPath == null && (existingPath?.isNotEmpty ?? false)
+            ? existingPath
+            : null;
+    final bool hasIcon = localPath != null || remotePath != null;
+
+    return SizedBox(
+      width: 132,
+      height: 132,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            width: 132,
+            height: 132,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceAlt(context),
+              border: Border.all(
+                color: hasIcon ? AppColors.primary : AppColors.outline(context),
+                width: hasIcon ? 1.5 : 1,
+              ),
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: hasIcon
+                  ? <BoxShadow>[
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.16),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
+                    ]
+                  : const <BoxShadow>[],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: hasIcon
+                    ? () => _openPreview(
+                          context,
+                          localPath: localPath,
+                          remotePath: remotePath,
+                        )
+                    : onPick,
+                child: hasIcon
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          if (localPath != null)
+                            Image.file(File(localPath), fit: BoxFit.cover)
+                          else
+                            Image.network(
+                              UrlResolver.media(remotePath!),
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.broken_image_outlined,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Container(
+                              margin: const EdgeInsets.all(8),
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.58),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.open_in_full_rounded,
+                                color: Colors.white,
+                                size: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          const Icon(
+                            Icons.add_photo_alternate_outlined,
+                            color: AppColors.primary,
+                            size: 30,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            pickLabel,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.textSecondary(context),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+          if (hasIcon)
+            Positioned(
+              right: -8,
+              bottom: -8,
+              child: Material(
+                color: AppColors.primary,
+                shape: const CircleBorder(),
+                child: IconButton(
+                  onPressed: onPick,
+                  icon: const Icon(
+                    Icons.edit_outlined,
+                    color: Colors.white,
+                    size: 17,
+                  ),
+                  tooltip: changeLabel,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          if (localPath != null)
+            Positioned(
+              top: -8,
+              left: -8,
+              child: Material(
+                color: Colors.black87,
+                shape: const CircleBorder(),
+                child: IconButton(
+                  onPressed: onRemove,
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: Colors.white,
+                    size: 17,
+                  ),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _openPreview(
+    BuildContext context, {
+    required String? localPath,
+    required String? remotePath,
+  }) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.7),
+      builder: (BuildContext dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        insetPadding: const EdgeInsets.all(28),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: <Widget>[
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 360, maxHeight: 520),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: InteractiveViewer(
+                  minScale: 1,
+                  maxScale: 4,
+                  child: localPath != null
+                      ? Image.file(File(localPath), fit: BoxFit.contain)
+                      : Image.network(
+                          UrlResolver.media(remotePath!),
+                          fit: BoxFit.contain,
+                        ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: -14,
+              right: -14,
+              child: Material(
+                color: Colors.black87,
+                shape: const CircleBorder(),
+                child: IconButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -438,6 +438,25 @@ class AppLocalizationsTr extends AppLocalizations {
   String get submitDestination => 'Hedef';
 
   @override
+  String get submitAppIconLabel => 'UYGULAMA İKONU';
+
+  @override
+  String get submitPickAppIcon => 'İkon seç';
+
+  @override
+  String get submitChangeAppIcon => 'İkonu değiştir';
+
+  @override
+  String get submitAppIconRequirements =>
+      'PNG veya JPG formatında, en fazla 2 MB olacak şekilde uygulama ikonunuzu seçin.';
+
+  @override
+  String get submitAppIconRequired => 'Uygulama ikonu zorunludur.';
+
+  @override
+  String get submitAppIconSizeError => 'Uygulama ikonu en fazla 2 MB olabilir.';
+
+  @override
   String get submitScreenshotsLabel => 'EKRAN GÖRÜNTÜLERİ (3-5)';
 
   @override
@@ -528,6 +547,42 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get detailEditBlocked =>
       'Aktif Drop içerisindeki uygulamalar düzenlenemez.';
+
+  @override
+  String get detailRequestSupport => 'Destek iste';
+
+  @override
+  String get storyShareTitle => 'Desteğini iste';
+
+  @override
+  String get storyShareSubtitle =>
+      'Story kartın hazır. Instagram\'da paylaşarak uygulamanın daha fazla kişiye ulaşmasını sağla.';
+
+  @override
+  String get storyShareBadge => 'FIRSTLOOK DROP';
+
+  @override
+  String get storyShareHeadline => 'Uygulamam yayında';
+
+  @override
+  String get storyShareSupportCopy =>
+      'İlk destekleyenlerden biri ol. İncele, beğen ve yorumunla öne çıkmasına yardımcı ol.';
+
+  @override
+  String get storyShareCta => 'SEN DE KEŞFET';
+
+  @override
+  String get storyShareButton => 'Instagram hikayende paylaş';
+
+  @override
+  String get storySharePreparing => 'Story hazırlanıyor';
+
+  @override
+  String get storyShareUnavailable =>
+      'Instagram yüklü değil veya hikaye paylaşımı kullanılamıyor.';
+
+  @override
+  String get storyShareFailed => 'Story hazırlanamadı. Lütfen tekrar deneyin.';
 
   @override
   String get profileMyApps => 'Uygulamalarım';
