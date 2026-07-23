@@ -4,6 +4,7 @@ import UIKit
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private let instagramStoryChannelName = "com.firstlook/instagram_story_share"
+  private var instagramStoryChannel: FlutterMethodChannel?
 
   override func application(
     _ application: UIApplication,
@@ -15,11 +16,17 @@ import UIKit
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
-    let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "InstagramStoryShare")
+    guard let registrar = engineBridge.pluginRegistry.registrar(
+      forPlugin: "InstagramStoryShare"
+    ) else {
+      return
+    }
+
     let channel = FlutterMethodChannel(
       name: instagramStoryChannelName,
       binaryMessenger: registrar.messenger()
     )
+    instagramStoryChannel = channel
     channel.setMethodCallHandler { [weak self] call, result in
       guard call.method == "shareImage" else {
         result(FlutterMethodNotImplemented)
